@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="ZvitPlus.API/ZvitPlus.API.csproj">
+    <BuildDependency Project="ZvitPlus.BLL/ZvitPlus.BLL.csproj" />
+  </Project>
+  <Project Path="ZvitPlus.BLL/ZvitPlus.BLL.csproj">
+    <BuildDependency Project="ZvitPlus.DAL/ZvitPlus.DAL.csproj" />
+  </Project>
+  <Project Path="ZvitPlus.DAL/ZvitPlus.DAL.csproj" />
+</Solution>
