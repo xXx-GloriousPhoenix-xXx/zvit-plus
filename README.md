@@ -4,7 +4,7 @@
 
 Main Technology: React + TypeScript \
 State Handler: Redux \
-Request Handler: Zog \
+Request Handler: Axios + Zog
 
 ## BackEnd
 
