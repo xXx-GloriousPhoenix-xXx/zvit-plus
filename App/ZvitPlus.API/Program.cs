@@ -1,12 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using ZvitPlus.BLL.Helpers;
 using ZvitPlus.BLL.Mappings;
 using ZvitPlus.BLL.Services.Implementations;
 using ZvitPlus.BLL.Services.Interfaces;
 using ZvitPlus.DAL.Context;
-using ZvitPlus.BLL.Helpers;
 using ZvitPlus.DAL.Repositories.Implementations;
 using ZvitPlus.DAL.Repositories.Interfaces;
 
@@ -20,6 +21,8 @@ builder.Services.AddDbContext<ZvitPlusDbContext>(options =>
 // JWT
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 builder.Services.Configure<JwtSettings>(jwtSettings);
+builder.Services.AddSingleton(sp =>
+    sp.GetRequiredService<IOptions<JwtSettings>>().Value);
 builder.Services.AddSingleton<ITokenGenerator, TokenGenerator>();
 
 // Automapper
@@ -30,8 +33,8 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Service
 builder.Services.AddScoped<IAuthService, AuthService>();
-
-
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

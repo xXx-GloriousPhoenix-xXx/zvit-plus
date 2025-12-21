@@ -7,7 +7,6 @@ using ZvitPlus.BLL.Services.Exceptions;
 using ZvitPlus.DAL.Models.Entities;
 using static BCrypt.Net.BCrypt;
 using ZvitPlus.BLL.Helpers;
-using Microsoft.VisualBasic;
 
 namespace ZvitPlus.BLL.Services.Implementations
 {
@@ -79,10 +78,10 @@ namespace ZvitPlus.BLL.Services.Implementations
             var refreshToken = new RefreshToken
             {
                 Token = _tokenGenerator.GenerateRefreshToken(),
-                UserId = user.Id,
                 CreatedAt = DateTime.UtcNow,
                 ExpiresAt = DateTime.UtcNow.AddDays(_tokenGenerator.RefreshExpiresInDays),
-                IsRevoked = false
+                IsRevoked = false,
+                User = user
             };
 
             await _unitOfWork.BeginTransactionAsync(ct);

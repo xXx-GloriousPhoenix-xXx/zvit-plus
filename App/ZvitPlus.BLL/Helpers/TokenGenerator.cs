@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -7,9 +8,9 @@ using ZvitPlus.DAL.Models.Entities;
 
 namespace ZvitPlus.BLL.Helpers
 {
-    public class TokenGenerator(JwtSettings settings) : ITokenGenerator
+    public class TokenGenerator(IOptions<JwtSettings> settings) : ITokenGenerator
     {
-        private readonly JwtSettings _settings = settings;
+        private readonly JwtSettings _settings = settings.Value;
         public int AccessExpiresInMinutes => _settings.AccessTokenExpirationMinutes;
         public int RefreshExpiresInDays => _settings.RefreshTokenExpirationDays;
         public string GenerateAccessToken(User user)

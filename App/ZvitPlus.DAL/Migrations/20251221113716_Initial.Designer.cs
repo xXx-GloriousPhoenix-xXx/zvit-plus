@@ -12,7 +12,7 @@ using ZvitPlus.DAL.Context;
 namespace ZvitPlus.DAL.Migrations
 {
     [DbContext(typeof(ZvitPlusDbContext))]
-    [Migration("20251220025840_Initial")]
+    [Migration("20251221113716_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -37,7 +37,7 @@ namespace ZvitPlus.DAL.Migrations
                         .HasColumnName("author");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("datetime")
                         .HasColumnName("created_at");
 
                     b.Property<string>("FilePath")
@@ -46,8 +46,8 @@ namespace ZvitPlus.DAL.Migrations
                         .HasColumnType("varchar(255)")
                         .HasColumnName("file_path");
 
-                    b.Property<int>("FileSize")
-                        .HasColumnType("int")
+                    b.Property<long>("FileSize")
+                        .HasColumnType("bigint")
                         .HasColumnName("file_size");
 
                     b.Property<string>("Name")
@@ -57,7 +57,7 @@ namespace ZvitPlus.DAL.Migrations
                         .HasColumnName("name");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("datetime")
                         .HasColumnName("updated_at");
 
                     b.HasKey("Id");
@@ -66,6 +66,46 @@ namespace ZvitPlus.DAL.Migrations
                         .HasDatabaseName("idx_files_author_id");
 
                     b.ToTable("files", (string)null);
+                });
+
+            modelBuilder.Entity("ZvitPlus.DAL.Models.Entities.RefreshToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime")
+                        .HasColumnName("expires_at");
+
+                    b.Property<bool>("IsRevoked")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_revoked");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("varchar(512)")
+                        .HasColumnName("token");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Token")
+                        .HasDatabaseName("idx_refresh_tokens_token");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("refresh_tokens", (string)null);
                 });
 
             modelBuilder.Entity("ZvitPlus.DAL.Models.Entities.Report", b =>
@@ -152,7 +192,7 @@ namespace ZvitPlus.DAL.Migrations
                         .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("datetime")
                         .HasColumnName("created_at");
 
                     b.Property<string>("Email")
@@ -169,8 +209,8 @@ namespace ZvitPlus.DAL.Migrations
 
                     b.Property<string>("Login")
                         .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("varchar(64)")
+                        .HasMaxLength(24)
+                        .HasColumnType("varchar(24)")
                         .HasColumnName("login");
 
                     b.Property<string>("Password")
@@ -186,7 +226,7 @@ namespace ZvitPlus.DAL.Migrations
                         .HasColumnName("role");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2")
+                        .HasColumnType("datetime")
                         .HasColumnName("updated_at");
 
                     b.HasKey("Id");
@@ -212,6 +252,18 @@ namespace ZvitPlus.DAL.Migrations
                         .HasConstraintName("fk_files_users_author_id");
 
                     b.Navigation("Author");
+                });
+
+            modelBuilder.Entity("ZvitPlus.DAL.Models.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("ZvitPlus.DAL.Models.Entities.User", "User")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_refresh_tokens_users_user_id");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ZvitPlus.DAL.Models.Entities.Report", b =>
@@ -276,6 +328,8 @@ namespace ZvitPlus.DAL.Migrations
             modelBuilder.Entity("ZvitPlus.DAL.Models.Entities.User", b =>
                 {
                     b.Navigation("Files");
+
+                    b.Navigation("RefreshTokens");
                 });
 #pragma warning restore 612, 618
         }

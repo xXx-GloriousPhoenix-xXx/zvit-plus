@@ -9,17 +9,19 @@ namespace ZvitPlus.API.Controllers
     [Route("api/auth")]
     public class AuthController(IAuthService service) : ControllerBase
     {
+        private readonly IAuthService _service = service;
+
         [HttpPost("register")]
         public async Task<ActionResult> RegisterAsync([FromForm] RegisterDTO dto, CancellationToken ct = default)
         {
-            await service.RegisterAsync(dto, ct);
+            await _service.RegisterAsync(dto, ct);
             return Ok(new { message = "Registed Successfully!" });
         }
 
         [HttpPost("login")]
         public async Task<ActionResult<TokenDTO>> LoginAsync([FromForm] LoginDTO dto, CancellationToken ct = default)
         {
-            var result = await service.LoginAsync(dto, ct);
+            var result = await _service.LoginAsync(dto, ct);
             return Ok(result);
         }
 
@@ -27,7 +29,7 @@ namespace ZvitPlus.API.Controllers
         [Authorize]
         public async Task<ActionResult> LogoutAsync(string refreshToken, CancellationToken ct = default)
         {
-            await service.LogoutAsync(refreshToken, ct);
+            await _service.LogoutAsync(refreshToken, ct);
             return Ok(new { message = "Logged Out Successfully!" });
         }
 
@@ -35,7 +37,7 @@ namespace ZvitPlus.API.Controllers
         [Authorize]
         public async Task<ActionResult<TokenDTO>> RefreshAsync(string refreshToken, CancellationToken ct = default)
         {
-            var result = await service.RefreshAsync(refreshToken, ct);
+            var result = await _service.RefreshAsync(refreshToken, ct);
             return Ok(result);
         }
     }
