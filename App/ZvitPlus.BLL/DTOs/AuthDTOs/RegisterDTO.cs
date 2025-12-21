@@ -22,10 +22,5 @@ namespace ZvitPlus.BLL.DTOs.AuthDTOs
         [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$",
             ErrorMessage = "Пароль повинен містити великі та малі літери, цифри та спеціальні символи")]
         public required string Password { get; set; }
-
-        [Required(ErrorMessage = "Підтвердження паролю обов'язкове")]
-        [Compare(nameof(Password), ErrorMessage = "Паролі не співпадають")]
-        [DataType(DataType.Password)]
-        public required string ConfirmPassword { get; set; }
     }
 }

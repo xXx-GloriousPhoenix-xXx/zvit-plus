@@ -34,13 +34,15 @@ namespace ZvitPlus.DAL.Context.Configuration
                 .HasDefaultValue(false)
                 .IsRequired();
 
-            // RefreshToken - User (N : 1)
             builder.HasOne(rf => rf.User)
                 .WithMany(u => u.RefreshToken)
                 .HasForeignKey(rf => rf.UserId)
                 .HasConstraintName("fk_refresh_tokens_users_user_id")
                 .OnDelete(DeleteBehavior.Cascade)
                 .IsRequired();
+
+            builder.HasIndex(rf => rf.Token)
+                .HasDatabaseName("idx_refresh_tokens_token");
         }
     }
 }
