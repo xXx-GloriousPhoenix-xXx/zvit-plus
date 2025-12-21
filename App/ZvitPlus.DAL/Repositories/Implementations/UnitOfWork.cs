@@ -15,6 +15,7 @@ namespace ZvitPlus.DAL.Repositories.Implementations
         private IBaseRepository<TemplateType>? _templateTypes;
         private IBaseRepository<Template>? _templates;
         private IBaseRepository<Report>? _reports;
+        private IBaseRepository<RefreshToken>? _refreshTokens;
 
         public IBaseRepository<User> Users =>
             _users ??= new BaseRepository<User>(_context);
@@ -31,6 +32,8 @@ namespace ZvitPlus.DAL.Repositories.Implementations
         public IBaseRepository<Report> Reports =>
             _reports ??= new BaseRepository<Report>(_context);
 
+        public IBaseRepository<RefreshToken> RefreshTokens =>
+            _refreshTokens ??= new BaseRepository<RefreshToken>(_context);
         public async Task<int> CompleteAsync(CancellationToken ct = default)
         {
             return await _context.SaveChangesAsync(ct);

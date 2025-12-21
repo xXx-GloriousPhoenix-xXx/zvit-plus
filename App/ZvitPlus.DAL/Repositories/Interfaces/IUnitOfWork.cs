@@ -9,6 +9,7 @@ namespace ZvitPlus.DAL.Repositories.Interfaces
         IBaseRepository<TemplateType> TemplateTypes { get; }
         IBaseRepository<Template> Templates { get; }
         IBaseRepository<Report> Reports { get; }
+        IBaseRepository<RefreshToken> RefreshTokens { get; }
 
         Task<int> CompleteAsync(CancellationToken ct = default);
         Task BeginTransactionAsync(CancellationToken ct = default);
