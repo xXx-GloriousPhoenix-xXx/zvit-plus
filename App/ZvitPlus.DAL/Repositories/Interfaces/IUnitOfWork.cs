@@ -4,12 +4,12 @@ namespace ZvitPlus.DAL.Repositories.Interfaces
 {
     public interface IUnitOfWork : IDisposable, IAsyncDisposable
     {
-        IBaseRepository<User> Users { get; }
+        IUserRepository Users { get; }
         IBaseRepository<FileEntity> Files { get; }
         IBaseRepository<TemplateType> TemplateTypes { get; }
         IBaseRepository<Template> Templates { get; }
         IBaseRepository<Report> Reports { get; }
-        IBaseRepository<RefreshToken> RefreshTokens { get; }
+        IRefreshTokenRepository RefreshTokens { get; }
 
         Task<int> CompleteAsync(CancellationToken ct = default);
         Task BeginTransactionAsync(CancellationToken ct = default);

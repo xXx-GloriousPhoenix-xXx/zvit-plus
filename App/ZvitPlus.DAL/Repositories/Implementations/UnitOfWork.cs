@@ -10,15 +10,15 @@ namespace ZvitPlus.DAL.Repositories.Implementations
         private readonly ZvitPlusDbContext _context = context;
         private IDbContextTransaction? _currentTransaction;
 
-        private IBaseRepository<User>? _users;
+        private IUserRepository? _users;
         private IBaseRepository<FileEntity>? _files;
         private IBaseRepository<TemplateType>? _templateTypes;
         private IBaseRepository<Template>? _templates;
         private IBaseRepository<Report>? _reports;
-        private IBaseRepository<RefreshToken>? _refreshTokens;
+        private IRefreshTokenRepository? _refreshTokens;
 
-        public IBaseRepository<User> Users =>
-            _users ??= new BaseRepository<User>(_context);
+        public IUserRepository Users =>
+            _users ??= new UserRepository(_context);
 
         public IBaseRepository<FileEntity> Files =>
             _files ??= new BaseRepository<FileEntity>(_context);
@@ -32,8 +32,8 @@ namespace ZvitPlus.DAL.Repositories.Implementations
         public IBaseRepository<Report> Reports =>
             _reports ??= new BaseRepository<Report>(_context);
 
-        public IBaseRepository<RefreshToken> RefreshTokens =>
-            _refreshTokens ??= new BaseRepository<RefreshToken>(_context);
+        public IRefreshTokenRepository RefreshTokens =>
+            _refreshTokens ??= new RefreshTokenRepository(_context);
         public async Task<int> CompleteAsync(CancellationToken ct = default)
         {
             return await _context.SaveChangesAsync(ct);

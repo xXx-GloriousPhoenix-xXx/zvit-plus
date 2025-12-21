@@ -10,8 +10,5 @@ namespace ZvitPlus.BLL.DTOs.AuthDTOs
         [Required(ErrorMessage = "Пароль обов'язковий")]
         [DataType(DataType.Password)]
         public required string Password { get; set; }
-
-        [Display(Name = "Запам'ятати мене")]
-        public bool RememberMe { get; set; }
     }
 }

@@ -19,7 +19,8 @@ namespace ZvitPlus.BLL.DTOs.AuthDTOs
         [MinLength(8, ErrorMessage = "Пароль повинен містити мінімум 8 символів")]
         [MaxLength(64, ErrorMessage = "Пароль не може перевищувати 64 символи")]
         [DataType(DataType.Password)]
-        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$",
+        [RegularExpression(
+            @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$",
             ErrorMessage = "Пароль повинен містити великі та малі літери, цифри та спеціальні символи")]
         public required string Password { get; set; }
     }

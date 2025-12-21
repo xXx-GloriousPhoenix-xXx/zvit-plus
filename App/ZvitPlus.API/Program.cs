@@ -1,28 +1,37 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using ZvitPlus.BLL.Mappings;
+using ZvitPlus.BLL.Services.Implementations;
+using ZvitPlus.BLL.Services.Interfaces;
 using ZvitPlus.DAL.Context;
+using ZvitPlus.BLL.Helpers;
 using ZvitPlus.DAL.Repositories.Implementations;
 using ZvitPlus.DAL.Repositories.Interfaces;
 
+// Builder
 var builder = WebApplication.CreateBuilder(args);
 
+// DBConnection
 builder.Services.AddDbContext<ZvitPlusDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-//builder.Services.AddAutoMapper(typeof(AuthorProfile).Assembly);
+// JWT
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+builder.Services.Configure<JwtSettings>(jwtSettings);
+builder.Services.AddSingleton<ITokenGenerator, TokenGenerator>();
 
+// Automapper
+builder.Services.AddAutoMapper(typeof(AuthProfile));
+
+// Repository
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-//builder.Services
-//    .AddScoped<ICustomerService, CustomerService>()
-//    .AddScoped<IAuthorService, AuthorService>()
-//    .AddScoped<IGenreService, GenreService>()
-//    .AddScoped<IPosterService, PosterService>()
-//    .AddScoped<ITicketInfoService, TicketInfoService>()
-//    .AddScoped<ITicketService, TicketService>()
-//    .AddScoped<IBookingService, BookingService>()
-//    .AddScoped<ITransactionService, TransactionService>();
+// Service
+builder.Services.AddScoped<IAuthService, AuthService>();
+
+
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>

@@ -23,19 +23,19 @@ namespace ZvitPlus.API.Controllers
             return Ok(result);
         }
 
-        [HttpPost("logout")]
+        [HttpPost("logout/{refreshToken}")]
         [Authorize]
-        public async Task<ActionResult> LogoutAsync(CancellationToken ct = default)
+        public async Task<ActionResult> LogoutAsync(string refreshToken, CancellationToken ct = default)
         {
-            await service.LogoutAsync(ct);
+            await service.LogoutAsync(refreshToken, ct);
             return Ok(new { message = "Logged Out Successfully!" });
         }
 
-        [HttpPost("refresh")]
+        [HttpPost("refresh/{refreshToken}")]
         [Authorize]
-        public async Task<ActionResult<TokenDTO>> RefreshAsync([FromForm] RefreshDTO dto, CancellationToken ct = default)
+        public async Task<ActionResult<TokenDTO>> RefreshAsync(string refreshToken, CancellationToken ct = default)
         {
-            var result = await service.RefreshAsync(dto, ct);
+            var result = await service.RefreshAsync(refreshToken, ct);
             return Ok(result);
         }
     }

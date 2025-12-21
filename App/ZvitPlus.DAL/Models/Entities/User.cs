@@ -12,6 +12,6 @@ namespace ZvitPlus.DAL.Models.Entities
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public virtual ICollection<FileEntity> Files { get; set; } = [];
-        public virtual ICollection<RefreshToken> RefreshToken { get; set; } = [];
+        public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = [];
     }
 }

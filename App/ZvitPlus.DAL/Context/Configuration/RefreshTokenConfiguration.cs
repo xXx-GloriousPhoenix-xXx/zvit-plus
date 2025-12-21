@@ -35,7 +35,7 @@ namespace ZvitPlus.DAL.Context.Configuration
                 .IsRequired();
 
             builder.HasOne(rf => rf.User)
-                .WithMany(u => u.RefreshToken)
+                .WithMany(u => u.RefreshTokens)
                 .HasForeignKey(rf => rf.UserId)
                 .HasConstraintName("fk_refresh_tokens_users_user_id")
                 .OnDelete(DeleteBehavior.Cascade)
