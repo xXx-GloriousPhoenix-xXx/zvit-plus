@@ -14,29 +14,27 @@ namespace ZvitPlus.DAL.Context.Configuration
 
             builder.Property(t => t.TemplateTypeId)
                 .HasColumnName("template_type")
+                .HasColumnType("uniqueidentifier")
                 .IsRequired();
 
             builder.Property(t => t.FileId)
                 .HasColumnName("file")
+                .HasColumnType("uniqueidentifier")
                 .IsRequired();
 
             builder.HasOne(t => t.TemplateType)
                 .WithMany(tt => tt.Templates)
                 .HasForeignKey(t => t.TemplateTypeId)
                 .HasConstraintName("fk_templates_template_types_id")
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Restrict)
+                .IsRequired();
 
             builder.HasOne(t => t.File)
                 .WithOne(f => f.Template)
                 .HasForeignKey<Template>(t => t.FileId)
                 .HasConstraintName("fk_templates_files_id")
-                .OnDelete(DeleteBehavior.Cascade);
-
-            //builder.HasMany(t => t.Reports)
-            //    .WithOne(r => r.Template)
-            //    .HasForeignKey(r => r.TemplateId)
-            //    .HasConstraintName("fk_report_template")
-            //    .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade)
+                .IsRequired();
 
             builder.HasIndex(t => t.TemplateTypeId)
                 .HasDatabaseName("idx_templates_template_type_id");

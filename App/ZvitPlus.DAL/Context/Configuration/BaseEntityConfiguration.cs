@@ -10,7 +10,12 @@ namespace ZvitPlus.DAL.Context.Configuration
         public virtual void Configure(EntityTypeBuilder<T> builder)
         {
             builder.HasKey(e => e.Id);
-            builder.Property(e => e.Id).HasColumnName("id");
+
+            builder.Property(e => e.Id)
+                .HasColumnName("id")
+                .HasColumnType("uniqueidentifier")
+                .IsRequired()
+                .ValueGeneratedOnAdd();
         }
     }
 }

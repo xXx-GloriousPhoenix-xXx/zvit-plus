@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ZvitPlus.BLL.DTOs.AuthDTOs
+﻿namespace ZvitPlus.BLL.DTOs.AuthDTOs
 {
     public class TokenDTO
     {

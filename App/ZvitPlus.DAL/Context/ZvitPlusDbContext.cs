@@ -12,6 +12,7 @@ namespace ZvitPlus.DAL.Context
         public DbSet<Template> Templates { get; set; }
         public DbSet<TemplateType> TemplateTypes { get; set; }
         public DbSet<Report> Reports { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -22,6 +23,7 @@ namespace ZvitPlus.DAL.Context
             modelBuilder.ApplyConfiguration(new TemplateTypeConfiguration());
             modelBuilder.ApplyConfiguration(new TemplateConfiguration());
             modelBuilder.ApplyConfiguration(new ReportConfiguration());
+            modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
         }
     }
 }

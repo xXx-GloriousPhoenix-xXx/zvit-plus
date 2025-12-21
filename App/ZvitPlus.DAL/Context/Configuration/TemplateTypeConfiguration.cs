@@ -14,15 +14,9 @@ namespace ZvitPlus.DAL.Context.Configuration
 
             builder.Property(tt => tt.Name)
                 .HasColumnName("name")
-                .IsRequired()
+                .HasColumnType("nvarchar(32)")
                 .HasMaxLength(32)
-                .HasColumnType("nvarchar(32)");
-
-            //builder.HasMany(tt => tt.Templates)
-            //    .WithOne(t => t.TemplateType)
-            //    .HasForeignKey(t => t.TemplateTypeId)
-            //    .HasConstraintName("fk_template_template_type")
-            //    .OnDelete(DeleteBehavior.Restrict);
+                .IsRequired();
 
             builder.HasIndex(tt => tt.Name)
                 .HasDatabaseName("idx_template_types_name")

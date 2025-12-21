@@ -14,46 +14,44 @@ namespace ZvitPlus.DAL.Context.Configuration
 
             builder.Property(u => u.Login)
                 .HasColumnName("login")
-                .IsRequired()
-                .HasMaxLength(64)
-                .HasColumnType("varchar(64)");
+                .HasColumnType("varchar(24)")
+                .HasMaxLength(24)
+                .IsRequired();
 
             builder.Property(u => u.Email)
                 .HasColumnName("email")
-                .IsRequired()
+                .HasColumnType("varchar(64)")
                 .HasMaxLength(64)
-                .HasColumnType("varchar(64)");
+                .IsRequired();
 
             builder.Property(u => u.Password)
                 .HasColumnName("password")
-                .IsRequired()
+                .HasColumnType("varchar(128)")
                 .HasMaxLength(128)
-                .HasColumnType("varchar(128)");
+                .IsRequired();
 
             builder.Property(u => u.Role)
                 .HasColumnName("role")
-                .IsRequired()
-                .HasConversion<string>()
+                .HasColumnType("varchar(16)")
                 .HasMaxLength(16)
-                .HasColumnType("varchar(16)");
+                .HasConversion<string>()
+                .IsRequired();
 
             builder.Property(u => u.IsBanned)
                 .HasColumnName("is_banned")
-                .HasDefaultValue(false);
+                .HasColumnType("bit")
+                .HasDefaultValue(false)
+                .IsRequired();
 
             builder.Property(u => u.CreatedAt)
                 .HasColumnName("created_at")
+                .HasColumnType("datetime")
                 .IsRequired();
 
             builder.Property(u => u.UpdatedAt)
                 .HasColumnName("updated_at")
+                .HasColumnType("datetime")
                 .IsRequired();
-
-            //builder.HasMany(u => u.Files)
-            //    .WithOne(f => f.Author)
-            //    .HasForeignKey(f => f.AuthorId)
-            //    .HasConstraintName("fk_file_author")
-            //    .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasIndex(u => u.Login)
                 .HasDatabaseName("idx_users_login")

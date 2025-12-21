@@ -5,8 +5,8 @@ namespace ZvitPlus.BLL.DTOs.AuthDTOs
     public class RegisterDTO
     {
         [Required(ErrorMessage = "Логін обов'язковий")]
-        [MinLength(8, ErrorMessage = "Логін повинен містити мінімум 8 символи")]
-        [MaxLength(64, ErrorMessage = "Логін не може перевищувати 64 символи")]
+        [MinLength(4, ErrorMessage = "Логін повинен містити мінімум 4 символи")]
+        [MaxLength(16, ErrorMessage = "Логін не може перевищувати 16 символів")]
         [RegularExpression(@"^[a-zA-Z0-9_.-]+$", ErrorMessage = "Логін може містити лише літери, цифри, крапки, тире та підкреслення")]
         public required string Login { get; set; }
 

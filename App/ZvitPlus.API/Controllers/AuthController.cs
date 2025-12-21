@@ -8,14 +8,14 @@ namespace ZvitPlus.API.Controllers
     public class AuthController : ControllerBase
     {
         [HttpPost("register")]
-        public async Task<ActionResult<TokenDTO>> RegisterAsync(RegisterDTO dto)
+        public async Task<ActionResult<TokenDTO>> RegisterAsync([FromForm] RegisterDTO dto, CancellationToken ct = default)
         {
             //var result = await ...
             return Ok();
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<TokenDTO>> LoginAsync(LoginDTO dto)
+        public async Task<ActionResult<TokenDTO>> LoginAsync(LoginDTO dto, CancellationToken ct = default)
         {
             //var result = await ...
             return Ok();
