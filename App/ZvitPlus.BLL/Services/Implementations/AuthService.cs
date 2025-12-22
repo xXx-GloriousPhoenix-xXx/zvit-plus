@@ -153,15 +153,17 @@ namespace ZvitPlus.BLL.Services.Implementations
             }
 
             LogUserLoginSucceed(user.Id);
+
+            var refreshToken = _tokenGenerator.GenerateRefreshToken();
             var tokenDto = new TokenDTO
             {
                 AccessToken = _tokenGenerator.GenerateAccessToken(user),
-                RefreshToken = _tokenGenerator.GenerateRefreshToken(),
+                RefreshToken = refreshToken,
                 ExpiresIn = _tokenGenerator.AccessExpiresInMinutes
             };
-            var refreshToken = new RefreshToken
+            var refreshTokenEntity = new RefreshToken
             {
-                Token = _tokenGenerator.GenerateRefreshToken(),
+                Token = refreshToken,
                 UserId = user.Id,
                 CreatedAt = DateTime.UtcNow,
                 ExpiresAt = DateTime.UtcNow.AddDays(_tokenGenerator.RefreshExpiresInDays),
@@ -171,7 +173,7 @@ namespace ZvitPlus.BLL.Services.Implementations
             await _unitOfWork.BeginTransactionAsync(ct);
             try
             {
-                _unitOfWork.RefreshTokens.Add(refreshToken);
+                _unitOfWork.RefreshTokens.Add(refreshTokenEntity);
                 await _unitOfWork.CompleteAsync(ct);
                 await _unitOfWork.CommitTransactionAsync(ct);
             }

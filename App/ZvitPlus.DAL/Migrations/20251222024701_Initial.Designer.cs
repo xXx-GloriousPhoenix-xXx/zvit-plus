@@ -12,7 +12,7 @@ using ZvitPlus.DAL.Context;
 namespace ZvitPlus.DAL.Migrations
 {
     [DbContext(typeof(ZvitPlusDbContext))]
-    [Migration("20251221113716_Initial")]
+    [Migration("20251222024701_Initial")]
     partial class Initial
     {
         /// <inheritdoc />

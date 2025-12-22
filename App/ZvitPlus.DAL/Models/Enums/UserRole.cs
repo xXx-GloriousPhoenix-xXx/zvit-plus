@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ZvitPlus.DAL.Models.Enums
+﻿namespace ZvitPlus.DAL.Models.Enums
 {
     public enum UserRole
     {
