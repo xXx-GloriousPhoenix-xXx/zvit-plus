@@ -116,6 +116,12 @@ namespace ZvitPlus.DAL.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("file");
 
+                    b.Property<bool>("IsPrivate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_private");
+
                     b.Property<Guid>("TemplateId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("template");
@@ -142,6 +148,12 @@ namespace ZvitPlus.DAL.Migrations
                     b.Property<Guid>("FileId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("file");
+
+                    b.Property<bool>("IsPrivate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_private");
 
                     b.Property<Guid>("TemplateTypeId")
                         .HasColumnType("uniqueidentifier")

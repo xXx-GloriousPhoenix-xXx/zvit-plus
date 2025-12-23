@@ -6,6 +6,7 @@
         public Guid AuthorId { get; set; }
         public int FileSize { get; set; }
         public required string FilePath { get; set; }
+        public bool IsPrivate { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public virtual User? Author { get; set; }

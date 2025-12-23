@@ -2,13 +2,12 @@
 
 namespace ZvitPlus.BLL.DTOs.AuthDTOs
 {
-    public class LoginDTO
-    {
-        [Required(ErrorMessage = "Логін або електронна пошта обов'язкові")]
-        public required string LoginOrEmail { get; set; }
+    public sealed record LoginDTO(
+        [property: Required(ErrorMessage = "Логін або електронна пошта обов'язкові")]
+        string LoginOrEmail,
 
-        [Required(ErrorMessage = "Пароль обов'язковий")]
-        [DataType(DataType.Password)]
-        public required string Password { get; set; }
-    }
+        [property: Required(ErrorMessage = "Пароль обов'язковий")]
+        [property: DataType(DataType.Password)]
+        string Password
+    );
 }

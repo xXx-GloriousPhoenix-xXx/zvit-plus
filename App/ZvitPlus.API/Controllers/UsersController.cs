@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ZvitPlus.BLL.DTOs.UserDTOs;
 using ZvitPlus.BLL.Services.Interfaces;
+using ZvitPlus.DAL.Models.Enums;
 
 namespace ZvitPlus.API.Controllers
 {
@@ -10,18 +12,19 @@ namespace ZvitPlus.API.Controllers
     {
         private readonly IUserService _service = service;
 
-        [HttpGet]
-        public async Task<ActionResult> GetAllAsync(CancellationToken ct = default)
+        [HttpPost("{userId}/grant/{role}")]
+        [Authorize(Policy = "AdminLevel")]
+        public async Task<ActionResult<GetUserDTO>> GrandRoleAsync(Guid userId, UserRole role, CancellationToken ct = default)
         {
-            var result = await _service.GetAllAsync(ct);
+            var result = await _service.GrantRoleAsync(userId, role, ct);
             return Ok(result);
         }
 
-        [HttpGet("authcheck")]
-        [Authorize]
-        public async Task<ActionResult> GetAllAuthAsync(CancellationToken ct = default)
+        [HttpPost("{userId}/ban/{isBan}")]
+        [Authorize(Policy = "ModLevel")]
+        public async Task<ActionResult<GetUserDTO>> BanAsync(Guid userId, bool isBan, CancellationToken ct = default)
         {
-            var result = await _service.GetAllAsync(ct);
+            var result = await _service.BanAsync(userId, isBan, ct);
             return Ok(result);
         }
     }

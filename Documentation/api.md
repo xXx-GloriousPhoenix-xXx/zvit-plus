@@ -1,19 +1,25 @@
 # API Functionality
+### Authorization
+|Operation|Guest|User|Mod|Admin|
+|-|:-:|:-:|:-:|:-:|
+|Register|✔|❌|❌|❌|
+|Login|✔|❌|❌|❌|
+|Logout|❌|✔|✔|✔|
+|Refresh|❌|✔|✔|✔|
 
-## Auth
-<ul>
-	<li>register</li>
-	<li>login</li>
-	<li>logout</li>
-	<li>refresh</li>
-</ul>
+### Template, Report
+|Operation|Guest|User|Mod|Admin|
+|-|:-:|:-:|:-:|:-:|
+|Create|❌|✔|✔|✔|
+|Read|✔|✔|✔|✔|
+|Update|❌|Own|Own|✔|
+|Delete|❌|Own|Own & All Users|✔|
+|Search|✔|✔|✔|✔|
+|Get Own|❌|✔|✔|✔|
+|Export|✔|✔|✔|✔|
 
-## Template
-<ul>
-	<li>CRUD</li>
-	<li>Search</li>
-	<li></li>
-
-</ul>
-
-## User
+### User
+|Operation|Guest|User|Mod|Admin|
+|-|:-:|:-:|:-:|:-:|
+|Grant Role|❌|❌|❌|✔|
+|Ban, Unban|❌|❌|✔|✔|

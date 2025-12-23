@@ -23,6 +23,12 @@ namespace ZvitPlus.DAL.Context.Configuration
                 .HasColumnType("uniqueidentifier")
                 .IsRequired();
 
+            builder.Property(f => f.IsPrivate)
+                .HasColumnName("is_private")
+                .HasColumnType("bit")
+                .HasDefaultValue(false)
+                .IsRequired();
+
             builder.Property(f => f.FileSize)
                 .HasColumnName("file_size")
                 .HasColumnType("bigint")

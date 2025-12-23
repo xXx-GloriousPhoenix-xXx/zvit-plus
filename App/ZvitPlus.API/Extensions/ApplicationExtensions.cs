@@ -21,6 +21,9 @@ namespace ZvitPlus.API.Extensions
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+            services.AddScoped<IFileService, FileService>();
+            services.AddScoped<IReportService, ReportService>();
+            services.AddScoped<ITemplateService, TemplateService>();
 
             services.AddSingleton<ITokenGenerator, TokenGenerator>();
 
@@ -32,6 +35,8 @@ namespace ZvitPlus.API.Extensions
         public static IServiceCollection AddAuthorizationPolicies(
             this IServiceCollection services)
         {
+
+            //ToDo Fix access
             services.AddAuthorizationBuilder()
                 .AddPolicy("UserLevel", policy =>
                     policy.RequireAssertion(context =>

@@ -1,12 +1,13 @@
-﻿using ZvitPlus.BLL.DTOs.AuthDTOs;
-using ZvitPlus.BLL.Services.Interfaces;
-using ZvitPlus.DAL.Repositories.Interfaces;
-using AutoMapper;
+﻿using AutoMapper;
+using Azure.Core;
 using Microsoft.Extensions.Logging;
-using ZvitPlus.BLL.Services.Exceptions;
-using ZvitPlus.DAL.Models.Entities;
-using static BCrypt.Net.BCrypt;
+using ZvitPlus.BLL.DTOs.AuthDTOs;
 using ZvitPlus.BLL.Helpers;
+using ZvitPlus.BLL.Services.Exceptions;
+using ZvitPlus.BLL.Services.Interfaces;
+using ZvitPlus.DAL.Models.Entities;
+using ZvitPlus.DAL.Repositories.Interfaces;
+using static BCrypt.Net.BCrypt;
 
 namespace ZvitPlus.BLL.Services.Implementations
 {
@@ -155,12 +156,11 @@ namespace ZvitPlus.BLL.Services.Implementations
             LogUserLoginSucceed(user.Id);
 
             var refreshToken = _tokenGenerator.GenerateRefreshToken();
-            var tokenDto = new TokenDTO
-            {
-                AccessToken = _tokenGenerator.GenerateAccessToken(user),
-                RefreshToken = refreshToken,
-                ExpiresIn = _tokenGenerator.AccessExpiresInMinutes
-            };
+            var tokenDto = new TokenDTO(
+                AccessToken: _tokenGenerator.GenerateAccessToken(user),
+                RefreshToken: refreshToken,
+                ExpiresIn: _tokenGenerator.AccessExpiresInMinutes
+            );
             var refreshTokenEntity = new RefreshToken
             {
                 Token = refreshToken,
@@ -254,12 +254,11 @@ namespace ZvitPlus.BLL.Services.Implementations
 
             var newAccessToken = _tokenGenerator.GenerateAccessToken(user);
 
-            var tokenDto = new TokenDTO
-            {
-                AccessToken = newAccessToken,
-                RefreshToken = refreshToken,
-                ExpiresIn = _tokenGenerator.AccessExpiresInMinutes
-            };
+            var tokenDto = new TokenDTO(
+                AccessToken: newAccessToken,
+                RefreshToken: refreshToken,
+                ExpiresIn: _tokenGenerator.AccessExpiresInMinutes
+            );
 
             return tokenDto;
         }

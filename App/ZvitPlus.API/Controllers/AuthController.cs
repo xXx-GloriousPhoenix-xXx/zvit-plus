@@ -26,7 +26,7 @@ namespace ZvitPlus.API.Controllers
         }
 
         [HttpPost("logout/{refreshToken}")]
-        [Authorize]
+        [Authorize(Policy = "UserLevel")]
         public async Task<ActionResult> LogoutAsync(string refreshToken, CancellationToken ct = default)
         {
             await _service.LogoutAsync(refreshToken, ct);
@@ -34,7 +34,7 @@ namespace ZvitPlus.API.Controllers
         }
 
         [HttpPost("refresh/{refreshToken}")]
-        [Authorize]
+        [Authorize(Policy = "UserLevel")]
         public async Task<ActionResult<TokenDTO>> RefreshAsync(string refreshToken, CancellationToken ct = default)
         {
             var result = await _service.RefreshAsync(refreshToken, ct);

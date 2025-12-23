@@ -92,7 +92,8 @@ namespace ZvitPlus.DAL.Migrations
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     template_type = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    file = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    file = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    is_private = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
                 {
@@ -117,7 +118,8 @@ namespace ZvitPlus.DAL.Migrations
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     template = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    file = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    file = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    is_private = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
                 {
