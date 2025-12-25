@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ZvitPlus.DAL.Context;
 
-namespace ZvitPlus.API.Extensions
+namespace ZvitPlus.API.Extensions.BuildExtensions
 {
     public static class DatabaseExtensions
     {

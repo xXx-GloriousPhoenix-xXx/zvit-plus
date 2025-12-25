@@ -1,4 +1,5 @@
-﻿using ZvitPlus.BLL.DTOs.AdditionalDTOs;
+﻿using ZvitPlus.BLL.Context;
+using ZvitPlus.BLL.DTOs.AdditionalDTOs;
 using ZvitPlus.BLL.DTOs.FileEntityDTOs;
 using ZvitPlus.BLL.DTOs.ReportDTOs;
 using ZvitPlus.BLL.Services.Interfaces;
@@ -12,7 +13,7 @@ namespace ZvitPlus.BLL.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public Task DeleteAsync(Guid id, CancellationToken ct = default)
+        public Task DeleteAsync(Guid id, UserContext context, CancellationToken ct = default)
         {
             throw new NotImplementedException();
         }
@@ -22,12 +23,12 @@ namespace ZvitPlus.BLL.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<PagedResponse<GetFileEntityDTO>> GetPageAsync(int page, int pageSize, SearchFileEntityDTO? search, CancellationToken ct = default)
+        public Task<PagedResponse<GetFileEntityDTO>> GetPageAsync(int page, int pageSize, UserContext context, SearchFileEntityDTO? search, CancellationToken ct = default)
         {
             throw new NotImplementedException();
         }
 
-        public Task<GetFileEntityDTO> UpdateAsync(Guid id, UpdateReportDTO dto, CancellationToken ct = default)
+        public Task<GetFileEntityDTO> UpdateAsync(Guid id, UpdateReportDTO dto, UserContext context, CancellationToken ct = default)
         {
             throw new NotImplementedException();
         }

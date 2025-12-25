@@ -3,7 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using ZvitPlus.BLL.Helpers;
 
-namespace ZvitPlus.API.Extensions
+namespace ZvitPlus.API.Extensions.BuildExtensions
 {
     public static class JwtExtensions
     {

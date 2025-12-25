@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace ZvitPlus.API.Extensions
+namespace ZvitPlus.API.Extensions.BuildExtensions
 {
     public static class ControllerExtensions
     {

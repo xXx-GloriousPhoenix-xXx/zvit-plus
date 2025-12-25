@@ -1,6 +1,6 @@
 @ZvitPlus.API_HostAddress = http://localhost:5267
 
-GET {{ZvitPlus.API_HostAddress}}/weatherforecast/
+GET {{ZvitPlus.API_HostAddress}}/api/reports
 Accept: application/json
 
 ###

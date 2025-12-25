@@ -1,4 +1,5 @@
-using ZvitPlus.API.Extensions;
+using ZvitPlus.API.Extensions.AuthorizationExtensions;
+using ZvitPlus.API.Extensions.BuildExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
 

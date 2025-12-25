@@ -1,4 +1,4 @@
-﻿namespace ZvitPlus.API.Extensions
+﻿namespace ZvitPlus.API.Extensions.BuildExtensions
 {
     public static class CorsExtensions
     {

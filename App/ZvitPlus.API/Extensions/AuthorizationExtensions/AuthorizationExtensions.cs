@@ -1,42 +1,19 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using ZvitPlus.BLL.Helpers;
-using ZvitPlus.BLL.Mappings;
-using ZvitPlus.BLL.Services.Implementations;
-using ZvitPlus.BLL.Services.Interfaces;
+using ZvitPlus.API.Context.Implementations;
+using ZvitPlus.API.Context.Interfaces;
 using ZvitPlus.DAL.Models.Enums;
-using ZvitPlus.DAL.Repositories.Implementations;
-using ZvitPlus.DAL.Repositories.Interfaces;
 
-namespace ZvitPlus.API.Extensions
+namespace ZvitPlus.API.Extensions.AuthorizationExtensions
 {
-    public static class ApplicationExtensions
-    {
-        public static IServiceCollection AddApplicationServices(
-            this IServiceCollection services)
-        {
-            services.AddAutoMapper(typeof(AuthProfile));
-
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddScoped<IAuthService, AuthService>();
-            services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IRefreshTokenService, RefreshTokenService>();
-            services.AddScoped<IFileService, FileService>();
-            services.AddScoped<IReportService, ReportService>();
-            services.AddScoped<ITemplateService, TemplateService>();
-
-            services.AddSingleton<ITokenGenerator, TokenGenerator>();
-
-            return services;
-        }
-    }
     public static class AuthorizationExtensions
     {
         public static IServiceCollection AddAuthorizationPolicies(
             this IServiceCollection services)
         {
+            services.AddHttpContextAccessor();
+            services.AddScoped<IUserContextFactory, UserContextFactory>();
 
-            //ToDo Fix access
             services.AddAuthorizationBuilder()
                 .AddPolicy("UserLevel", policy =>
                     policy.RequireAssertion(context =>
@@ -47,6 +24,7 @@ namespace ZvitPlus.API.Extensions
                 .AddPolicy("AdminLevel", policy =>
                     policy.RequireAssertion(context =>
                         HasRequiredRole(context, UserRole.Admin)));
+
 
             return services;
         }

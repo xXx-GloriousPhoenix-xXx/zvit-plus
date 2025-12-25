@@ -2,7 +2,7 @@
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace ZvitPlus.API.Extensions
+namespace ZvitPlus.API.Extensions.BuildExtensions
 {
     public sealed class AuthorizeOperationFilter : IOperationFilter
     {

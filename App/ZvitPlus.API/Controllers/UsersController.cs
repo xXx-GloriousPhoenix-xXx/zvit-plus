@@ -14,7 +14,7 @@ namespace ZvitPlus.API.Controllers
 
         [HttpPost("{userId}/grant/{role}")]
         [Authorize(Policy = "AdminLevel")]
-        public async Task<ActionResult<GetUserDTO>> GrandRoleAsync(Guid userId, UserRole role, CancellationToken ct = default)
+        public async Task<ActionResult<GetUserDTO>> GrantRoleAsync(Guid userId, UserRole role, CancellationToken ct = default)
         {
             var result = await _service.GrantRoleAsync(userId, role, ct);
             return Ok(result);
