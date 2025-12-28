@@ -2,8 +2,8 @@
 {
     public sealed record UpdateTemplateDTO(
         string? Name,
-        string? TemplateType,
+        string? Type,
         bool? IsPrivate,
-        string? FileBase64
+        Stream? File
     );
 }

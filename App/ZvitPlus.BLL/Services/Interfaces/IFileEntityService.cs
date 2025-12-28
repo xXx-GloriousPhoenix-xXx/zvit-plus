@@ -8,10 +8,10 @@ namespace ZvitPlus.BLL.Services.Interfaces
     {
         Task<GetFullFileEntityDTO> GetByIdAsync(Guid id, CancellationToken ct = default);
         Task<PagedResponse<GetFileEntityDTO>> GetPageAsync(
-            int page,
-            int pageSize,
             UserContext context,
-            SearchFileEntityDTO? search,
+            int page = 1,
+            int pageSize = 10,
+            SearchFileEntityDTO? search = null,
             CancellationToken ct = default);
         Task DeleteAsync(Guid id, UserContext context, CancellationToken ct = default);
     }

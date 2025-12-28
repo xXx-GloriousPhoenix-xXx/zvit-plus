@@ -3,15 +3,10 @@
 namespace ZvitPlus.BLL.DTOs.ReportDTOs
 {
     public sealed record CreateReportDTO(
-        [property: Required]
-        string Name,
-        [property: Required]
-        Guid AuthorId,
-        [property: Required]
-        Guid TemplateId,
-        [property: Required]
-        bool IsPrivate,
-        [property: Required]
-        string FileBase64
+        [Required] string Name,
+        [Required] Guid AuthorId,
+        [Required] Guid TemplateId,
+        [Required] bool IsPrivate,
+        [Required] Stream File
     );
 }

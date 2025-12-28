@@ -24,4 +24,8 @@
     <ProjectReference Include="..\ZvitPlus.BLL\ZvitPlus.BLL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DTOs\ReportDTOs\" />
+  </ItemGroup>
+
 </Project>

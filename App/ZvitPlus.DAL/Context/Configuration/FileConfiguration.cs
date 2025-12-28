@@ -29,6 +29,12 @@ namespace ZvitPlus.DAL.Context.Configuration
                 .HasDefaultValue(false)
                 .IsRequired();
 
+            builder.Property(f => f.IsDeleted)
+                .HasColumnName("is_deleted")
+                .HasColumnType("bit")
+                .HasDefaultValue(false)
+                .IsRequired();
+
             builder.Property(f => f.FileSize)
                 .HasColumnName("file_size")
                 .HasColumnType("bigint")

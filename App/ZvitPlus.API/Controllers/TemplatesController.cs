@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using ZvitPlus.API.Context.Interfaces;
-using ZvitPlus.API.Extensions.AuthorizationExtensions;
-using ZvitPlus.BLL.Context;
+using ZvitPlus.API.DTOs.TemplateDTOs;
+using ZvitPlus.BLL.DTOs.FileDTOs;
 using ZvitPlus.BLL.DTOs.FileEntityDTOs;
 using ZvitPlus.BLL.DTOs.TemplateDTOs;
 using ZvitPlus.BLL.Services.Interfaces;
@@ -13,18 +12,26 @@ namespace ZvitPlus.API.Controllers
 {
     [ApiController]
     [Route("api/templates")]
-    public class TemplatesController(ITemplateService service, IUserContextFactory context) : ControllerBase
+    public class TemplatesController(ITemplateService service, IUserContextFactory contextFactory) : ControllerBase
     {
         private readonly ITemplateService _service = service;
-        private readonly IUserContextFactory _context = context;
+        private readonly IUserContextFactory _contextFactory = contextFactory;
 
         [HttpPost]
         [Authorize(Policy = "UserLevel")]
         public async Task<ActionResult<GetFileEntityDTO>> AddAsync(
-            [FromForm] CreateTemplateDTO dto,
+            [FromForm] CreateTemplateDTORequest request,
             CancellationToken ct = default)
         {
-            var result = await _service.AddAsync(dto, ct);
+            var dto = new CreateTemplateDTO(
+                Name: request.Name,
+                Type: request.TemplateType,
+                IsPrivate: request.IsPrivate,
+                File: request.File.OpenReadStream()
+            );
+
+            var context = _contextFactory.CreateUserContext();
+            var result = await _service.AddAsync(dto, context, ct);
             return Ok(result);
         }
 
@@ -35,7 +42,7 @@ namespace ZvitPlus.API.Controllers
             [FromBody] UpdateTemplateDTO dto,
             CancellationToken ct = default)
         {
-            var userContext = _context.CreateUserContext();
+            var userContext = _contextFactory.CreateUserContext();
             var result = await _service.UpdateAsync(id, dto, userContext, ct);
             return Ok(result);
         }
@@ -46,7 +53,7 @@ namespace ZvitPlus.API.Controllers
             [FromRoute] Guid id,
             CancellationToken ct = default)
         {
-            var userContext = _context.CreateUserContext();
+            var userContext = _contextFactory.CreateUserContext();
             await _service.DeleteAsync(id, userContext, ct);
             return Ok();
         }
@@ -58,12 +65,13 @@ namespace ZvitPlus.API.Controllers
             [FromQuery] SearchFileEntityDTO? dto = null,
             CancellationToken ct = default)
         {
-            var userContext = _context.CreateUserContext();
-            var result = await _service.GetPageAsync(page, itemsPerPage, userContext, dto, ct);
+            var userContext = _contextFactory.CreateUserContext();
+            var result = await _service.GetPageAsync(userContext, page, itemsPerPage, dto, ct);
             return Ok(result);
         }
 
         [HttpGet("{id}")]
+        [Authorize(Policy = "UserLevel")]
         public async Task<ActionResult<GetFullFileEntityDTO>> GetById(
             [FromRoute] Guid id,
             CancellationToken ct = default)

@@ -12,7 +12,7 @@ using ZvitPlus.DAL.Context;
 namespace ZvitPlus.DAL.Migrations
 {
     [DbContext(typeof(ZvitPlusDbContext))]
-    [Migration("20251223033052_Initial")]
+    [Migration("20251228134921_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -49,6 +49,18 @@ namespace ZvitPlus.DAL.Migrations
                     b.Property<long>("FileSize")
                         .HasColumnType("bigint")
                         .HasColumnName("file_size");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
+
+                    b.Property<bool>("IsPrivate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_private");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -119,12 +131,6 @@ namespace ZvitPlus.DAL.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("file");
 
-                    b.Property<bool>("IsPrivate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_private");
-
                     b.Property<Guid>("TemplateId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("template");
@@ -151,12 +157,6 @@ namespace ZvitPlus.DAL.Migrations
                     b.Property<Guid>("FileId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("file");
-
-                    b.Property<bool>("IsPrivate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_private");
 
                     b.Property<Guid>("TemplateTypeId")
                         .HasColumnType("uniqueidentifier")

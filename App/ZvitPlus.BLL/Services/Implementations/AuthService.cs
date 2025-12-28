@@ -8,6 +8,7 @@ using ZvitPlus.BLL.Services.Interfaces;
 using ZvitPlus.DAL.Models.Entities;
 using ZvitPlus.DAL.Repositories.Interfaces;
 using static BCrypt.Net.BCrypt;
+using ZvitPlus.BLL.Services.Logging;
 
 namespace ZvitPlus.BLL.Services.Implementations
 {
@@ -18,41 +19,6 @@ namespace ZvitPlus.BLL.Services.Implementations
         private readonly ILogger<AuthService> _logger = logger;
         private readonly ITokenGenerator _tokenGenerator = tokenGenerator;
 
-        [LoggerMessage(
-            Level = LogLevel.Information,
-            Message = "Створено нового користувача (id: {UserId})")]
-        private partial void LogUserCreated(Guid userId);
-
-        [LoggerMessage(
-            Level = LogLevel.Information,
-            Message = "Створення нового користувача...")]
-        private partial void LogUserCreationStarted();
-
-        [LoggerMessage(
-            Level = LogLevel.Error,
-            Message = "Помилка створення користувача")]
-        private partial void LogUserCreationFailed();
-
-        [LoggerMessage(
-            Level = LogLevel.Information,
-            Message = "Спроба авторизації користувача ({ParamName}: {ParamValue})")]
-        private partial void LogUserLoginAttempted(string paramName, string paramValue);
-
-        [LoggerMessage(
-            Level = LogLevel.Warning,
-            Message = "Помилка авторизації користувача (id: {UserId})")]
-        private partial void LogUserLoginFailed(Guid userId);
-
-        [LoggerMessage(
-            Level = LogLevel.Warning,
-            Message = "Помилка авторизації користувача ({ParamName}: {ParamValue})")]
-        private partial void LogUserLoginFailed(string paramName, string paramValue);
-
-        [LoggerMessage(
-            Level = LogLevel.Information,
-            Message = "Користувача успішно авторизовано (id: {UserId})")]
-        private partial void LogUserLoginSucceed(Guid userId);
-
         /// <summary>
         /// Creates a new user and refresh token
         /// </summary>
@@ -62,13 +28,16 @@ namespace ZvitPlus.BLL.Services.Implementations
         /// <exception cref="BusinessException">User exists, Wrong password</exception>
         public async Task RegisterAsync(RegisterDTO dto, CancellationToken ct = default)
         {
-            LogUserCreationStarted();
+            AppLogger.LogActionStarted(_logger, "Створення користувача");
 
             var userExists = await _unitOfWork.Users.ExistsAsync(
                 u => u.Login == dto.Login || u.Email == dto.Email, ct);
 
             if (userExists)
             {
+                AppLogger.LogActionFailed(logger, "Користувач вже існує",
+                    dto.Login is null ? "login" : "email",
+                    dto.Login ?? dto.Email);
                 throw new BusinessException("Користувач з таким логіном або поштою вже існує");
             }
 
@@ -92,15 +61,15 @@ namespace ZvitPlus.BLL.Services.Implementations
                 _unitOfWork.RefreshTokens.Add(refreshToken);
                 await _unitOfWork.CompleteAsync(ct);
                 await _unitOfWork.CommitTransactionAsync(ct);
-
-                LogUserCreated(user.Id);
+                AppLogger.LogEntityCreated(_logger, "Токен", refreshToken.Id);
+                AppLogger.LogEntityCreated(_logger, "Користувач", user.Id);
             }
             catch
             {
                 await _unitOfWork.RollbackTransactionAsync(ct);
-                LogUserCreationFailed();
+                AppLogger.LogActionFailed(_logger, "створення користувача");
                 throw new BusinessException("Помилка реєстрації");
-            }
+            }   
         }
 
         /// <summary>
@@ -118,42 +87,40 @@ namespace ZvitPlus.BLL.Services.Implementations
             if (dto.LoginOrEmail.Contains('@'))
             {
                 var email = dto.LoginOrEmail;
-                LogUserLoginAttempted("email", email);
+                AppLogger.LogUserLoginAttempt(_logger, "email", email);
 
                 user = await _unitOfWork.Users.GetByEmailAsync(email, ct);
                 if (user is null)
                 {
-                    LogUserLoginFailed("email", email);
+                    AppLogger.LogUserLoginFailed(_logger, "email", email);
                     throw new NotFoundException("Користувача не знайдено");
                 }
             }
             else
             {
                 var login = dto.LoginOrEmail;
-                LogUserLoginAttempted("login", login);
+                AppLogger.LogUserLoginAttempt(_logger, "login", login);
 
                 user = await _unitOfWork.Users.GetByLoginAsync(login, ct);
                 if (user is null)
                 {
-                    LogUserLoginFailed("login", login);
+                    AppLogger.LogUserLoginFailed(_logger, "login", login);
                     throw new NotFoundException("Користувача не знайдено");
                 }
             }
 
             if (user.IsBanned)
             {
-                LogUserLoginFailed(user.Id);
+                AppLogger.LogUserLoginFailed(_logger, user.Id);
                 throw new AccessException("Користувача заблоковано");
             }
 
             var result = Verify(dto.Password, user.Password);
             if (!result)
             {
-                LogUserLoginFailed(user.Id);
+                AppLogger.LogUserLoginFailed(_logger, user.Id);
                 throw new LoginException("Введено невірний пароль");
             }
-
-            LogUserLoginSucceed(user.Id);
 
             var refreshToken = _tokenGenerator.GenerateRefreshToken();
             var tokenDto = new TokenDTO(
@@ -176,11 +143,13 @@ namespace ZvitPlus.BLL.Services.Implementations
                 _unitOfWork.RefreshTokens.Add(refreshTokenEntity);
                 await _unitOfWork.CompleteAsync(ct);
                 await _unitOfWork.CommitTransactionAsync(ct);
+                AppLogger.LogEntityCreated(_logger, "Refresh токен", refreshTokenEntity.Id);
+                AppLogger.LogUserLogin(_logger, user.Id);
             }
             catch
             {
                 await _unitOfWork.RollbackTransactionAsync(ct);
-                LogUserLoginFailed(user.Id);
+                AppLogger.LogUserLoginFailed(_logger, user.Id);
                 throw new LoginException("Помилка авторизації");
             }
 
@@ -199,15 +168,18 @@ namespace ZvitPlus.BLL.Services.Implementations
             var token = await _unitOfWork.RefreshTokens.GetByTokenAsync(refreshToken, ct);
             if (token is null)
             {
-                throw new BusinessException("Токен не знайдно");
+                AppLogger.LogActionFailed(_logger, "Refresh токен не знайдно");
+                throw new BusinessException("Refresh токен не знайдно");
             }
             else if (token.ExpiresAt > DateTime.UtcNow)
             {
+                AppLogger.LogUserLogoutFailed(_logger, token.UserId);
                 throw new BusinessException("Строк дії токену завершився");
             }
             else if (token.IsRevoked)
             {
-                throw new BusinessException("Токен скасовано");
+                AppLogger.LogUserLogoutFailed(_logger, token.UserId);
+                throw new BusinessException("Refresh токен скасовано");
             }
 
             token.IsRevoked = true;
@@ -218,10 +190,12 @@ namespace ZvitPlus.BLL.Services.Implementations
                 _unitOfWork.RefreshTokens.Update(token);
                 await _unitOfWork.CompleteAsync(ct);
                 await _unitOfWork.CommitTransactionAsync(ct);
+                AppLogger.LogUserLogout(_logger, token.UserId);
             }
             catch
             {
                 await _unitOfWork.RollbackTransactionAsync(ct);
+                AppLogger.LogUserLogoutFailed(_logger, token.UserId);
                 throw new BusinessException("Помилка виходу");
             }
         }
@@ -239,16 +213,19 @@ namespace ZvitPlus.BLL.Services.Implementations
             var currentRefreshToken = await _unitOfWork.RefreshTokens.GetByTokenAsync(refreshToken, ct);
             if (currentRefreshToken is null)
             {
+                AppLogger.LogActionFailed(_logger, "Refresh токен не знайдено", "Refresh токен", refreshToken);
                 throw new BusinessException("Невалідний refresh токен");
             }
 
             var user = await _unitOfWork.Users.GetByIdAsync(currentRefreshToken.UserId, ct);
             if (user is null)
             {
+                AppLogger.LogActionFailed(_logger, "Користувача не знайдено", currentRefreshToken.UserId);
                 throw new BusinessException("Користувач не знайдений");
             }
             if (user.IsBanned)
             {
+                AppLogger.LogAccessDenied(_logger, currentRefreshToken.UserId);
                 throw new AccessException("Користувач заблокований");
             }
 

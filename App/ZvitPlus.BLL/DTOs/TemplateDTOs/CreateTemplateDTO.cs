@@ -3,15 +3,9 @@
 namespace ZvitPlus.BLL.DTOs.TemplateDTOs
 {
     public sealed record CreateTemplateDTO(
-        [property: Required]
-        string Name,
-        [property: Required]
-        Guid AuthorId,
-        [property: Required]
-        string TemplateType,
-        [property: Required]
-        bool IsPrivate,
-        [property: Required]
-        string FileBase64
+        [Required] string Name,
+        [Required] string Type,
+        [Required] bool IsPrivate,
+        [Required] Stream File
     );
 }

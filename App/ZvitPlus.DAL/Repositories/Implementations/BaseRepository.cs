@@ -59,9 +59,13 @@ namespace ZvitPlus.DAL.Repositories.Implementations
         }
 
         public async Task<int> CountAsync(
-            Expression<Func<T, bool>> predicate,
+            Expression<Func<T, bool>>? predicate = null,
             CancellationToken ct = default)
         {
+            if (predicate is null)
+            {
+                return await _dbSet.CountAsync(ct);
+            }
             return await _dbSet.CountAsync(predicate, ct);
         }
 

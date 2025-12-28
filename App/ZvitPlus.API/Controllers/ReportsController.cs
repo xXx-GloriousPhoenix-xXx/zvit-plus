@@ -23,7 +23,8 @@ namespace ZvitPlus.API.Controllers
             [FromForm] CreateReportDTO dto,
             CancellationToken ct = default)
         {
-            var result = await _service.AddAsync(dto, ct);
+            var userContext = _context.CreateUserContext();
+            var result = await _service.AddAsync(dto, userContext, ct);
             return Ok(result);
         }
 
@@ -58,7 +59,7 @@ namespace ZvitPlus.API.Controllers
             CancellationToken ct = default)
         {
             var userContext = _context.CreateUserContext();
-            var result = await _service.GetPageAsync(page, itemsPerPage, userContext, dto, ct);
+            var result = await _service.GetPageAsync(userContext, page, itemsPerPage, dto, ct);
             return Ok(result);
         }
 

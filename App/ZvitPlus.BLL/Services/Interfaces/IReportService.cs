@@ -6,7 +6,7 @@ namespace ZvitPlus.BLL.Services.Interfaces
 {
     public interface IReportService : IFileEntityService
     {
-         Task<GetFileEntityDTO> AddAsync(CreateReportDTO dto, CancellationToken ct = default);
+         Task<GetFileEntityDTO> AddAsync(CreateReportDTO dto, UserContext context, CancellationToken ct = default);
          Task<GetFileEntityDTO> UpdateAsync(Guid id, UpdateReportDTO dto, UserContext context, CancellationToken ct = default);
     }
 }

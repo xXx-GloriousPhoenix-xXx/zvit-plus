@@ -47,6 +47,18 @@ namespace ZvitPlus.DAL.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("file_size");
 
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
+
+                    b.Property<bool>("IsPrivate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_private");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(64)
@@ -116,12 +128,6 @@ namespace ZvitPlus.DAL.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("file");
 
-                    b.Property<bool>("IsPrivate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_private");
-
                     b.Property<Guid>("TemplateId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("template");
@@ -148,12 +154,6 @@ namespace ZvitPlus.DAL.Migrations
                     b.Property<Guid>("FileId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("file");
-
-                    b.Property<bool>("IsPrivate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_private");
 
                     b.Property<Guid>("TemplateTypeId")
                         .HasColumnType("uniqueidentifier")

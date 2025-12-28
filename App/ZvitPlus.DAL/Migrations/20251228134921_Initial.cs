@@ -50,6 +50,8 @@ namespace ZvitPlus.DAL.Migrations
                     author = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     file_size = table.Column<long>(type: "bigint", nullable: false),
                     file_path = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false),
+                    is_private = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    is_deleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     created_at = table.Column<DateTime>(type: "datetime", nullable: false),
                     updated_at = table.Column<DateTime>(type: "datetime", nullable: false)
                 },
@@ -92,8 +94,7 @@ namespace ZvitPlus.DAL.Migrations
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     template_type = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    file = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    is_private = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
+                    file = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -118,8 +119,7 @@ namespace ZvitPlus.DAL.Migrations
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     template = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    file = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    is_private = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
+                    file = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {

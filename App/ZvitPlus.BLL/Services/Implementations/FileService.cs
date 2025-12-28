@@ -1,24 +1,446 @@
-﻿using ZvitPlus.BLL.DTOs.FileDTOs;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using System;
+using System.IO;
+using ZvitPlus.BLL.Context;
+using ZvitPlus.BLL.DTOs.AdditionalDTOs;
+using ZvitPlus.BLL.DTOs.FileDTOs;
+using ZvitPlus.BLL.DTOs.FileEntityDTOs;
 using ZvitPlus.BLL.Services.Enums;
+using ZvitPlus.BLL.Services.Exceptions;
 using ZvitPlus.BLL.Services.Interfaces;
+using ZvitPlus.DAL.Models.Enums;
+using ZvitPlus.BLL.Services.Logging;
+using ZvitPlus.DAL.Models.Entities;
+using ZvitPlus.DAL.Repositories.Interfaces;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 
 namespace ZvitPlus.BLL.Services.Implementations
 {
-    public class FileService : IFileService
+    public class FileService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<FileService> logger) : IFileService
     {
-        public Task<string> SaveFileAsync(FileContent file, FileType ft, Guid entityId, Guid authorId, CancellationToken ct = default)
+        private readonly IUnitOfWork _unitOfWork = unitOfWork;
+        private readonly IMapper _mapper = mapper;
+        private readonly ILogger<FileService> _logger = logger;
+        private const string _fileExtension = "rep";
+        private readonly string _basePath = "F:\\Programmes\\Github\\Reps\\zvit-plus\\Storage";
+
+        public async Task<bool> ExistsAsync(Guid entityId, CancellationToken ct = default)
         {
-            throw new NotImplementedException();
+            AppLogger.LogActionStarted(_logger, "пошук файлу", entityId);
+            var exists = await _unitOfWork.Files.GetByIdAsync(entityId, ct);
+            AppLogger.LogActionCompleted(_logger, "Пошук файлу", entityId);
+            return exists is not null;
         }
 
-        public Task<FileContent> GetFileAsync(FileType ft, Guid entityId, CancellationToken ct = default)
+        public async Task<Guid> AddAsync(CreateFileDTO dto, Guid authorId, CancellationToken ct = default)
         {
-            throw new NotImplementedException();
+            AppLogger.LogActionStarted(_logger, "збереження фалу");
+
+            var fileId = Guid.NewGuid();
+            var filePath = GetDirectoryPath(authorId, dto.Type, fileId);
+            var dirPath = Path.GetDirectoryName(filePath)!;
+
+            var entity = new FileEntity
+            {
+                Id = fileId,
+                Name = Path.GetFileNameWithoutExtension(dto.Name),
+                AuthorId = authorId,
+                FileSize = dto.File.Length,
+                FilePath = filePath,
+                IsPrivate = dto.IsPrivate,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            await _unitOfWork.BeginTransactionAsync(ct);
+            try
+            {
+                if (!Directory.Exists(dirPath))
+                {
+                    Directory.CreateDirectory(dirPath!);
+                }
+
+                await SaveToDiskAsync(dto.File, filePath, ct);
+
+                _unitOfWork.Files.Add(entity);
+                await _unitOfWork.CompleteAsync(ct);
+                await _unitOfWork.CommitTransactionAsync(ct);
+                AppLogger.LogActionCompleted(_logger, "Збереження файлу", fileId);
+            }
+            catch
+            {
+                await _unitOfWork.RollbackTransactionAsync(ct);
+
+                if (File.Exists(filePath))
+                {
+                    File.Delete(filePath);
+                }
+
+                if (!Directory.EnumerateFiles(dirPath).Any())
+                {
+                    Directory.Delete(dirPath, true);
+                }
+
+                AppLogger.LogActionFailed(_logger, "збереження файлу");
+                throw new BusinessException("Помилка збереження файлу");
+            }
+
+            return fileId;
         }
 
-        public Task DeleteFileAsync(FileType ft, Guid entityId, CancellationToken ct = default)
+        public async Task<FileEntity> UpdateAsync(Guid entityId, UpdateFileDTO dto, CancellationToken ct = default)
         {
-            throw new NotImplementedException();
+            AppLogger.LogActionStarted(_logger, "оновлення файлу", entityId);
+
+            var entity = await _unitOfWork.Files.GetByIdAsync(entityId, ct);
+            if (entity is null)
+            {
+                AppLogger.LogActionFailed(_logger, "оновлення файлу");
+                throw new BusinessException("Файл не знайдено");
+            }
+
+            string? backupFilePath = null;
+
+            await _unitOfWork.BeginTransactionAsync(ct);
+            try
+            {
+                if (dto.File is not null)
+                {
+                    if (File.Exists(entity.FilePath))
+                    {
+                        backupFilePath = entity.FilePath + ".backup";
+                        File.Copy(entity.FilePath, backupFilePath, true);
+                    }
+
+                    await SaveToDiskAsync(dto.File, entity.FilePath, ct);
+
+                    var fileInfo = new FileInfo(entity.FilePath);
+                    entity.FileSize = fileInfo.Length;
+                }
+                if (dto.Name is not null)
+                {
+                    entity.Name = dto.Name;
+                }
+
+                if (dto.IsPrivate.HasValue)
+                {
+                    entity.IsPrivate = dto.IsPrivate.Value;
+                }
+
+                _unitOfWork.Files.Update(entity);
+                await _unitOfWork.CompleteAsync(ct);
+                await _unitOfWork.CommitTransactionAsync(ct);
+
+                if (backupFilePath is not null && File.Exists(backupFilePath))
+                {
+                    File.Delete(backupFilePath);
+                }
+
+                AppLogger.LogActionCompleted(_logger, "Оновлення файлу", entityId);
+            }
+            catch
+            {
+                await _unitOfWork.RollbackTransactionAsync(ct);
+
+                if (backupFilePath is not null && File.Exists(backupFilePath))
+                {
+                    if (File.Exists(entity.FilePath))
+                    {
+                        File.Delete(entity.FilePath);
+                    }
+
+                    File.Move(backupFilePath, entity.FilePath);
+                }
+
+                AppLogger.LogActionFailed(_logger, "оновлення файлу", entityId);
+                throw;
+            }
+
+            return entity;
+        }
+
+        public async Task<GetFileEntityDTO?> GetByIdAsync(Guid entityId, CancellationToken ct = default)
+        {
+            var entity = await _unitOfWork.Files.GetByIdAsync(entityId, ct);
+            var response = _mapper.Map<GetFileEntityDTO>(entity);
+            return response;
+        }
+
+        public async Task<(FileEntity entity, Stream stream)?> GetWithStreamAsync(Guid entityId, CancellationToken ct = default)
+        {
+            AppLogger.LogActionStarted(_logger, "читання файлу", entityId);
+
+            var entity = await _unitOfWork.Files.GetByIdAsync(entityId, ct);
+            if (entity is null)
+            {
+                AppLogger.LogActionFailed(_logger, "читання файлу", entityId);
+                throw new BusinessException("Файл не знайдено");
+            }
+
+            var file = await ReadFromFileAsync(entity.FilePath, ct);
+            if (file is null)
+            {
+                AppLogger.LogActionFailed(_logger, "читання файлу", entityId);
+                throw new BusinessException("Файл не знайдено");
+            }
+
+            AppLogger.LogActionCompleted(_logger, "Читання файлу", entityId);
+            return (entity, file);
+        }
+
+        public async Task ForceDeleteAsync(Guid entityId, CancellationToken ct = default)
+        {
+            AppLogger.LogActionStarted(_logger, "видалення файлу", entityId);
+
+            var entity = await _unitOfWork.Files.GetByIdAsync(entityId, ct);
+            if (entity is null)
+            {
+                AppLogger.LogActionFailed(_logger, "видалення файлу", entityId);
+                throw new BusinessException("Файл не знайдено");
+            }
+
+            var filePath = entity.FilePath;
+            var dirPath = Path.GetDirectoryName(filePath)!;
+
+            await _unitOfWork.BeginTransactionAsync(ct);
+            try
+            {
+                _unitOfWork.Files.Delete(entity);
+                await _unitOfWork.CompleteAsync(ct);
+
+                if (File.Exists(filePath))
+                {
+                    File.Delete(filePath);
+                }
+
+                if (Directory.Exists(dirPath) && !Directory.EnumerateFileSystemEntries(dirPath).Any())
+                {
+                    Directory.Delete(dirPath);
+                }
+
+                await _unitOfWork.CommitTransactionAsync(ct);
+                AppLogger.LogActionCompleted(_logger, "Видалення файлу", entityId);   
+            }
+            catch
+            {
+                await _unitOfWork.RollbackTransactionAsync(ct);
+                AppLogger.LogActionFailed(_logger, "видалення файлу", entityId);
+                throw new BusinessException("Помилка видалення файлу");
+            }
+        }
+
+        public async Task DeleteAsync(Guid entityId, UserContext context, CancellationToken ct = default)
+        {
+            AppLogger.LogActionStarted(_logger, "видалення файлу", entityId);
+
+            var entity = await _unitOfWork.Files.GetByIdAsync(entityId, ct);
+            if (entity is null || entity.IsDeleted)
+            {
+                AppLogger.LogActionFailed(_logger, "видалення файлу", entityId);
+                throw new BusinessException("Файл не знайдено");
+            }
+
+            var author = await _unitOfWork.Users.GetByIdAsync(entity.AuthorId, ct);
+            if (author is null)
+            {
+                AppLogger.LogActionFailed(_logger, "видалення файлу", entityId);
+                throw new BusinessException("Автора не знайдено");
+            }
+
+            if (context.UserId != author.Id && context.Role <= author.Role)
+            {
+                AppLogger.LogAccessDenied(_logger, context.UserId);
+                throw new BusinessException("Неможливо видалити файл");
+            }
+
+            entity.IsDeleted = true;
+
+            await _unitOfWork.BeginTransactionAsync(ct);
+            try
+            {
+                _unitOfWork.Files.Update(entity);
+                await _unitOfWork.CompleteAsync(ct);
+                await _unitOfWork.CommitTransactionAsync(ct);
+
+                AppLogger.LogActionCompleted(_logger, "Видалення файлу", entityId);
+            }
+            catch
+            {
+                await _unitOfWork.RollbackTransactionAsync(ct);
+
+                AppLogger.LogActionFailed(_logger, "видалення файлу", entityId);
+                throw new BusinessException("Помилка видалення файлу");
+            }
+        }
+
+        public async Task RestoreAsync(Guid entityId, CancellationToken ct = default)
+        {
+            var entity = await _unitOfWork.Files.GetByIdAsync(entityId, ct);
+            if (entity is null || !entity.IsDeleted)
+            {
+                throw new BusinessException("Файл не знайдено або не видалений");
+            }
+
+            entity.IsDeleted = false;
+
+            await _unitOfWork.BeginTransactionAsync(ct);
+            try
+            {
+                _unitOfWork.Files.Update(entity);
+                await _unitOfWork.CompleteAsync(ct);
+                await _unitOfWork.CommitTransactionAsync(ct);
+                AppLogger.LogActionCompleted(_logger, "Відновлення файлу", entityId);
+            }
+            catch
+            {
+                await _unitOfWork.RollbackTransactionAsync(ct);
+                AppLogger.LogActionFailed(_logger, "відновлення файлу", entityId);
+            }
+        }
+
+        public async Task<PagedResponse<GetFileEntityDTO>> GetPageAsync(
+            UserContext context,
+            int page = 1,
+            int pageSize = 10,
+            SearchFileEntityDTO? search = null, 
+            CancellationToken ct = default)
+        {
+            if (page < 1)
+            {
+                page = 1;
+            }
+            if (pageSize < 2)
+            {
+                pageSize = 10;
+            }
+            if (pageSize > 50)
+            {
+                pageSize = 50;
+            }
+
+            var query = _unitOfWork.Files.AsQueryable();
+            var totalCount = await _unitOfWork.Files.CountAsync(ct: ct);
+            var totalPages = (Math.Min(totalCount, 1) - 1) / pageSize + 1;
+
+            // Фільтрація користувача
+            if (search is not null)
+            {
+                if (search.Name is not null)
+                {
+                    query = query.Where(f => f.Name == search.Name);
+                }
+                if (search.Author is not null)
+                {
+                    query = query.Where(f => f.Author!.Login == search.Author);
+                }
+                if (search.TemplateType is not null)
+                {
+                    query = query.Where(f => f.Template!.TemplateType!.Name == search.TemplateType);
+                }
+                if (search.CreatedFrom is not null)
+                {
+                    query = query.Where(f => f.CreatedAt >= search.CreatedFrom);
+                }
+                if (search.CreatedTo is not null)
+                {
+                    query = query.Where(f => f.CreatedAt <= search.CreatedTo);
+                }
+                if (search.UpdatedFrom is not null)
+                {
+                    query = query.Where(f => f.UpdatedAt >= search.UpdatedFrom);
+                }
+                if (search.UpdatedTo is not null)
+                {
+                    query = query.Where(f => f.UpdatedAt <= search.UpdatedTo);
+                }
+            }
+
+            // Фільтрація сховища видалених файлів
+            if (context.Role <= UserRole.Mod)
+            {
+                query = query.Where(f => f.IsDeleted == false);
+            }
+
+            var collection = await query
+                .OrderBy(f => f.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(ct);
+
+            var result = _mapper.Map<List<GetFileEntityDTO>>(collection);
+
+            var response = new PagedResponse<GetFileEntityDTO>(
+                Items: result,
+                CurrentPage: page,
+                TotalCount: totalCount,
+                TotalPages: totalPages);
+
+            return response;
+        }
+
+        private string GetDirectoryPath(Guid authorId, FileType ft, Guid entityId)
+        {
+            return $"{_basePath}\\{authorId}\\{ft}\\{entityId}.{_fileExtension}";
+        }
+
+        private async Task SaveToDiskAsync(Stream stream, string path, CancellationToken ct = default)
+        {
+            AppLogger.LogActionStarted(_logger, "збереження файлу");
+
+            if (stream.CanSeek && stream.Position > 0)
+            {
+                stream.Seek(0, SeekOrigin.Begin);
+            }
+
+            var directory = Path.GetDirectoryName(path);
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory!);
+            }
+
+            await using var fs = new FileStream(
+                path,
+                FileMode.Create,
+                FileAccess.Write,
+                FileShare.Write,
+                bufferSize: 4096,
+                useAsync: true);
+
+            await stream.CopyToAsync(fs, ct);
+            await fs.FlushAsync(ct);
+
+            AppLogger.LogActionCompleted(_logger, "Збереження файлу");
+        }
+
+        private async Task<Stream> ReadFromFileAsync(string filePath, CancellationToken ct = default)
+        {
+            AppLogger.LogActionStarted(_logger, "читання з файлу");
+
+            if (string.IsNullOrEmpty(filePath))
+            {
+                AppLogger.LogActionFailed(_logger, "читання з файлу");
+                throw new BusinessException("Шлях до файлу не може бути порожнім");
+            }
+
+            if (!File.Exists(filePath))
+            {
+                AppLogger.LogActionFailed(_logger, "читання з файлу");
+                throw new BusinessException("Файл не існує");
+            }
+
+            await using var fs = new FileStream(
+                filePath,
+                FileMode.Open,
+                FileAccess.Read,
+                FileShare.Read,
+                bufferSize: 4096,
+                useAsync: true);
+
+            ct.ThrowIfCancellationRequested();
+
+            return fs;
         }
     }
 }
