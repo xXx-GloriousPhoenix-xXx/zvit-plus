@@ -22,5 +22,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.EnsureDatabaseCreated();
+await app.SeedTestData();
 
 app.Run();

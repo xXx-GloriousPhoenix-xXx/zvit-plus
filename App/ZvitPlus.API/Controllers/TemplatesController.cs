@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using ZvitPlus.API.Context.Interfaces;
 using ZvitPlus.API.DTOs.TemplateDTOs;
 using ZvitPlus.BLL.DTOs.FileDTOs;
@@ -39,9 +40,15 @@ namespace ZvitPlus.API.Controllers
         [Authorize(Policy = "UserLevel")]
         public async Task<ActionResult<GetFileEntityDTO>> UpdateAsync(
             [FromRoute] Guid id,
-            [FromBody] UpdateTemplateDTO dto,
+            [FromBody] UpdateTemplateDTORequest request,
             CancellationToken ct = default)
         {
+            var dto = new UpdateTemplateDTO(
+                Name: request.Name,
+                Type: request.TemplateType,
+                IsPrivate: request.IsPrivate,
+                File: request.File?.OpenReadStream());
+
             var userContext = _contextFactory.CreateUserContext();
             var result = await _service.UpdateAsync(id, dto, userContext, ct);
             return Ok(result);

@@ -10,6 +10,7 @@ using ZvitPlus.BLL.Services.Interfaces;
 using ZvitPlus.BLL.Services.Logging;
 using ZvitPlus.DAL.Models.Entities;
 using ZvitPlus.DAL.Repositories.Interfaces;
+using ZvitPlus.BLL.Services.Enums;
 
 namespace ZvitPlus.BLL.Services.Implementations
 {
@@ -22,24 +23,26 @@ namespace ZvitPlus.BLL.Services.Implementations
 
         public async Task<GetFileEntityDTO> AddAsync(CreateReportDTO dto, UserContext context, CancellationToken ct = default)
         {
-            // Делегувати створення файловому сервісу; Отримати id запису файлу
-            var innerDto = _mapper.Map<CreateFileDTO>(dto);
-            var fileId = await _fileService.AddAsync(innerDto, context.UserId, ct);
+            string? createdFilePath = null;
+            Report? entity = null;
 
-            // Створити об'єкт звіту
-            AppLogger.LogActionStarted(_logger, "збереження звіту");
-            var entityId = Guid.NewGuid();
-            var entity = new Report()
-            {
-                Id = entityId,
-                TemplateId = dto.TemplateId,
-                FileId = fileId
-            };
-
-            // Створення запису звіту
             await _unitOfWork.BeginTransactionAsync(ct);
             try
             {
+                // Делегувати створення файловому сервісу; Отримати id запису файлу
+                var innerDto = _mapper.Map<CreateFileDTO>(dto);
+                var (fileId, filePath) = await _fileService.AddAsync(innerDto, context.UserId, ct);
+
+                // Створити об'єкт звіту
+                AppLogger.LogActionStarted(_logger, "збереження звіту");
+                var entityId = Guid.NewGuid();
+                entity = new()
+                {
+                    Id = entityId,
+                    TemplateId = dto.TemplateId,
+                    FileId = fileId
+                };
+
                 _unitOfWork.Reports.Add(entity);
                 await _unitOfWork.CompleteAsync(ct);
                 await _unitOfWork.CommitTransactionAsync(ct);
@@ -48,13 +51,25 @@ namespace ZvitPlus.BLL.Services.Implementations
             catch
             {
                 await _unitOfWork.RollbackTransactionAsync(ct);
+
+                if (createdFilePath is not null && File.Exists(createdFilePath))
+                {
+                    File.Delete(createdFilePath);
+
+                    var dir = Path.GetDirectoryName(createdFilePath)!;
+                    if (Directory.Exists(dir) && !Directory.EnumerateFileSystemEntries(dir).Any())
+                    {
+                        Directory.Delete(dir);
+                    }
+                }
+
                 AppLogger.LogActionFailed(_logger, "збереження звіту");
                 throw new BusinessException("Помилка збереження звіту");
             }
 
             // Повернення інформації про запис
-            var createdEntity = await _unitOfWork.Reports.GetByIdAsync(entityId, ct);
-            var createdDto = _mapper.Map<GetFileEntityDTO>(createdEntity);
+            var createdEntity = await _unitOfWork.Reports.GetByIdAsync(entity!.Id, ct);
+            var createdDto = _mapper.Map<GetFileEntityDTO>(createdEntity!.File);
             return createdDto;
         }
 
@@ -69,6 +84,8 @@ namespace ZvitPlus.BLL.Services.Implementations
                 AppLogger.LogActionFailed(_logger, "видалення звіту");
                 throw new BusinessException("Звіт не знайдено");
             }
+
+            id = entity.FileId;
 
             // Делегація видалення файловому сервісу
             await _fileService.DeleteAsync(id, context, ct);
@@ -145,7 +162,7 @@ namespace ZvitPlus.BLL.Services.Implementations
                 pageSize = 50;
             }
 
-            var response = await _fileService.GetPageAsync(context, page, pageSize, search, ct);
+            var response = await _fileService.GetPageAsync(context, FileType.Report, page, pageSize, search, ct);
             return response;
         }
 
@@ -161,16 +178,26 @@ namespace ZvitPlus.BLL.Services.Implementations
                 throw new BusinessException("Звіт не знайдено");
             }
 
-            // Якщо оновлюється файл - делегація процесу у файловий сервіс
-            if (dto.File is not null)
-            {
-                var innerDto = _mapper.Map<UpdateFileDTO>(dto);
-                await _fileService.UpdateAsync(entity.FileId, innerDto, ct);
-            }
+            var currentFileEntity = await _unitOfWork.Files.GetByIdAsync(entity.FileId, ct);
+            string? fileBackupPath = null;
 
             await _unitOfWork.BeginTransactionAsync(ct);
             try
             {
+                // Якщо оновлюється файл - делегація процесу у файловий сервіс
+                if (dto.File is not null)
+                {
+                    var innerDto = _mapper.Map<UpdateFileDTO>(dto);
+
+                    if (currentFileEntity != null && File.Exists(currentFileEntity.FilePath))
+                    {
+                        fileBackupPath = currentFileEntity.FilePath + ".backup";
+                        File.Copy(currentFileEntity.FilePath, fileBackupPath, true);
+                    }
+
+                    await _fileService.UpdateAsync(entity.FileId, innerDto, ct);
+                }
+
                 _unitOfWork.Reports.Update(entity);
                 await _unitOfWork.CompleteAsync(ct);
                 await _unitOfWork.CommitTransactionAsync(ct);
@@ -179,6 +206,19 @@ namespace ZvitPlus.BLL.Services.Implementations
             catch
             {
                 await _unitOfWork.RollbackTransactionAsync(ct);
+
+                if (fileBackupPath is not null && currentFileEntity != null)
+                {
+                    if (File.Exists(currentFileEntity.FilePath))
+                    {
+                        File.Delete(currentFileEntity.FilePath);
+                    }
+                    if (File.Exists(fileBackupPath))
+                    {
+                        File.Move(fileBackupPath, currentFileEntity.FilePath);
+                    }
+                }
+
                 AppLogger.LogActionFailed(_logger, "оновелння звіту", id);
                 throw new BusinessException("Помилка оновлення звіту");
             }

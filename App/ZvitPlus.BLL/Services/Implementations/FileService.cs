@@ -11,20 +11,20 @@ using ZvitPlus.BLL.Services.Exceptions;
 using ZvitPlus.BLL.Services.Interfaces;
 using ZvitPlus.DAL.Models.Enums;
 using ZvitPlus.BLL.Services.Logging;
+using Microsoft.Extensions.Configuration;
 using ZvitPlus.DAL.Models.Entities;
 using ZvitPlus.DAL.Repositories.Interfaces;
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 
 namespace ZvitPlus.BLL.Services.Implementations
 {
-    public class FileService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<FileService> logger) : IFileService
+    public class FileService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<FileService> logger, IConfiguration configuration) : IFileService
     {
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly IMapper _mapper = mapper;
         private readonly ILogger<FileService> _logger = logger;
         private const string _fileExtension = "rep";
-        private readonly string _basePath = "F:\\Programmes\\Github\\Reps\\zvit-plus\\Storage";
+        private readonly string _basePath = configuration["DataStorage:BasePath"]!;
 
         public async Task<bool> ExistsAsync(Guid entityId, CancellationToken ct = default)
         {
@@ -34,7 +34,7 @@ namespace ZvitPlus.BLL.Services.Implementations
             return exists is not null;
         }
 
-        public async Task<Guid> AddAsync(CreateFileDTO dto, Guid authorId, CancellationToken ct = default)
+        public async Task<(Guid fileId, string filePath)> AddAsync(CreateFileDTO dto, Guid authorId, CancellationToken ct = default)
         {
             AppLogger.LogActionStarted(_logger, "збереження фалу");
 
@@ -54,40 +54,16 @@ namespace ZvitPlus.BLL.Services.Implementations
                 UpdatedAt = DateTime.UtcNow
             };
 
-            await _unitOfWork.BeginTransactionAsync(ct);
-            try
+            if (!Directory.Exists(dirPath))
             {
-                if (!Directory.Exists(dirPath))
-                {
-                    Directory.CreateDirectory(dirPath!);
-                }
-
-                await SaveToDiskAsync(dto.File, filePath, ct);
-
-                _unitOfWork.Files.Add(entity);
-                await _unitOfWork.CompleteAsync(ct);
-                await _unitOfWork.CommitTransactionAsync(ct);
-                AppLogger.LogActionCompleted(_logger, "Збереження файлу", fileId);
-            }
-            catch
-            {
-                await _unitOfWork.RollbackTransactionAsync(ct);
-
-                if (File.Exists(filePath))
-                {
-                    File.Delete(filePath);
-                }
-
-                if (!Directory.EnumerateFiles(dirPath).Any())
-                {
-                    Directory.Delete(dirPath, true);
-                }
-
-                AppLogger.LogActionFailed(_logger, "збереження файлу");
-                throw new BusinessException("Помилка збереження файлу");
+                Directory.CreateDirectory(dirPath!);
             }
 
-            return fileId;
+            await SaveToDiskAsync(dto.File, filePath, ct);
+
+            _unitOfWork.Files.Add(entity);
+
+            return (fileId, filePath);
         }
 
         public async Task<FileEntity> UpdateAsync(Guid entityId, UpdateFileDTO dto, CancellationToken ct = default)
@@ -103,7 +79,6 @@ namespace ZvitPlus.BLL.Services.Implementations
 
             string? backupFilePath = null;
 
-            await _unitOfWork.BeginTransactionAsync(ct);
             try
             {
                 if (dto.File is not null)
@@ -130,15 +105,10 @@ namespace ZvitPlus.BLL.Services.Implementations
                 }
 
                 _unitOfWork.Files.Update(entity);
-                await _unitOfWork.CompleteAsync(ct);
-                await _unitOfWork.CommitTransactionAsync(ct);
-
-                if (backupFilePath is not null && File.Exists(backupFilePath))
-                {
-                    File.Delete(backupFilePath);
-                }
 
                 AppLogger.LogActionCompleted(_logger, "Оновлення файлу", entityId);
+
+                return entity;
             }
             catch
             {
@@ -150,20 +120,34 @@ namespace ZvitPlus.BLL.Services.Implementations
                     {
                         File.Delete(entity.FilePath);
                     }
-
                     File.Move(backupFilePath, entity.FilePath);
+
+                    if (File.Exists(entity.FilePath))
+                    {
+                        var fileInfo = new FileInfo(entity.FilePath);
+                        entity.FileSize = fileInfo.Length;
+                    }
+
                 }
 
                 AppLogger.LogActionFailed(_logger, "оновлення файлу", entityId);
                 throw;
             }
-
-            return entity;
+            finally
+            {
+                if (backupFilePath is not null && File.Exists(backupFilePath))
+                {
+                    File.Delete(backupFilePath);
+                }
+            }
         }
 
         public async Task<GetFileEntityDTO?> GetByIdAsync(Guid entityId, CancellationToken ct = default)
         {
-            var entity = await _unitOfWork.Files.GetByIdAsync(entityId, ct);
+            var entity = await _unitOfWork.Files.GetByIdAsync(entityId, ct,
+                f => f.Author,
+                f => f.Template!.TemplateType,
+                f => f.Report!.Template!.TemplateType);
             var response = _mapper.Map<GetFileEntityDTO>(entity);
             return response;
         }
@@ -302,6 +286,7 @@ namespace ZvitPlus.BLL.Services.Implementations
 
         public async Task<PagedResponse<GetFileEntityDTO>> GetPageAsync(
             UserContext context,
+            FileType ft,
             int page = 1,
             int pageSize = 10,
             SearchFileEntityDTO? search = null, 
@@ -321,7 +306,18 @@ namespace ZvitPlus.BLL.Services.Implementations
             }
 
             var query = _unitOfWork.Files.AsQueryable();
-            var totalCount = await _unitOfWork.Files.CountAsync(ct: ct);
+
+            // Типізація
+            if (ft == FileType.Template)
+            {
+                query = query.Where(f => f.Template != null);
+            }
+            else
+            {
+                query = query.Where(f => f.Report != null);
+            }
+
+            var totalCount = await query.CountAsync(ct);
             var totalPages = (Math.Min(totalCount, 1) - 1) / pageSize + 1;
 
             // Фільтрація користувача
@@ -367,6 +363,12 @@ namespace ZvitPlus.BLL.Services.Implementations
                 .OrderBy(f => f.CreatedAt)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
+                .Include(f => f.Author)
+                .Include(f => f.Template)
+                    .ThenInclude(t => t.TemplateType)
+                .Include(f => f.Report)
+                    .ThenInclude(r => r.Template)
+                        .ThenInclude(t => t.TemplateType)
                 .ToListAsync(ct);
 
             var result = _mapper.Map<List<GetFileEntityDTO>>(collection);

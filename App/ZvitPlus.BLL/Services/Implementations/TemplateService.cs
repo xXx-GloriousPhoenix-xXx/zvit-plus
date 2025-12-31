@@ -10,6 +10,7 @@ using ZvitPlus.BLL.Services.Interfaces;
 using ZvitPlus.BLL.Services.Logging;
 using ZvitPlus.DAL.Models.Entities;
 using ZvitPlus.DAL.Repositories.Interfaces;
+using ZvitPlus.BLL.Services.Enums;
 
 namespace ZvitPlus.BLL.Services.Implementations
 {
@@ -22,51 +23,71 @@ namespace ZvitPlus.BLL.Services.Implementations
 
         public async Task<GetFileEntityDTO> AddAsync(CreateTemplateDTO dto, UserContext context, CancellationToken ct = default)
         {
-            // Делегувати створення файловому сервісу; Отримати id запису файлу
-            var innerDto = _mapper.Map<CreateFileDTO>(dto);
-            var fileId = await _fileService.AddAsync(innerDto, context.UserId, ct);
-
-            // Знайти тип шаблону
-            AppLogger.LogActionStarted(_logger, "пошук шаблону");
-
-            var templateTypes = await _unitOfWork.TemplateTypes.FindAsync(t => t.Name == dto.Type, ct);
-            var templateType = templateTypes.SingleOrDefault();
-            if (templateType is null)
-            {
-                AppLogger.LogActionFailed(_logger, "пошуку типу шаблона");
-                throw new BusinessException("Тип шаблону не знайдено");
-            }
-
-            // Створити об'єкт шаблону
-            AppLogger.LogActionStarted(_logger, "збереження шаблону");
-            var entityId = Guid.NewGuid();
-            var entity = new Template()
-            {
-                Id = entityId,
-                TemplateTypeId = templateType.Id,
-                FileId = fileId
-            };
+            string? createdFilePath = null;
+            Template? entity = null;
 
             // Створення запису шаблону
             await _unitOfWork.BeginTransactionAsync(ct);
             try
             {
+                // Делегувати створення файловому сервісу; Отримати id запису файлу
+                var innerDto = _mapper.Map<CreateFileDTO>(dto);
+                var (fileId, filePath) = await _fileService.AddAsync(innerDto, context.UserId, ct);
+
+                createdFilePath = filePath;
+
+                // Знайти тип шаблону
+                AppLogger.LogActionStarted(_logger, "пошук шаблону");
+
+                var templateTypes = await _unitOfWork.TemplateTypes.FindAsync(t => t.Name == dto.Type, ct);
+                var templateType = templateTypes.SingleOrDefault();
+                if (templateType is null)
+                {
+                    AppLogger.LogActionFailed(_logger, "пошуку типу шаблона");
+                    throw new BusinessException("Тип шаблону не знайдено");
+                }
+
+                // Створити об'єкт шаблону
+                AppLogger.LogActionStarted(_logger, "збереження шаблону");
+                entity = new Template()
+                {
+                    Id = Guid.NewGuid(),
+                    TemplateTypeId = templateType.Id,
+                    FileId = fileId
+                };
+
                 _unitOfWork.Templates.Add(entity);
                 await _unitOfWork.CompleteAsync(ct);
                 await _unitOfWork.CommitTransactionAsync(ct);
-                AppLogger.LogActionCompleted(_logger, "Збереження шаблону", entityId);
+                AppLogger.LogActionCompleted(_logger, "Збереження шаблону", entity.Id);
             }
             catch
             {
                 await _unitOfWork.RollbackTransactionAsync(ct);
+
+                if (createdFilePath is not null && File.Exists(createdFilePath))
+                {
+                    File.Delete(createdFilePath);
+
+                    var dir = Path.GetDirectoryName(createdFilePath)!;
+                    if (Directory.Exists(dir) && !Directory.EnumerateFileSystemEntries(dir).Any())
+                    {
+                        Directory.Delete(dir);
+                    }
+                }
+
                 AppLogger.LogActionFailed(_logger, "збереження шаблону");
                 throw new BusinessException("Помилка збереження шаблону");
             }
 
             // Повернення інформації про запис
-            var createdEntity = await _unitOfWork.Templates.GetByIdAsync(entityId, ct);
-            var createdDto = _mapper.Map<GetFileEntityDTO>(createdEntity);
-            return createdDto;
+            var response = await _fileService.GetByIdAsync(entity.FileId, ct);
+            if (response is null)
+            {
+                throw new BusinessException("Помилка формування інформації про файл");
+            }
+
+            return response;
         }
 
         public async Task DeleteAsync(Guid id, UserContext context, CancellationToken ct = default)
@@ -80,6 +101,8 @@ namespace ZvitPlus.BLL.Services.Implementations
                 AppLogger.LogActionFailed(_logger, "видалення шаблону");
                 throw new BusinessException("Шаблон не знайдено");
             }
+
+            id = entity.FileId;
 
             // Делегація видалення файловому сервісу
             await _fileService.DeleteAsync(id, context, ct);
@@ -161,7 +184,7 @@ namespace ZvitPlus.BLL.Services.Implementations
                 pageSize = 50;
             }
 
-            var response = await _fileService.GetPageAsync(context, page, pageSize, search, ct);
+            var response = await _fileService.GetPageAsync(context, FileType.Template, page, pageSize, search, ct);
             return response;
         }
 
@@ -177,20 +200,31 @@ namespace ZvitPlus.BLL.Services.Implementations
                 throw new BusinessException("Шаблон не знайдено");
             }
 
-            // Якщо оновлюється файл - делегація процесу у файловий сервіс
-            if (dto.File is not null)
-            {
-                var innerDto = _mapper.Map<UpdateFileDTO>(dto);
-                await _fileService.UpdateAsync(entity.FileId, innerDto, ct);
-            }
+            var currentFileEntity = await _unitOfWork.Files.GetByIdAsync(entity.FileId, ct);
+            string? fileBackupPath = null;
 
-            // Оновлення запису БД
-            if (dto.Type is not null)
+            await _unitOfWork.BeginTransactionAsync(ct);
+            try
             {
-                var singleItemCollection = await _unitOfWork.TemplateTypes.FindAsync(tt => tt.Name == dto.Type, ct);
-                try
+                // Якщо оновлюється файл - делегація процесу у файловий сервіс
+                if (dto.File is not null)
                 {
-                    var type = singleItemCollection.SingleOrDefault();
+                    var innerDto = _mapper.Map<UpdateFileDTO>(dto);
+
+                    if (currentFileEntity != null && File.Exists(currentFileEntity.FilePath))
+                    {
+                        fileBackupPath = currentFileEntity.FilePath + ".backup";
+                        File.Copy(currentFileEntity.FilePath, fileBackupPath, true);
+                    }
+
+                    await _fileService.UpdateAsync(entity.FileId, innerDto, ct);
+                }
+
+                // Оновлення запису БД
+                if (dto.Type is not null)
+                {
+                    var templateTypes = await _unitOfWork.TemplateTypes.FindAsync(tt => tt.Name == dto.Type, ct);
+                    var type = templateTypes.SingleOrDefault();
                     if (type is null)
                     {
                         throw new BusinessException("Тип шаблону не знайдено");
@@ -198,16 +232,7 @@ namespace ZvitPlus.BLL.Services.Implementations
 
                     entity.TemplateTypeId = type.Id;
                 }
-                catch
-                {
-                    AppLogger.LogActionFailed(_logger, "оновлення файлу", id);
-                    throw;
-                }
-            }
 
-            await _unitOfWork.BeginTransactionAsync(ct);
-            try
-            {
                 _unitOfWork.Templates.Update(entity);
                 await _unitOfWork.CompleteAsync(ct);
                 await _unitOfWork.CommitTransactionAsync(ct);
@@ -216,8 +241,35 @@ namespace ZvitPlus.BLL.Services.Implementations
             catch
             {
                 await _unitOfWork.RollbackTransactionAsync(ct);
+
+                if (fileBackupPath is not null && currentFileEntity != null)
+                {
+                    try
+                    {
+                        if (File.Exists(currentFileEntity.FilePath))
+                        {
+                            File.Delete(currentFileEntity.FilePath);
+                        }
+                        if (File.Exists(fileBackupPath))
+                        {
+                            File.Move(fileBackupPath, currentFileEntity.FilePath);
+                        }
+                    }
+                    catch (Exception rollbackEx)
+                    {
+                        _logger.LogError(rollbackEx, "Помилка під час відкату файлу");
+                    }
+                }
+
                 AppLogger.LogActionFailed(_logger, "оновелння шаблону", id);
                 throw new BusinessException("Помилка оновлення шаблону");
+            }
+            finally
+            {
+                if (fileBackupPath is not null && File.Exists(fileBackupPath))
+                {
+                    try { File.Delete(fileBackupPath); } catch { }
+                }
             }
 
             AppLogger.LogActionStarted(_logger, "читання шаблону", id);

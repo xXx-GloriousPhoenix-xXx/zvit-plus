@@ -2,6 +2,7 @@
 using ZvitPlus.BLL.Mappings;
 using ZvitPlus.BLL.Services.Implementations;
 using ZvitPlus.BLL.Services.Interfaces;
+using ZvitPlus.DAL.Context.DataFactory;
 using ZvitPlus.DAL.Repositories.Implementations;
 using ZvitPlus.DAL.Repositories.Interfaces;
 
@@ -24,6 +25,8 @@ namespace ZvitPlus.API.Extensions.BuildExtensions
             services.AddScoped<ITemplateService, TemplateService>();
 
             services.AddSingleton<ITokenGenerator, TokenGenerator>();
+
+            services.AddScoped<IDataFactory, DataFactory>();
 
             return services;
         }

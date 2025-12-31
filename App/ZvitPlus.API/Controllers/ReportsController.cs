@@ -7,6 +7,8 @@ using ZvitPlus.BLL.Services.Interfaces;
 using GetReportPageDTO = ZvitPlus.BLL.DTOs.AdditionalDTOs.PagedResponse<ZvitPlus.BLL.DTOs.FileEntityDTOs.GetFileEntityDTO>;
 using Microsoft.AspNetCore.Authorization;
 using ZvitPlus.API.Context.Interfaces;
+using ZvitPlus.API.DTOs.TemplateDTOs;
+using ZvitPlus.API.DTOs.ReportDTOs;
 
 namespace ZvitPlus.API.Controllers
 {
@@ -20,9 +22,15 @@ namespace ZvitPlus.API.Controllers
         [HttpPost]
         [Authorize(Policy = "UserLevel")]
         public async Task<ActionResult<GetFileEntityDTO>> AddAsync(
-            [FromForm] CreateReportDTO dto,
+            [FromForm] CreateReportDTORequest request,
             CancellationToken ct = default)
         {
+            var dto = new CreateReportDTO(
+                Name: request.Name,
+                TemplateId: request.TemplateId,
+                IsPrivate: request.IsPrivate,
+                File: request.File.OpenReadStream());
+
             var userContext = _context.CreateUserContext();
             var result = await _service.AddAsync(dto, userContext, ct);
             return Ok(result);
@@ -32,9 +40,14 @@ namespace ZvitPlus.API.Controllers
         [Authorize(Policy = "UserLevel")]
         public async Task<ActionResult<GetFileEntityDTO>> UpdateAsync(
             [FromRoute] Guid id,
-            [FromBody] UpdateReportDTO dto,
+            [FromBody] UpdateReportDTORequest request,
             CancellationToken ct = default)
         {
+            var dto = new UpdateReportDTO(
+                Name: request.Name,
+                IsPrivate: request.IsPrivate,
+                File: request.File?.OpenReadStream());
+
             var userContext = _context.CreateUserContext();
             var result = await _service.UpdateAsync(id, dto, userContext, ct);
             return Ok(result);
@@ -64,6 +77,7 @@ namespace ZvitPlus.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Policy = "UserLevel")]
         public async Task<ActionResult<GetFullFileEntityDTO>> GetById(
             [FromRoute] Guid id,
             CancellationToken ct = default)

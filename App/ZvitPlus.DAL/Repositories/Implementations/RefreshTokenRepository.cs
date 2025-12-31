@@ -1,4 +1,6 @@
-﻿using ZvitPlus.DAL.Context;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Net;
+using ZvitPlus.DAL.Context;
 using ZvitPlus.DAL.Models.Entities;
 using ZvitPlus.DAL.Repositories.Interfaces;
 
@@ -9,8 +11,7 @@ namespace ZvitPlus.DAL.Repositories.Implementations
     {
         public async Task<RefreshToken?> GetByTokenAsync(string refreshToken, CancellationToken ct = default)
         {
-            var singleItemCollection = await FindAsync(rt =>
-                rt.Token == refreshToken, ct);
+            var singleItemCollection = await FindAsync(rt => rt.Token == refreshToken, ct);
             return singleItemCollection.SingleOrDefault();
         }
     }

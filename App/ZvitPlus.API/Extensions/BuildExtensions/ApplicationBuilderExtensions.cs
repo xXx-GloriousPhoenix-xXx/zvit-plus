@@ -1,4 +1,5 @@
 ﻿using ZvitPlus.DAL.Context;
+using ZvitPlus.DAL.Context.DataFactory;
 
 namespace ZvitPlus.API.Extensions.BuildExtensions
 {
@@ -22,6 +23,19 @@ namespace ZvitPlus.API.Extensions.BuildExtensions
             using var scope = app.Services.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<ZvitPlusDbContext>();
             db.Database.EnsureCreated();
+            return app;
+        }
+
+        public async static Task<WebApplication> SeedTestData(
+            this WebApplication app)
+        {
+            if (app.Environment.IsDevelopment())
+            {
+                using var scope = app.Services.CreateScope();
+                var dataFactory = scope.ServiceProvider.GetRequiredService<IDataFactory>();
+                await dataFactory.InitializeAsync();
+            }
+
             return app;
         }
     }
