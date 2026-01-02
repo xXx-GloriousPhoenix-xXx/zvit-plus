@@ -1,4 +1,5 @@
-﻿using ZvitPlus.DAL.Context;
+﻿using Scalar.AspNetCore;
+using ZvitPlus.DAL.Context;
 using ZvitPlus.DAL.Context.DataFactory;
 
 namespace ZvitPlus.API.Extensions.BuildExtensions
@@ -12,6 +13,12 @@ namespace ZvitPlus.API.Extensions.BuildExtensions
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
+                app.MapScalarApiReference(options =>
+                {
+                    options
+                        .WithTitle("Zvit+ API")
+                        .WithOpenApiRoutePattern("/swagger/{documentName}/swagger.json");
+                });
             }
 
             return app;
