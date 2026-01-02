@@ -87,13 +87,13 @@ namespace ZvitPlus.BLL.Services.Implementations
 
             id = entity.FileId;
 
-            // Делегація видалення файловому сервісу
-            await _fileService.DeleteAsync(id, context, ct);
-
-            // Видалення запису про звіт
             await _unitOfWork.BeginTransactionAsync(ct);
             try
             {
+                // Делегація видалення файловому сервісу
+                await _fileService.DeleteAsync(id, context, ct);
+
+                // Видалення запису про звіт
                 _unitOfWork.Reports.Delete(entity);
                 await _unitOfWork.CompleteAsync(ct);
                 await _unitOfWork.CommitTransactionAsync(ct);

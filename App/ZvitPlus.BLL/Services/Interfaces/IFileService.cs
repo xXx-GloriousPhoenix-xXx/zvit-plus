@@ -14,9 +14,7 @@ namespace ZvitPlus.BLL.Services.Interfaces
         Task<GetFileEntityDTO?> GetByIdAsync(Guid entityId, CancellationToken ct = default);
         Task<(FileEntity entity, Stream stream)?> GetWithStreamAsync(Guid entityId, CancellationToken ct = default);
         Task<bool> ExistsAsync(Guid entityId, CancellationToken ct = default);
-        Task ForceDeleteAsync(Guid entityId, CancellationToken ct = default);
         Task DeleteAsync(Guid entityId, UserContext context, CancellationToken ct = default);
-        Task RestoreAsync(Guid entityId, CancellationToken ct = default);
         Task<PagedResponse<GetFileEntityDTO>> GetPageAsync(
             UserContext context,
             FileType ft,

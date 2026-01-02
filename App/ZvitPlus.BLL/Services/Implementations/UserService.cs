@@ -22,7 +22,7 @@ namespace ZvitPlus.BLL.Services.Implementations
 
         public async Task<GetUserDTO> BanAsync(Guid userId, bool isBan, UserContext context, CancellationToken ct = default)
         {
-            var operationName = (isBan ? "блокування" : "розблокування") + "користувача";
+            var operationName = (isBan ? "блокування" : "розблокування") + " користувача";
             AppLogger.LogActionStarted(_logger, operationName, userId);
 
             var user = await _unitOfWork.Users.GetByIdAsync(userId, ct);
@@ -37,7 +37,7 @@ namespace ZvitPlus.BLL.Services.Implementations
                 throw new BusinessException("Неможливо виконати операцію для себе");
             }
 
-            if (context.Role < user.Role)
+            if (context.Role > user.Role)
             {
                 user.IsBanned = isBan;
 
@@ -80,7 +80,7 @@ namespace ZvitPlus.BLL.Services.Implementations
                 throw new BusinessException("Неможливо виконати операцію для себе");
             }
 
-            if (context.Role == UserRole.Admin)
+            if (context.Role == UserRole.Admin && role < context.Role)
             {
                 user.Role = role;
 

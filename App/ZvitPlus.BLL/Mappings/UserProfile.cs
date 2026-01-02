@@ -9,7 +9,11 @@ namespace ZvitPlus.BLL.Mappings
         public UserProfile()
         {
             CreateMap<User, GetUserDTO>()
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Login));
+                .ForCtorParam("Id", opt => opt.MapFrom(src => src.Id))
+                .ForCtorParam("Name", opt => opt.MapFrom(src => src.Login))
+                .ForCtorParam("Role", opt => opt.MapFrom(src => src.Role))
+                .ForCtorParam("IsBanned", opt => opt.MapFrom(src => src.IsBanned));
+                
         }
     }
 }

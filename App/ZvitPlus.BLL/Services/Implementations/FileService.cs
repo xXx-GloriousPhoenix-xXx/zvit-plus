@@ -174,47 +174,6 @@ namespace ZvitPlus.BLL.Services.Implementations
             return (entity, file);
         }
 
-        public async Task ForceDeleteAsync(Guid entityId, CancellationToken ct = default)
-        {
-            AppLogger.LogActionStarted(_logger, "видалення файлу", entityId);
-
-            var entity = await _unitOfWork.Files.GetByIdAsync(entityId, ct);
-            if (entity is null)
-            {
-                AppLogger.LogActionFailed(_logger, "видалення файлу", entityId);
-                throw new BusinessException("Файл не знайдено");
-            }
-
-            var filePath = entity.FilePath;
-            var dirPath = Path.GetDirectoryName(filePath)!;
-
-            await _unitOfWork.BeginTransactionAsync(ct);
-            try
-            {
-                _unitOfWork.Files.Delete(entity);
-                await _unitOfWork.CompleteAsync(ct);
-
-                if (File.Exists(filePath))
-                {
-                    File.Delete(filePath);
-                }
-
-                if (Directory.Exists(dirPath) && !Directory.EnumerateFileSystemEntries(dirPath).Any())
-                {
-                    Directory.Delete(dirPath);
-                }
-
-                await _unitOfWork.CommitTransactionAsync(ct);
-                AppLogger.LogActionCompleted(_logger, "Видалення файлу", entityId);   
-            }
-            catch
-            {
-                await _unitOfWork.RollbackTransactionAsync(ct);
-                AppLogger.LogActionFailed(_logger, "видалення файлу", entityId);
-                throw new BusinessException("Помилка видалення файлу");
-            }
-        }
-
         public async Task DeleteAsync(Guid entityId, UserContext context, CancellationToken ct = default)
         {
             AppLogger.LogActionStarted(_logger, "видалення файлу", entityId);
@@ -240,11 +199,12 @@ namespace ZvitPlus.BLL.Services.Implementations
             }
 
             entity.IsDeleted = true;
+            _unitOfWork.Files.Update(entity);
+
 
             await _unitOfWork.BeginTransactionAsync(ct);
             try
             {
-                _unitOfWork.Files.Update(entity);
                 await _unitOfWork.CompleteAsync(ct);
                 await _unitOfWork.CommitTransactionAsync(ct);
 
@@ -259,30 +219,6 @@ namespace ZvitPlus.BLL.Services.Implementations
             }
         }
 
-        public async Task RestoreAsync(Guid entityId, CancellationToken ct = default)
-        {
-            var entity = await _unitOfWork.Files.GetByIdAsync(entityId, ct);
-            if (entity is null || !entity.IsDeleted)
-            {
-                throw new BusinessException("Файл не знайдено або не видалений");
-            }
-
-            entity.IsDeleted = false;
-
-            await _unitOfWork.BeginTransactionAsync(ct);
-            try
-            {
-                _unitOfWork.Files.Update(entity);
-                await _unitOfWork.CompleteAsync(ct);
-                await _unitOfWork.CommitTransactionAsync(ct);
-                AppLogger.LogActionCompleted(_logger, "Відновлення файлу", entityId);
-            }
-            catch
-            {
-                await _unitOfWork.RollbackTransactionAsync(ct);
-                AppLogger.LogActionFailed(_logger, "відновлення файлу", entityId);
-            }
-        }
 
         public async Task<PagedResponse<GetFileEntityDTO>> GetPageAsync(
             UserContext context,
