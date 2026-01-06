@@ -1,0 +1,18 @@
+.Button {
+    display: flex;
+    padding: 0.5em 1em;
+    background-color: transparent;
+    border: 0.05em solid var(--text-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    transition: 250ms;
+    cursor: pointer;
+    font-size: 1.1rem;
+}
+.Button:hover {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}

@@ -1,0 +1,52 @@
+.Form {
+    display: flex;
+    flex-flow: column nowrap;
+    gap: 1em;
+    border-radius: var(--border-radius);
+    padding: 0.5em 1.5em 1.5em 1.5em;
+    background-color: var(--white);
+    box-shadow: var(--shadow);
+    font-size: 1.5em;
+}
+.Button {
+    margin-top: 1.25em;
+    border: none;
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+.Button:hover {
+    background-color: var(--dark-color);
+    color: var(--white);
+}
+.Header {
+    text-align: center;
+    margin: 1em 0 1.5em 0;
+    color: var(--primary-color);
+    position: relative;
+    font-size: 2rem;
+}
+.Header::after {
+    content: '';
+    position: absolute;
+    top: 1.5em;
+    left: 10%;
+    width: 80%;
+    height: 0.125em;
+    background-color: var(--primary-color);
+    border-radius: var(--border-radius);
+}
+.Hint {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    /* gap: 0.5em; */
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+.Hint a {
+    text-decoration: none;
+    color: var(--primary-color);
+}
+.Hint a:hover {
+    text-decoration: underline;
+}

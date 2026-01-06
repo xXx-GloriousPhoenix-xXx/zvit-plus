@@ -1,0 +1,40 @@
+.Wrapper {
+    display: flex;
+    flex-flow: column nowrap;
+    gap: 0.25em;
+    font-size: 1rem;
+    background-color: transparent;
+    width: 100%;
+    transition: 250ms;
+}
+.Label {
+    margin-left: 1rem;
+    font-size: 1.1rem;
+    transition: 250ms;
+}
+.Input {
+    background-color: transparent;
+    padding: 0.5em 1em;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    border: 0.05em solid #ddd;
+    outline: none;
+    cursor: pointer;
+    transition: 250ms;
+    font-size: 1.1rem;
+}
+.Wrapper:hover,
+.Wrapper:focus-within {
+    color: var(--primary-color);
+}
+
+.Wrapper:hover .Label,
+.Wrapper:focus-within .Label {
+    color: var(--primary-color);
+}
+
+.Wrapper:hover .Input,
+.Wrapper:focus-within .Input {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}

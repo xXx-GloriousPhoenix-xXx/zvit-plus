@@ -1,0 +1,22 @@
+.Section {
+    display: flex;
+    flex-flow: column nowrap;
+    width: 100%;
+    height: 100%;
+    padding: 1em;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+}
+.Form {
+    width: 20em;
+}
+
+.Test {
+    display: flex;
+    flex-flow: column nowrap;
+    position: absolute;
+    right: 2em;
+    bottom: 2em;
+    gap: 1em
+}

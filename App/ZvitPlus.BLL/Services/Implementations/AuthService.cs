@@ -171,7 +171,7 @@ namespace ZvitPlus.BLL.Services.Implementations
                 AppLogger.LogActionFailed(_logger, "Refresh токен не знайдно");
                 throw new BusinessException("Refresh токен не знайдно");
             }
-            else if (token.ExpiresAt > DateTime.UtcNow)
+            else if (token.ExpiresAt < DateTime.UtcNow)
             {
                 AppLogger.LogUserLogoutFailed(_logger, token.UserId);
                 throw new BusinessException("Строк дії токену завершився");
