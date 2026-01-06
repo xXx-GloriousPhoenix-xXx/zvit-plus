@@ -3,5 +3,5 @@
     flex-flow: column nowrap;
     justify-content: center;
     align-items: center;
-    height: 100%;
+    height: calc(100dvh - 2em);
 }

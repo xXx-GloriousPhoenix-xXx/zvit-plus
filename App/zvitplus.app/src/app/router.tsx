@@ -1,30 +1,29 @@
 import { createBrowserRouter } from 'react-router-dom';
 
-// Outlet
 import { MainOutlet } from '@/widgets/layouts/MainOutlet/MainOutlet';
 import { AuthOutlet } from '@/widgets/layouts/AuthOutlet/AuthOutlet';
 
-// Auth section components
 import { LoginPage } from '@/pages/LoginPage/LoginPage.tsx';
 import { RegisterPage } from '@/pages/RegisterPage/RegisterPage.tsx';
 
-// Main section components
 import { DiscoveryPage } from '@/pages/DiscoveryPage/DiscoveryPage.tsx';
 import { MyWorkPage } from '@/pages/MyWorkPage/MyWorkPage.tsx';
-import { TemplatePage } from '@/pages/TemplatePage/TemplatePage.tsx';
+import { TemplatePage } from '@/pages/templates/TemplatePage/TemplatePage';
 import { ReportPage } from '@/pages/ReportPage/ReportPage.tsx';
 
-// Extra section components
 import { NotFoundPage } from '@/pages/NotFoundPage/NotFoundPage.tsx';
+import { TemplateUploadPage } from '@/pages/templates/TemplateUploadPage/TemplateUploadPage';
+import { TemplateCreatePage } from '@/pages/templates/TemplateCreatePage/TemplateCreatePage';
+import { TemplateEditPage } from '@/pages/templates/TemplateEditPage/TemplateEditPage';
+import { HomePage } from '@/pages/general/HomePage/HomePage';
 
 export const router = createBrowserRouter([
     {
         element: <MainOutlet/>,
         children: [
-            // { path: "/", element: <HomePage/> },
+            { path: "/", element: <HomePage/> },
             { path: "/discovery", element: <DiscoveryPage/> },
             { path: "/my-works", element: <MyWorkPage/> },
-            { path: "/templates", element: <TemplatePage/> },
             { path: "/reports", element: <ReportPage/> },
 
             // { path: "/tutorials", element: <TutorialPage/> },
@@ -38,6 +37,21 @@ export const router = createBrowserRouter([
         children: [
             { path: "/login", element: <LoginPage/> },
             { path: "/register", element: <RegisterPage/> }            
+        ]
+    },
+    {
+        path: "/templates",
+        element: <MainOutlet/>,
+        children: [
+            { index: true, element: <TemplatePage/> },
+            { path: "upload", element: <TemplateUploadPage /> },
+            { path: "create", element: <TemplateCreatePage /> },
+            { path: ":id/edit", element:
+                <TemplateEditPage
+                    mode="template"
+                    id={id}
+                    readonly={false}    
+                /> },
         ]
     },
     // { 
