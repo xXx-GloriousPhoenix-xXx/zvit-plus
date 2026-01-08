@@ -16,6 +16,7 @@ import { TemplateUploadPage } from '@/pages/templates/TemplateUploadPage/Templat
 import { TemplateCreatePage } from '@/pages/templates/TemplateCreatePage/TemplateCreatePage';
 import { TemplateEditPage } from '@/pages/templates/TemplateEditPage/TemplateEditPage';
 import { HomePage } from '@/pages/general/HomePage/HomePage';
+import { ProtectedRoute } from './ProtectedRoute';
 
 export const router = createBrowserRouter([
     {
@@ -44,14 +45,18 @@ export const router = createBrowserRouter([
         element: <MainOutlet/>,
         children: [
             { index: true, element: <TemplatePage/> },
-            { path: "upload", element: <TemplateUploadPage /> },
-            { path: "create", element: <TemplateCreatePage /> },
-            { path: ":id/edit", element:
-                <TemplateEditPage
-                    mode="template"
-                    id={id}
-                    readonly={false}    
-                /> },
+            {
+                element: <ProtectedRoute />,
+                children: [
+                    { path: "upload", element: <TemplateUploadPage /> },
+                    { path: "create", element: <TemplateCreatePage /> },
+                    { path: ":id/edit", element:
+                        <TemplateEditPage
+                            mode="template"
+                            readonly={false}    
+                        /> }
+                ]
+            }
         ]
     },
     // { 

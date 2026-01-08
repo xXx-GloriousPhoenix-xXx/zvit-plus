@@ -24,7 +24,7 @@ namespace ZvitPlus.BLL.Services.Implementations
         public async Task<GetFileEntityDTO> AddAsync(CreateTemplateDTO dto, UserContext context, CancellationToken ct = default)
         {
             string? createdFilePath = null;
-            Template? entity = null;
+            Template? entity;
 
             // Створення запису шаблону
             await _unitOfWork.BeginTransactionAsync(ct);
@@ -39,8 +39,14 @@ namespace ZvitPlus.BLL.Services.Implementations
                 // Знайти тип шаблону
                 AppLogger.LogActionStarted(_logger, "пошук шаблону");
 
-                var templateTypes = await _unitOfWork.TemplateTypes.FindAsync(t => t.Name == dto.Type, ct);
-                var templateType = templateTypes.SingleOrDefault();
+                //
+                Console.WriteLine($"In Service: {dto.TypeId}");
+                foreach (var type in await _unitOfWork.TemplateTypes.GetAllAsync(ct))
+                {
+                    Console.WriteLine(type.Id);
+                }
+
+                var templateType = await _unitOfWork.TemplateTypes.GetByIdAsync(dto.TypeId, ct);
                 if (templateType is null)
                 {
                     AppLogger.LogActionFailed(_logger, "пошуку типу шаблона");

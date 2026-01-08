@@ -34,7 +34,6 @@ namespace ZvitPlus.API.Controllers
         }
 
         [HttpPost("refresh/{refreshToken}")]
-        [Authorize(Policy = "UserLevel")]
         public async Task<ActionResult<TokenDTO>> RefreshAsync(string refreshToken, CancellationToken ct = default)
         {
             var result = await _service.RefreshAsync(refreshToken, ct);

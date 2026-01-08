@@ -1,0 +1,42 @@
+.Wrapper {
+    display: flex;
+    flex-flow: column nowrap;
+    gap: 0.25em;
+}
+.Wrapper,
+.Wrapper * {
+    font-size: 1.1rem;
+}
+.Label {
+    margin-left: 1em;
+}
+.SelectWrapper {
+    position: relative;
+    display: flex;
+    width: 100%;
+}
+.Select {
+    background-color: var(--white);
+    padding: 0.5em 1em;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    border: 0.05em solid #ddd;
+    width: 100%;
+
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    position: relative;
+}
+.Arrow {
+    position: absolute;
+    right: 1em;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--text-color);
+    font-size: 0.8rem;
+}
+.DefaultOption {
+    color: #777;  
+}

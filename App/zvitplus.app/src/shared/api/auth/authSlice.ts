@@ -65,6 +65,26 @@ export const refreshToken = createAsyncThunk<TokenResponse, string, { rejectValu
     }
 );
 
+export const initAuth = createAsyncThunk<
+    void,
+    void
+>(
+    "auth/init",
+    async (_, { dispatch }) => {
+        const refreshTokenValue = localStorage.getItem("refreshToken");
+
+        if (!refreshTokenValue) return;
+
+        try {
+            await dispatch(refreshToken(refreshTokenValue)).unwrap();
+        } catch {
+            localStorage.removeItem("refreshToken");
+        }
+    }
+);
+
+
+
 const authSlice = createSlice({
     name: "auth",
     initialState,
@@ -92,6 +112,8 @@ const authSlice = createSlice({
                 state.expiresIn = action.payload.expiresIn;
                 state.isAuth = true;
                 state.loading = false;
+
+                localStorage.setItem("refreshToken", action.payload.refreshToken);
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.loading = false;
@@ -117,6 +139,8 @@ const authSlice = createSlice({
                 state.refreshToken = null;
                 state.expiresIn = null;
                 state.isAuth = false;
+
+                localStorage.removeItem("refreshToken");
             })
             .addCase(logoutUser.rejected, (state, action) => {
                 state.error = action.payload ?? "Unknown logout error";

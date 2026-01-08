@@ -15,10 +15,18 @@
     align-items: center;
     font-size: 1.25em;
 }
-.Logo h1 {
+.Navbar a:hover {
+    transform: translateY(-0.1em);
+}
+.Logo a {
+    display: inline-block;
     font-size: 1.8rem;
     color: var(--primary-color);
-    margin: 0;
+    text-decoration: none;
+    transition: var(--transition);
+}
+.Logo a:hover {
+    color: var(--dark-color);
 }
 .Tabs, .Auth {
     display: flex;
@@ -30,7 +38,7 @@
 .Auth {
     gap: 1em;
 }
-.Navbar a {
+.Tabs a, .Auth a {
     text-decoration: none;
     color: var(--text-color);
     transition: 250ms;

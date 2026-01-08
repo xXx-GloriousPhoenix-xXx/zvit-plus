@@ -1,0 +1,36 @@
+.Wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+    font-size: 1.1rem;
+}
+
+.Label {
+    margin-left: 1em;
+}
+
+.Toggle {
+    padding: 0.5em 1em;
+    font-size: 1.1rem;
+    border-radius: var(--border-radius);
+    border: 0.05em solid #ddd;
+    background-color: var(--white);
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: var(--shadow);
+}
+
+.Toggle:not(.Active):hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.Active {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border-color: var(--primary-color);
+}
+
+.Active:hover {
+    background-color: var(--dark-color);
+}

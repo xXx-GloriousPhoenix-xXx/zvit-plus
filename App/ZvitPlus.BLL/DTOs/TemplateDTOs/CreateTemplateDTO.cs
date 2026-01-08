@@ -2,7 +2,7 @@
 {
     public sealed record CreateTemplateDTO(
         string Name,
-        string Type,
+        Guid TypeId,
         bool IsPrivate,
         Stream File
     );

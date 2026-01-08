@@ -24,9 +24,25 @@ namespace ZvitPlus.API.Controllers
             [FromForm] CreateTemplateDTORequest request,
             CancellationToken ct = default)
         {
+            if (!ModelState.IsValid)
+            {
+                foreach (var kv in ModelState)
+                {
+                    Console.WriteLine($"{kv.Key}: {kv.Value.Errors.Count} errors");
+                    foreach (var err in kv.Value.Errors)
+                        Console.WriteLine($"  -> {err.ErrorMessage}");
+                }
+                return BadRequest(ModelState);
+            }
+
+            if (request.File == null)
+    		    return BadRequest("File is required");
+
+            Console.WriteLine($"In Controller: {request.TemplateTypeId}");
+
             var dto = new CreateTemplateDTO(
                 Name: request.Name,
-                Type: request.TemplateType,
+                TypeId: request.TemplateTypeId,
                 IsPrivate: request.IsPrivate,
                 File: request.File.OpenReadStream()
             );

@@ -26,7 +26,9 @@ export function Header() {
         <header className={cl.Header}>
             <nav className={cl.Navbar}>
                 <div className={cl.Logo}>
-                    <h1>Звіт+</h1>
+                    <NavLink to="/">
+                        Звіт+
+                    </NavLink>
                 </div>
                 <div className={cl.Tabs}>
                     {mainNav.map(item => (

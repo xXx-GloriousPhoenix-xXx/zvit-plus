@@ -1,0 +1,13 @@
+.Wrapper {
+    display: flex;
+    flex-flow: column nowrap;
+    padding: 1em;
+    gap: 1em;
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+.Wrapper:hover {
+    transform: translateY(-0.25em);
+}

@@ -1,0 +1,7 @@
+.Wrapper {
+    display: grid;
+    grid-auto-rows: auto;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1em;
+    width: 100%;
+}

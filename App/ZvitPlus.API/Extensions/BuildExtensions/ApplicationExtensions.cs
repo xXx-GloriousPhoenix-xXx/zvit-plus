@@ -16,6 +16,7 @@ namespace ZvitPlus.API.Extensions.BuildExtensions
             services.AddAutoMapper(typeof(AuthProfile));
             services.AddAutoMapper(typeof(UserProfile));
             services.AddAutoMapper(typeof(FileProfile));
+            services.AddAutoMapper(typeof(TemplateTypeProfile));
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IAuthService, AuthService>();
@@ -23,6 +24,7 @@ namespace ZvitPlus.API.Extensions.BuildExtensions
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IReportService, ReportService>();
             services.AddScoped<ITemplateService, TemplateService>();
+            services.AddScoped<ITemplateTypeService, TemplateTypeService>();
 
             services.AddSingleton<ITokenGenerator, TokenGenerator>();
 
