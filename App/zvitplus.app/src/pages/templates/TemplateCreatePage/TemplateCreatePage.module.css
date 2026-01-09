@@ -8,12 +8,20 @@
     border-radius: var(--border-radius);
     gap: 1em;
 }
-.Button {
+.MarginedButton {
     margin-top: 1em;
+}
+.Button,
+.MarginedButton {
     border: 0.05em solid var(--primary-color);
     color: var(--primary-color);
 }
 .Button:hover {
     background-color: var(--primary-color);
     color: var(--white);
+}
+.Control {
+    display: flex;
+    width: 100%;
+    gap: 1em;
 }

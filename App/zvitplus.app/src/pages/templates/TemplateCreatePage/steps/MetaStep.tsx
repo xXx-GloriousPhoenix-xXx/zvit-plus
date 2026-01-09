@@ -101,7 +101,7 @@ export function MetaStep({ value, onNext }: Props) {
                 text="Далі"
                 disabled={!isSelected}
                 onClick={() => onNext(state)}
-                extraClassName={cl.Button}
+                extraClassName={cl.MarginedButton}
             />
         </>
     );

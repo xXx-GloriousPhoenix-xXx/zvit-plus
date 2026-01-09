@@ -1,0 +1,44 @@
+{
+    "templateName": "Invoice Template",
+    "templateType": "Invoice",
+    "pageSize": "A4",
+    "orientation": "portrait",
+    "elements": [
+        {
+            "id": "title1",
+            "type": "text",
+            "text": "Invoice",
+            "position": { "x": 10, "y": 10 },
+            "style": { "fontSize": 18, "bold": true, "color": "#000000" }
+        },
+        {
+            "id": "logo",
+            "type": "image",
+            "src": "media/logo.png",
+            "position": { "x": 300, "y": 20 },
+            "size": { "width": 100, "height": 50 }
+        },
+        {
+            "id": "itemsTable",
+            "type": "table",
+            "columns": ["№", "Name", "Qty", "Price"],
+            "rows": [],
+            "position": { "x": 10, "y": 100 },
+            "style": { "border": "1px solid #ccc", "fontSize": 12 }
+        },
+        {
+            "id": "chart1",
+            "type": "chart",
+            "chartType": "bar",
+            "dataSource": "data/sales.json",
+            "position": { "x": 10, "y": 300 },
+            "size": { "width": 400, "height": 200 }
+        }
+    ],
+    "metadata": {
+        "version": "1.0",
+        "author": "John Doe",
+        "createdAt": "2026-01-09",
+        "updatedAt": "2026-01-09"
+    }
+}

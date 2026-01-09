@@ -1,13 +1,55 @@
 // editor/types.ts
 export type RepElementType = "text" | "table" | "chart" | "image";
+export type RepElementMode = "static" | "dynamic";
+export type ChartType = "bar" | "line" | "pie";
+export type AlignType = 'left' | 'center' | 'right';
+export type FontWeight = 'normal' | 'bold';
 
-export interface RepElement {
+export interface BaseRepElement {
     id: string;
     type: RepElementType;
+    mode: RepElementMode;
     position: { x: number; y: number };
     size: { width: number; height: number };
-    payload?: Record<string, unknown>;
 }
+
+interface TextElement extends BaseRepElement {
+    type: "text";
+    payload: {
+        text?: string;
+        fontSize?: number;
+        fontWeight?: FontWeight;
+        color?: string;
+        align?: AlignType;
+    };
+}
+  
+interface ImageElement extends BaseRepElement {
+    type: "image";
+    payload: {
+        src?: string;
+        alt?: string;
+    };
+}
+  
+interface ChartElement extends BaseRepElement {
+    type: "chart";
+    payload: {
+        chartType?: ChartType;
+        dataSource?: string;
+        title?: string;
+    };
+}
+  
+interface TableElement extends BaseRepElement {
+    type: "table";
+    payload: {
+        columns?: string[];
+        rows?: unknown[][];
+    };
+}
+
+export type RepElement = TextElement | ImageElement | ChartElement | TableElement;
 
 export interface RepTemplate {
     meta: MetaValue;
@@ -25,3 +67,11 @@ export interface MetaValue {
 export type PageOrientation = "portrait" | "landscape";
 export type PageSize = "A0" | "A1" | "A2" | "A3" | "A4" | "A5" | "A6";
 export const PAGE_SIZES: PageSize[] = ["A0", "A1", "A2", "A3", "A4", "A5", "A6"];
+
+export type Dimension = {
+    width: number;
+    height: number;
+}
+export type PageDimension = {
+    [key in PageSize]: Dimension
+};

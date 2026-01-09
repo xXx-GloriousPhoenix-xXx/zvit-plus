@@ -1,0 +1,372 @@
+.Wrapper {
+    display: flex;
+    height: 100vh;
+    background-color: #f9fafb;
+  }
+  
+  .Sidebar {
+    width: 16rem;
+    background-color: white;
+    border-right: 1px solid #e5e7eb;
+    padding: 1rem 1rem 1rem 0;
+    overflow-y: auto;
+  }
+  
+  .SidebarTitle {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #1f2937;
+  }
+  
+  .ButtonList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .AddButton {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s;
+    border: none;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  
+  .TextButton {
+    background-color: #dbeafe;
+    color: #1d4ed8;
+  }
+  
+  .TextButton:hover {
+    background-color: #bfdbfe;
+  }
+  
+  .ImageButton {
+    background-color: #d1fae5;
+    color: #047857;
+  }
+  
+  .ImageButton:hover {
+    background-color: #a7f3d0;
+  }
+  
+  .ChartButton {
+    background-color: #fef3c7;
+    color: #b45309;
+  }
+  
+  .ChartButton:hover {
+    background-color: #fde68a;
+  }
+  
+  .TableButton {
+    background-color: #fee2e2;
+    color: #b91c1c;
+  }
+  
+  .TableButton:hover {
+    background-color: #fecaca;
+  }
+  
+  .ElementsListTitle {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: #374151;
+  }
+  
+  .ElementsList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .ElementItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    color: #374151;
+  }
+  
+  .ElementItem:hover {
+    background-color: #f3f4f6;
+  }
+  
+  .ElementItemActive {
+    background-color: #dbeafe;
+    color: #1e40af;
+  }
+  
+  .ElementItemText {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .DeleteButton {
+    color: #ef4444;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+  }
+  
+  .DeleteButton:hover {
+    color: #b91c1c;
+  }
+  
+  .CanvasContainer {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .Header {
+    background-color: white;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 0.75rem 1rem;
+  }
+  
+  .HeaderTitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1f2937;
+  }
+  
+  .CanvasArea {
+    flex: 1;
+    background-color: #e5e7eb;
+    padding: 2rem;
+    overflow: auto;
+    position: relative;
+  }
+  
+  .Canvas {
+    background-color: white;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
+    width: 794px;
+    height: 1123px;
+    position: relative;
+  }
+  
+  .Element {
+    transition: border-color 0.2s;
+  }
+  
+  .Element:hover {
+    border-color: #93c5fd !important;
+  }
+  
+  .ElementLabel {
+    position: absolute;
+    top: 0.25rem;
+    left: 0.25rem;
+    background-color: white;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #4b5563;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  }
+  
+  .ElementContent {
+    padding: 0.75rem;
+    padding-top: 1.75rem;
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  .TextContent {
+    word-break: break-word;
+  }
+  
+  .PlaceholderIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #9ca3af;
+  }
+  
+  .TablePreview {
+    font-size: 0.75rem;
+  }
+  
+  .TableHeader {
+    display: flex;
+    border-bottom: 1px solid #d1d5db;
+    font-weight: 600;
+  }
+  
+  .TableHeaderCell {
+    flex: 1;
+    padding: 0.25rem;
+    border-right: 1px solid #d1d5db;
+  }
+  
+  .TableHeaderCell:last-child {
+    border-right: none;
+  }
+  
+  .ResizeHandle {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 1rem;
+    height: 1rem;
+    background-color: #3b82f6;
+    cursor: nwse-resize;
+    border-top-left-radius: 0.25rem;
+  }
+  
+  .PropertiesPanel {
+    display: flex;
+    flex-flow: column nowrap;
+    flex: 0 1 20rem;
+    background-color: white;
+    border-left: 1px solid #e5e7eb;
+    padding: 1rem 0 1rem 1rem;
+    overflow-y: auto;
+  }
+  
+  .PropertiesHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  
+  .PropertiesTitle {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1f2937;
+  }
+  
+  .PropertiesContent {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .PropertyGroup {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .PropertyLabel {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.25rem;
+  }
+  
+  .PropertyValue {
+    font-size: 0.875rem;
+    color: #4b5563;
+    background-color: #f9fafb;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+  }
+  
+  .PropertyRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+  
+  .PropertyInput {
+    width: 100%;
+    padding: 0.375rem 0.5rem;
+    font-size: 0.875rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+  }
+  
+  .PropertyInput:focus {
+    outline: none;
+    ring: 2px;
+    ring-color: #3b82f6;
+    border-color: transparent;
+  }
+  
+  .PropertyTextarea {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    resize: vertical;
+  }
+  
+  .PropertyTextarea:focus {
+    outline: none;
+    ring: 2px;
+    ring-color: #3b82f6;
+    border-color: transparent;
+  }
+  
+  .PropertyColorInput {
+    width: 100%;
+    height: 2.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    cursor: pointer;
+  }
+  
+  .PropertySelect {
+    width: 100%;
+    padding: 0.375rem 0.5rem;
+    font-size: 0.875rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+  }
+  
+  .PropertySelect:focus {
+    outline: none;
+    ring: 2px;
+    ring-color: #3b82f6;
+    border-color: transparent;
+  }
+  
+  .ColumnRow {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .AddColumnButton {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    background-color: #dbeafe;
+    color: #1d4ed8;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .AddColumnButton:hover {
+    background-color: #bfdbfe;
+  }

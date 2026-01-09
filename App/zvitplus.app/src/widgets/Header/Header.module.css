@@ -82,3 +82,71 @@
     background-color: var(--dark-color);
     border: 0.1em solid var(--dark-color);
 }
+
+/* Стили для бургер-меню */
+.Burger {
+    display: none;
+    flex-direction: column;
+    gap: 0.5em;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.Burger span {
+    width: 2em;
+    height: 0.2em;
+    background-color: var(--text-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+}
+
+.Menu {
+    display: flex;
+    align-items: center;
+    gap: 2em;
+}
+
+@media (max-width: 768px) {
+    .Burger {
+        display: flex;
+    }
+
+    .Menu {
+        display: flex;
+        position: absolute;
+        top: 3em;
+        left: 0;
+        width: calc(100% - 1.75em);
+        flex-direction: column;
+        background-color: var(--white);
+        padding: 1em;
+        box-shadow: var(--shadow);
+        margin: 1em;
+        z-index: 1000;
+
+        gap: 1.5em;
+        display: none;
+    }
+
+    .Menu.Open {
+        display: flex;
+    }
+
+    .Tabs,
+    .Auth {
+        flex-direction: column;
+        gap: 1em;
+        width: 100%;
+        align-items: stretch;
+    }
+
+    .Tabs a,
+    .Auth a {
+        text-align: center;
+    }
+
+    .Tabs a::after {
+        display: none;
+    }
+}

@@ -1,7 +1,10 @@
 import { useAppDispatch } from "@/app/store/hooks";
 import { createTemplate } from "@/shared/api/templates/createTemplateThunk";
+import { Button } from "@/shared/ui/Button/Button";
 import type { RepTemplate } from "../editor/types";
 import { useState } from "react";
+
+import cl from "../TemplateCreatePage.module.css";
 
 interface ReviewStepProps {
     template: RepTemplate;
@@ -27,9 +30,18 @@ export function ReviewStep({ template, onBack }: ReviewStepProps) {
 
     return (
         <>
-            <h2>Review & submit</h2>
-            <button onClick={onBack} disabled={loading}>Back</button>
-            <button onClick={submit} disabled={loading}>Create template</button>
+            <div className={cl.Control}>
+                <Button
+                    extraClassName={cl.Button}
+                    text='Назад'
+                    onClick={onBack}
+                />
+                <Button
+                    extraClassName={cl.Button}
+                    text='Завершити'
+                    onClick={submit}
+                />
+            </div>
         </>
     );
 }
