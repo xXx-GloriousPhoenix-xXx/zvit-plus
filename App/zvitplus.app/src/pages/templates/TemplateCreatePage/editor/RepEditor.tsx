@@ -44,7 +44,7 @@ export function RepEditor({ template, onChange }: Props) {
     handleResizeStart,
     handleResizeMove,
     handleResizeEnd,
-  } = useResize(updateElement);
+  } = useResize(canvasRef, updateElement);
 
   // Об'єднана обробка руху миші
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -144,13 +144,14 @@ export function RepEditor({ template, onChange }: Props) {
         </div>
         
         <div 
-          ref={canvasRef}
           className={cl.CanvasArea}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
         >
-          <div className={cl.Canvas}>
+          <div className={cl.Canvas}
+            ref={canvasRef}
+          >
             {elements.map(el => (
               <div
                 key={el.id}
@@ -205,16 +206,30 @@ export function RepEditor({ template, onChange }: Props) {
                   )}
                   
                   {el.type === 'table' && (
-                    <div className={cl.TablePreview}>
-                      <div className={cl.TableHeader}>
-                        {el.payload.columns?.map((col, i) => (
-                          <div key={i} className={cl.TableHeaderCell}>
-                            {col}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+  <div className={cl.TablePreview}>
+    {/* Заголовок */}
+    <div className={cl.TableHeader}>
+      {el.payload.columns?.map((col, i) => (
+        <div key={i} className={cl.TableHeaderCell}>
+          {col}
+        </div>
+      ))}
+    </div>
+
+    {/* Строки */}
+    <div className={cl.TableBody}>
+      {el.payload.rows?.map((row, rowIndex) => (
+        <div key={rowIndex} className={cl.TableRow}>
+          {row.map((cell, cellIndex) => (
+            <div key={cellIndex} className={cl.TableCell}>
+              {cell || ''}
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  </div>
+)}
                 </div>
 
                 {selectedElement?.id === el.id && (
@@ -388,49 +403,93 @@ export function RepEditor({ template, onChange }: Props) {
             )}
 
             {/* Властивості для таблиці */}
-            {selectedElement.type === 'table' && (
-              <div className={cl.PropertyGroup}>
-                <label className={cl.PropertyLabel}>Колонки</label>
-                {selectedElement.payload.columns?.map((col, i) => (
-                  <div key={i} className={cl.ColumnRow}>
-                    <input
-                      type="text"
-                      value={col}
-                      onChange={(e) => {
-                        const newColumns = [...(selectedElement.payload.columns || [])];
-                        newColumns[i] = e.target.value;
-                        updatePayload(selectedElement.id, { columns: newColumns });
-                      }}
-                      className={cl.PropertyInput}
-                    />
-                    <button
-                      onClick={() => {
-                        const newColumns = selectedElement.payload.columns?.filter(
-                          (_, idx) => idx !== i
-                        );
-                        updatePayload(selectedElement.id, { columns: newColumns });
-                      }}
-                      className={cl.DeleteButton}
-                    >
-                      <X size={16} />
-                    </button>
-                  </div>
-                ))}
-                <button
-                  onClick={() => {
-                    const newColumns = [
-                      ...(selectedElement.payload.columns || []), 
-                      `Колонка ${(selectedElement.payload.columns?.length || 0) + 1}`
-                    ];
-                    updatePayload(selectedElement.id, { columns: newColumns });
-                  }}
-                  className={cl.AddColumnButton}
-                >
-                  <Plus size={14} />
-                  Додати колонку
-                </button>
-              </div>
-            )}
+{selectedElement.type === 'table' && (
+  <div className={cl.PropertyGroup}>
+    {/* Колонки */}
+    <label className={cl.PropertyLabel}>Колонки</label>
+    {selectedElement.payload.columns?.map((col, i) => (
+      <div key={i} className={cl.ColumnRow}>
+        <input
+          type="text"
+          value={col}
+          onChange={(e) => {
+            const newColumns = [...(selectedElement.payload.columns || [])];
+            newColumns[i] = e.target.value;
+            updatePayload(selectedElement.id, { columns: newColumns });
+          }}
+          className={cl.PropertyInput}
+        />
+        <button
+          onClick={() => {
+            const newColumns = selectedElement.payload.columns?.filter(
+              (_, idx) => idx !== i
+            );
+            updatePayload(selectedElement.id, { columns: newColumns });
+          }}
+          className={cl.DeleteButton}
+        >
+          <X size={16} />
+        </button>
+      </div>
+    ))}
+    <button
+      onClick={() => {
+        const newColumns = [
+          ...(selectedElement.payload.columns || []), 
+          `Колонка ${(selectedElement.payload.columns?.length || 0) + 1}`
+        ];
+        updatePayload(selectedElement.id, { columns: newColumns });
+      }}
+      className={cl.AddColumnButton}
+    >
+      <Plus size={14} />
+      Додати колонку
+    </button>
+
+    {/* Строки */}
+    <label className={cl.PropertyLabel}>Рядки</label>
+    {selectedElement.payload.rows?.map((row, rowIndex) => (
+      <div key={rowIndex} className={cl.ColumnRow}>
+        {row.map((cell: any, cellIndex: number) => (
+          <input
+            key={cellIndex}
+            type="text"
+            value={cell}
+            onChange={(e) => {
+              const newRows = [...(selectedElement.payload.rows || [])];
+              newRows[rowIndex][cellIndex] = e.target.value;
+              updatePayload(selectedElement.id, { rows: newRows });
+            }}
+            className={cl.PropertyInput}
+          />
+        ))}
+        <button
+          onClick={() => {
+            const newRows = selectedElement.payload.rows?.filter(
+              (_, idx) => idx !== rowIndex
+            );
+            updatePayload(selectedElement.id, { rows: newRows });
+          }}
+          className={cl.DeleteButton}
+        >
+          <X size={16} />
+        </button>
+      </div>
+    ))}
+    <button
+      onClick={() => {
+        const columnsCount = selectedElement.payload.columns?.length || 1;
+        const newRow = Array(columnsCount).fill("");
+        const newRows = [...(selectedElement.payload.rows || []), newRow];
+        updatePayload(selectedElement.id, { rows: newRows });
+      }}
+      className={cl.AddColumnButton}
+    >
+      <Plus size={14} />
+      Додати рядок
+    </button>
+  </div>
+)}
 
             {/* Властивості для діаграми */}
             {selectedElement.type === 'chart' && (

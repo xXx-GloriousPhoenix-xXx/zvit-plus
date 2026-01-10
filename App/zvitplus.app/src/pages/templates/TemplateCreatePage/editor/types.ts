@@ -45,7 +45,7 @@ interface TableElement extends BaseRepElement {
     type: "table";
     payload: {
         columns?: string[];
-        rows?: unknown[][];
+        rows?: string[][];
     };
 }
 
@@ -67,6 +67,11 @@ export interface MetaValue {
 export type PageOrientation = "portrait" | "landscape";
 export type PageSize = "A0" | "A1" | "A2" | "A3" | "A4" | "A5" | "A6";
 export const PAGE_SIZES: PageSize[] = ["A0", "A1", "A2", "A3", "A4", "A5", "A6"];
+
+export type Position = {
+    x: number;
+    y: number;
+}
 
 export type Dimension = {
     width: number;

@@ -34,9 +34,9 @@ export function MetaStep({ value, onNext }: Props) {
 
     const isSelected = state.templateName && state.templateTypeId;
 
-    useEffect(() => {
-        console.log(state, isSelected);
-    }, [state])
+    // useEffect(() => {
+    //     console.log(state, isSelected);
+    // }, [state])
 
     return (
         <>
