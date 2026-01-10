@@ -63,12 +63,10 @@ export function useResize(
       maxWidth
     );
 
-    const newHeight = resizeStartRef.current.type === 'table'
-    ? resizeStartRef.current.height
-    : Math.min(
-        Math.max(60, resizeStartRef.current.height + deltaY),
-        maxHeight
-      );
+    const newHeight = Math.min(
+      Math.max(60, resizeStartRef.current.height + deltaY),
+      maxHeight
+    );
 
     updateElement(resizingElement, {
       size: {

@@ -1,104 +1,79 @@
-import { Plus, X } from "lucide-react";
+import { Plus, Minus } from "lucide-react";
 import type { RepElement, TableElement } from "../../../types";
+import cl from "../PropertyPanel.module.css";
+import { useTable } from "../../../hooks/useTable";
+import { useEffect } from "react";
 
 type TablePropertiesProps = {
     selectedElement: TableElement;
-    updatePayload: (id: string, payloadUpdates: Partial<RepElement['payload']>) => void;
-}
-
-import cl from '../PropertyPanel.module.css';
+    updatePayload: (
+        id: string,
+        payloadUpdates: Partial<RepElement["payload"]>
+    ) => void;
+};
 
 export function TableProperties({
     selectedElement,
-    updatePayload
-} : TablePropertiesProps) {
+    updatePayload,
+}: TablePropertiesProps) {
+    const table = useTable(selectedElement, updatePayload);
+
+    useEffect(() => {
+        console.log(`${table.rows.length}x${table.columns.length}`);
+    }, [table.rows, table.columns]);
+
     return (
-        <div className={cl.PropertyGroup}>
+        <div className={cl.PropertyRow}>
+            
             {/* Колонки */}
-            <label className={cl.PropertyLabel}>Колонки</label>
-            {selectedElement.payload.columns?.map((col, i) => (
-                <div key={i} className={cl.ColumnRow}>
-                    <input
-                        type="text"
-                        value={col}
-                        onChange={(e) => {
-                            const newColumns = [...(selectedElement.payload.columns || [])];
-                            newColumns[i] = e.target.value;
-                            updatePayload(selectedElement.id, { columns: newColumns });
-                        }}
-                        className={cl.PropertyInput}
-                    />
+            <div className={cl.PropertyGroup}>
+                <label className={cl.PropertyLabel}>Колонки</label>
+                <div className={cl.CounterRow}>
                     <button
-                        onClick={() => {
-                            const newColumns = selectedElement.payload.columns?.filter(
-                                (_, idx) => idx !== i
-                            );
-                            updatePayload(selectedElement.id, { columns: newColumns });
-                        }}
-                        className={cl.DeleteButton}
+                        className={cl.CounterButton}
+                        onClick={table.removeColumn}
+                        disabled={table.columns.length <= 1}
                     >
-                        <X size={16} />
+                        <Minus size={14} />
+                    </button>
+
+                    <span className={cl.CounterValue}>
+                        {table.columns.length}
+                    </span>
+
+                    <button
+                        className={cl.CounterButton}
+                        onClick={table.addColumn}
+                    >
+                        <Plus size={14} />
                     </button>
                 </div>
-            ))}
-
-            <button
-                onClick={() => {
-                    const newColumns = [
-                        ...(selectedElement.payload.columns || []), 
-                        `Колонка ${(selectedElement.payload.columns?.length || 0) + 1}`
-                    ];
-                    updatePayload(selectedElement.id, { columns: newColumns });
-                }}
-                className={cl.AddColumnButton}
-            >
-                <Plus size={14} />
-                Додати колонку
-            </button>
+            </div>
 
             {/* Рядки */}
-            <label className={cl.PropertyLabel}>Рядки</label>
-            {selectedElement.payload.rows?.map((row, rowIndex) => (
-                <div key={rowIndex} className={cl.ColumnRow}>
-                    {row.map((cell: any, cellIndex: number) => (
-                        <input
-                            key={cellIndex}
-                            type="text"
-                            value={cell}
-                            onChange={(e) => {
-                                const newRows = [...(selectedElement.payload.rows || [])];
-                                newRows[rowIndex][cellIndex] = e.target.value;
-                                updatePayload(selectedElement.id, { rows: newRows });
-                            }}
-                            className={cl.PropertyInput}
-                        />
-                    ))}
+            <div className={cl.PropertyGroup}>
+                <label className={cl.PropertyLabel}>Рядки</label>
+                <div className={cl.CounterRow}>
                     <button
-                        onClick={() => {
-                            const newRows = selectedElement.payload.rows?.filter(
-                                (_, idx) => idx !== rowIndex
-                            );
-                            updatePayload(selectedElement.id, { rows: newRows });
-                        }}
-                        className={cl.DeleteButton}
+                        className={cl.CounterButton}
+                        onClick={table.removeRow}
+                        disabled={table.rows.length <= 1}
                     >
-                        <X size={16} />
+                        <Minus size={14} />
+                    </button>
+
+                    <span className={cl.CounterValue}>
+                        {table.rows.length}
+                    </span>
+
+                    <button
+                        className={cl.CounterButton}
+                        onClick={table.addRow}
+                    >
+                        <Plus size={14} />
                     </button>
                 </div>
-            ))}
-            
-            <button
-                onClick={() => {
-                    const columnsCount = selectedElement.payload.columns?.length || 1;
-                    const newRow = Array(columnsCount).fill("");
-                    const newRows = [...(selectedElement.payload.rows || []), newRow];
-                    updatePayload(selectedElement.id, { rows: newRows });
-                }}
-                className={cl.AddColumnButton}
-            >
-                <Plus size={14} />
-                Додати рядок
-            </button>
+            </div>
         </div>
     );
 }

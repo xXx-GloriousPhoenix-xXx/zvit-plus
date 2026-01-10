@@ -54,12 +54,51 @@
     gap: 0.75rem;
 }
   
+.RowGroup {
+    display: grid;
+    gap: 0.5rem;
+    align-items: center;
+}
+
 .PropertyInput {
     width: 100%;
-    padding: 0.375rem 0.5rem;
+    padding: 0.5rem;
     font-size: 0.875rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.375rem;
+    border: 0.05rem solid #ddd;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+.CounterRow {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.CounterButton {
+    /* width: 2em;
+    height: 2em; */
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    border: 0.05em solid #ddd;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+.CounterButton:hover {
+    border-color: var(--primary-color);
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+.CounterValue {
+    min-width: 2em;
+    text-align: center;
+    font-weight: 500;
 }
   
 .PropertyInput:focus {
