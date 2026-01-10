@@ -13,7 +13,7 @@ export interface BaseRepElement {
     size: { width: number; height: number };
 }
 
-interface TextElement extends BaseRepElement {
+export interface TextElement extends BaseRepElement {
     type: "text";
     payload: {
         text?: string;
@@ -24,7 +24,7 @@ interface TextElement extends BaseRepElement {
     };
 }
   
-interface ImageElement extends BaseRepElement {
+export interface ImageElement extends BaseRepElement {
     type: "image";
     payload: {
         src?: string;
@@ -32,7 +32,7 @@ interface ImageElement extends BaseRepElement {
     };
 }
   
-interface ChartElement extends BaseRepElement {
+export interface ChartElement extends BaseRepElement {
     type: "chart";
     payload: {
         chartType?: ChartType;
@@ -41,7 +41,7 @@ interface ChartElement extends BaseRepElement {
     };
 }
   
-interface TableElement extends BaseRepElement {
+export interface TableElement extends BaseRepElement {
     type: "table";
     payload: {
         columns?: string[];

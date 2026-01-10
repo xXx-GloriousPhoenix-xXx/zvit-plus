@@ -1,0 +1,106 @@
+.CanvasContainer {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .Header {
+    background-color: white;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 0 1rem 0.75rem 1rem;
+  }
+  
+  .HeaderTitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1f2937;
+  }
+  
+  .CanvasArea {
+    flex: 1;
+    background-color: #e5e7eb;
+    padding: 2rem;
+    overflow: auto;
+    position: relative;
+    scrollbar-width: thin;
+  }
+  
+  .Canvas {
+    background-color: white;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
+    width: 794px;
+    height: 1123px;
+    position: relative;
+  }
+  
+  .Element {
+    transition: border-color 0.2s;
+  }
+  
+  .Element:hover {
+    border-color: #93c5fd !important;
+  }
+  
+  .ElementLabel {
+    position: absolute;
+    top: 0.25rem;
+    left: 0.25rem;
+    background-color: white;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #4b5563;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  }
+  
+  .ElementContent {
+    padding: 0.75rem;
+    padding-top: 1.75rem;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .TextContent {
+    word-break: break-word;
+  }
+  
+  .PlaceholderIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #9ca3af;
+  }
+  
+  .TablePreview {
+    font-size: 0.75rem;
+  }
+  
+  .TableHeader {
+    display: flex;
+    border-bottom: 1px solid #d1d5db;
+    font-weight: 600;
+  }
+  
+  .TableHeaderCell {
+    flex: 1;
+    padding: 0.25rem;
+    border-right: 1px solid #d1d5db;
+  }
+  
+  .TableHeaderCell:last-child {
+    border-right: none;
+  }
+  
+  .ResizeHandle {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 1rem;
+    height: 1rem;
+    background-color: #3b82f6;
+    cursor: nwse-resize;
+    border-top-left-radius: 0.25rem;
+  }

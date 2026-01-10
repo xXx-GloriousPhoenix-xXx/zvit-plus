@@ -1,0 +1,124 @@
+.Sidebar {
+    width: 16rem;
+    background-color: white;
+    border-right: 1px solid #e5e7eb;
+    padding: 0 1rem 1rem 0;
+    overflow-y: auto;
+}
+  
+.SidebarTitle {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #1f2937;
+}
+
+.ButtonList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .AddButton {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s;
+    border: none;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  
+  .TextButton {
+    background-color: #dbeafe;
+    color: #1d4ed8;
+  }
+  
+  .TextButton:hover {
+    background-color: #bfdbfe;
+  }
+  
+  .ImageButton {
+    background-color: #d1fae5;
+    color: #047857;
+  }
+  
+  .ImageButton:hover {
+    background-color: #a7f3d0;
+  }
+  
+  .ChartButton {
+    background-color: #fef3c7;
+    color: #b45309;
+  }
+  
+  .ChartButton:hover {
+    background-color: #fde68a;
+  }
+  
+  .TableButton {
+    background-color: #fee2e2;
+    color: #b91c1c;
+  }
+  
+  .TableButton:hover {
+    background-color: #fecaca;
+  }
+
+  .ElementsListTitle {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: #374151;
+  }
+  
+  .ElementsList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .ElementItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    color: #374151;
+  }
+  
+  .ElementItem:hover {
+    background-color: #f3f4f6;
+  }
+  
+  .ElementItemActive {
+    background-color: #dbeafe;
+    color: #1e40af;
+  }
+  
+  .ElementItemText {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .DeleteButton {
+    color: #ef4444;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+  }
+  
+  .DeleteButton:hover {
+    color: #b91c1c;
+  }
