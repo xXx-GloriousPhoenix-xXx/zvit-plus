@@ -75,7 +75,7 @@ export function ElementRenderer({
         width: element.size.width,
         height: element.size.height,
         backgroundColor: ELEMENT_COLORS[element.type],
-        border: isSelected ? '0.05rem solid var(--primary-color)' : '0.05rem dashed var(--secondary-color)',
+        border: isSelected ? '0.05rem solid var(--secondary-color)' : '0.05rem dashed #ddd',
         cursor: isDragged ? 'grabbing' : 'grab',
         borderRadius: 'var(--border-radius)',
       }}
