@@ -1,46 +1,44 @@
 import { useState, useCallback, useRef } from 'react';
-import type { RepElement, RepElementType } from '../types';
+import type { RepElement } from '../types';
 
 export function useResize(
   canvasRef: React.RefObject<HTMLDivElement | null>,
   updateElement: (id: string, updates: Partial<RepElement>) => void
 ) {
   const [resizingElement, setResizingElement] = useState<string | null>(null);
-  const resizeStartRef = useRef<{
-    mouseX: number;
-    mouseY: number;
-    width: number;
-    height: number;
+
+  const resizeRef = useRef<{
+    startX: number;
+    startY: number;
+    startWidth: number;
+    startHeight: number;
     elementX: number;
     elementY: number;
-    type?: RepElementType;
   }>({
-    mouseX: 0,
-    mouseY: 0,
-    width: 0,
-    height: 0,
+    startX: 0,
+    startY: 0,
+    startWidth: 0,
+    startHeight: 0,
     elementX: 0,
-    elementY: 0,
-    type: undefined
+    elementY: 0
   });
 
-  const handleResizeStart = useCallback((
-    e: React.MouseEvent,
-    element: RepElement
-  ) => {
+  const handleResizeStart = useCallback((e: React.MouseEvent, element: RepElement) => {
     e.stopPropagation();
     setResizingElement(element.id);
-  
-    resizeStartRef.current = {
-      mouseX: e.clientX,
-      mouseY: e.clientY,
-      width: element.size.width,
-      height: element.size.height,
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    resizeRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      startWidth: element.size.width,
+      startHeight: element.size.height,
       elementX: element.position.x,
-      elementY: element.position.y,
-      type: element.type
+      elementY: element.position.y
     };
-  }, []);
+  }, [canvasRef]);
 
   const handleResizeMove = useCallback((e: React.MouseEvent) => {
     if (!resizingElement) return;
@@ -48,33 +46,23 @@ export function useResize(
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const rect = canvas.getBoundingClientRect();
-    const canvasWidth = rect.width;
-    const canvasHeight = rect.height;
+    const deltaX = e.clientX - resizeRef.current.startX;
+    const deltaY = e.clientY - resizeRef.current.startY;
 
-    const maxWidth = canvasWidth - resizeStartRef.current.elementX;
-    const maxHeight = canvasHeight - resizeStartRef.current.elementY;
+    const newWidth = Math.max(120, resizeRef.current.startWidth + deltaX);
+    const newHeight = Math.max(60, resizeRef.current.startHeight + deltaY);
 
-    const deltaX = e.clientX - resizeStartRef.current.mouseX;
-    const deltaY = e.clientY - resizeStartRef.current.mouseY;
-
-    const newWidth = Math.min(
-      Math.max(120, resizeStartRef.current.width + deltaX),
-      maxWidth
-    );
-
-    const newHeight = Math.min(
-      Math.max(60, resizeStartRef.current.height + deltaY),
-      maxHeight
-    );
+    // const canvasRect = canvas.getBoundingClientRect();
+    const maxWidth = canvas.scrollWidth - resizeRef.current.elementX;
+    const maxHeight = canvas.scrollHeight - resizeRef.current.elementY;
 
     updateElement(resizingElement, {
       size: {
-        width: newWidth,
-        height: newHeight
+        width: Math.min(newWidth, maxWidth),
+        height: Math.min(newHeight, maxHeight)
       }
-    } as Partial<RepElement>);
-  }, [resizingElement, updateElement]);
+    });
+  }, [resizingElement, canvasRef, updateElement]);
 
   const handleResizeEnd = useCallback(() => {
     setResizingElement(null);
@@ -84,6 +72,6 @@ export function useResize(
     resizingElement,
     handleResizeStart,
     handleResizeMove,
-    handleResizeEnd,
+    handleResizeEnd
   };
 }

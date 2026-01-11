@@ -2,15 +2,14 @@ import { ELEMENT_COLORS } from "@/shared/constants/editor";
 import type { RepElement } from "../../../types";
 import { BarChart3, Image } from "lucide-react";
 import cl from '../Canvas.module.css';
-
 import { TableContent } from "./TableContent";
 
 interface ElementRendererProps {
   element: RepElement;
   isSelected: boolean;
   isDragged: boolean;
-  onDragStart: (e: React.MouseEvent<Element, MouseEvent>, element: RepElement) => void;
-  onResizeStart: (e: React.MouseEvent<Element, MouseEvent>, element: RepElement) => void;
+  onDragStart: (e: React.MouseEvent, element: RepElement) => void;
+  onResizeStart: (e: React.MouseEvent, element: RepElement) => void;
   onSelect: (element: RepElement) => void;
   resizeHandleClass: string;
 }
@@ -41,24 +40,20 @@ export function ElementRenderer({
             {element.payload.text || 'Порожній текст'}
           </div>
         );
-      
       case 'image':
         return (
           <div className={cl.PlaceholderIcon}>
             <Image size={32} />
           </div>
         );
-      
       case 'chart':
         return (
           <div className={cl.PlaceholderIcon}>
             <BarChart3 size={32} />
           </div>
         );
-      
       case 'table':
         return <TableContent element={element} />;
-      
       default:
         return null;
     }
@@ -66,6 +61,7 @@ export function ElementRenderer({
 
   return (
     <div
+      id={element.id}
       onMouseDown={(e) => {
         onDragStart(e, element);
         onSelect(element);
@@ -77,16 +73,15 @@ export function ElementRenderer({
         width: element.size.width,
         height: element.size.height,
         backgroundColor: ELEMENT_COLORS[element.type],
-        border: isSelected ? '0.05rem solid var(--secondary-color)' : '0.05rem dashed #ddd',
+        borderWidth: '0.05rem',
+        borderColor: 'var(--secondary-color)',
+        borderStyle: isSelected ? 'solid' : 'dashed',
         cursor: isDragged ? 'grabbing' : 'grab',
         borderRadius: 'var(--border-radius)',
+        transition: 'none',
       }}
       className={cl.Element}
     >
-      <div className={cl.ElementLabel}>
-        {element.type} {element.mode === 'static' && '(статичний)'}
-      </div>
-      
       <div className={cl.ElementContent}>
         {renderContent()}
       </div>

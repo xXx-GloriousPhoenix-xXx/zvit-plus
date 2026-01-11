@@ -1,80 +1,63 @@
 import { useState, useCallback, useRef } from 'react';
-import type { Dimension, Position, RepElement } from '../types';
+import type { RepElement } from '../types';
 
 export function useDragAndDrop(
   canvasRef: React.RefObject<HTMLDivElement | null>,
   updateElement: (id: string, updates: Partial<RepElement>) => void
 ) {
   const [draggedElement, setDraggedElement] = useState<string | null>(null);
-  const dragRef = useRef<Position & Dimension>({
-    x: 0, y: 0,
-    width: 50, height: 50
-  });
+  const dragOffset = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
 
-  const handleMouseDown = useCallback((
-    e: React.MouseEvent, 
-    element: RepElement,
-    resizeHandleClass: string
-  ) => {
-    if ((e.target as HTMLElement).classList.contains(resizeHandleClass)) return;
-    
-    e.stopPropagation();
-    setDraggedElement(element.id);
-    
-    // Розмір об'єкту
-    dragRef.current = {
-      ...dragRef.current,
-      width: element.size.width,
-      height: element.size.height,
-    };    
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent, element: RepElement) => {
+      e.stopPropagation();
+      setDraggedElement(element.id);
 
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    
-    const rect = canvas.getBoundingClientRect();
+      const canvas = canvasRef.current;
+      if (!canvas) return;
 
-    // Позиція курсору усередині об'єкту
-    dragRef.current = {
-      ...dragRef.current,
-      x: e.clientX - rect.left - element.position.x,
-      y: e.clientY - rect.top - element.position.y
-    };
-  }, [canvasRef]);
+      const canvasRect = canvas.getBoundingClientRect();
 
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!draggedElement) return;
-    
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+      dragOffset.current = {
+        x: e.clientX - canvasRect.left - element.position.x,
+        y: e.clientY - canvasRect.top - element.position.y
+      };
+    },
+    [canvasRef]
+  );
 
-    const rect = canvas.getBoundingClientRect();
-    const borderLeft = rect.left;
-    const borderTop = rect.top;
-    const canvasWidth = rect.width;
-    const canvasHeight = rect.height;
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (!draggedElement) return;
 
-    // Позиція курсору усередені холсту
-    const positionX = e.clientX - borderLeft;
-    const positionY = e.clientY - borderTop;
+      const canvas = canvasRef.current;
+      if (!canvas) return;
 
-    const newX = Math.max(0, Math.min(positionX - dragRef.current.x, canvasWidth - dragRef.current.width));
-    const newY = Math.max(0, Math.min(positionY - dragRef.current.y, canvasHeight - dragRef.current.height));
-    
-    console.log(rect.width, rect.height);
+      const canvasRect = canvas.getBoundingClientRect();
+      const scrollLeft = canvas.scrollLeft;
+      const scrollTop = canvas.scrollTop;
 
-    updateElement(draggedElement, {
-      position: { x: newX, y: newY }
-    } as Partial<RepElement>);
-  }, [draggedElement, canvasRef, updateElement]);
+      let newX = e.clientX - canvasRect.left + scrollLeft - dragOffset.current.x;
+      let newY = e.clientY - canvasRect.top + scrollTop - dragOffset.current.y;
+
+      const elementEl = document.getElementById(draggedElement);
+      if (!elementEl) return;
+      const width = elementEl.offsetWidth;
+      const height = elementEl.offsetHeight;
+
+      newX = Math.max(0, Math.min(newX, canvas.scrollWidth - width));
+      newY = Math.max(0, Math.min(newY, canvas.scrollHeight - height));
+
+      updateElement(draggedElement, {
+        position: { x: newX, y: newY }
+      });
+    },
+    [draggedElement, canvasRef, updateElement]
+  );
 
   const handleMouseUp = useCallback(() => {
     setDraggedElement(null);
   }, []);
 
-  return {
-    draggedElement,
-    handleMouseDown,
-    handleMouseMove,
-    handleMouseUp,
-  };
+  return { draggedElement, handleMouseDown, handleMouseMove, handleMouseUp };
 }

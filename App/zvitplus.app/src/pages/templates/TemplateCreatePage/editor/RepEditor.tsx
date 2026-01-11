@@ -1,5 +1,5 @@
 // editor/RepEditor.tsx
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import type { RepTemplate } from "./types";
 
@@ -24,6 +24,16 @@ export function RepEditor({ template, onChange }: Props) {
     const rep = useRepEditor({ template, onChange });
     const drag = useDragAndDrop(canvasRef, rep.updateElement);
     const resize = useResize(canvasRef, rep.updateElement);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+          if (e.key === "Delete" && rep.selectedElement) {
+            rep.deleteElement(rep.selectedElement.id);
+          }
+        };
+        document.addEventListener("keydown", handleKeyDown);
+        return () => document.removeEventListener("keydown", handleKeyDown);
+    }, [rep.selectedElement, rep.deleteElement]);
 
     return (
         <div className={cl.Wrapper}>
