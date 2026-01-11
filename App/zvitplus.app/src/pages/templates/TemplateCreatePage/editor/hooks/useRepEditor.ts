@@ -61,7 +61,9 @@ export function useRepEditor({ template, onChange }: UseRepEditorProps) {
         ? { src: '', alt: '' }
         : type === 'chart'
         ? { chartType: 'bar', dataSource: '', title: '' }
-        : { columns: ['Колонка 1', 'Колонка 2'], rows: [] }
+        : { columns: ['Колонка 1', 'Колонка 2'], rows: [
+          ['', '']
+        ] }
     } as RepElement;
 
     setElements(prev => [...prev, newElement]);

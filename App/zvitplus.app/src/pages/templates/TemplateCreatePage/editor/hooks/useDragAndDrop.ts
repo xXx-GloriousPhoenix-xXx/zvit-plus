@@ -6,11 +6,9 @@ export function useDragAndDrop(
   updateElement: (id: string, updates: Partial<RepElement>) => void
 ) {
   const [draggedElement, setDraggedElement] = useState<string | null>(null);
-  const dragRef = useRef<Position & Dimension>({ 
-    x: 0,
-    y: 0,
-    width: 50,
-    height: 50
+  const dragRef = useRef<Position & Dimension>({
+    x: 0, y: 0,
+    width: 50, height: 50
   });
 
   const handleMouseDown = useCallback((
@@ -80,5 +78,3 @@ export function useDragAndDrop(
     handleMouseUp,
   };
 }
-
-//TODO: FIX

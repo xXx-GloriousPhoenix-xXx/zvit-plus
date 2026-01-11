@@ -1,0 +1,11 @@
+.Header {
+    background-color: white;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 0 1rem 0.75rem 1rem;
+}
+  
+.HeaderTitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1f2937;
+}

@@ -2,7 +2,6 @@ import { Plus, Minus } from "lucide-react";
 import type { RepElement, TableElement } from "../../../types";
 import cl from "../PropertyPanel.module.css";
 import { useTable } from "../../../hooks/useTable";
-import { useEffect } from "react";
 
 type TablePropertiesProps = {
     selectedElement: TableElement;
@@ -17,10 +16,6 @@ export function TableProperties({
     updatePayload,
 }: TablePropertiesProps) {
     const table = useTable(selectedElement, updatePayload);
-
-    useEffect(() => {
-        console.log(`${table.rows.length}x${table.columns.length}`);
-    }, [table.rows, table.columns]);
 
     return (
         <div className={cl.PropertyRow}>
