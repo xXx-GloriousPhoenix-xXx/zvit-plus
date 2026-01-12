@@ -1,5 +1,5 @@
+import type { CanvasProps } from '../Canvas';
 import cl from '../Canvas.module.css';
-import type { CanvasProps } from '../../../../../../../shared/types/repEditorTypes';
 
 interface CanvasAreaProps extends Pick<CanvasProps, 
   'handleDragMove' | 

@@ -80,3 +80,8 @@ export type Dimension = {
 export type PageDimension = {
     [key in PageSize]: Dimension
 };
+
+export type Cell = {
+    row: number | null;
+    col: number;
+}

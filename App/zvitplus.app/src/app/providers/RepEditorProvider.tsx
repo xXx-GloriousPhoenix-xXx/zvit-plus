@@ -44,7 +44,6 @@ export function RepEditorProvider({ template, onChange, children }: Props) {
       }}
     >
       {children}
-      {/* <div ref={canvasRef} hidden /> */}
     </RepEditorContext.Provider>
   );
 }
