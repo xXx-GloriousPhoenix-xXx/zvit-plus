@@ -41,11 +41,13 @@ export interface ChartElement extends BaseRepElement {
     };
 }
   
+export interface TableCell extends Partial<TextElement['payload']> {};
+
 export interface TableElement extends BaseRepElement {
     type: "table";
     payload: {
-        columns?: string[];
-        rows?: string[][];
+        columns?: TableCell[];
+        rows?: TableCell[][];
     };
 }
 

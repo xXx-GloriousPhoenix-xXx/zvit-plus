@@ -16,9 +16,9 @@ export function TableContent({ element }: TableContentProps) {
     useEffect(() => {
         if (editingCell) {
             if (editingCell.row === null) {
-                setEditingValue(columns[editingCell.col] || '');
+                setEditingValue(columns[editingCell.col]?.text ?? '');
             } else {
-                setEditingValue(rows[editingCell.row][editingCell.col] || '');
+                setEditingValue(rows[editingCell.row][editingCell.col]?.text ?? '');
             }
 
             inputRef.current?.focus();
@@ -28,14 +28,24 @@ export function TableContent({ element }: TableContentProps) {
 
     const saveCell = () => {
         if (!editingCell) return;
+        // if (!editingValue) return;
 
         if (editingCell.row === null) {
-            const newColumns = [...columns];
-            newColumns[editingCell.col] = editingValue;
+            const newColumns = columns.map((col, idx) => 
+                idx === editingCell.col 
+                    ? { ...col, text: editingValue ?? '' }
+                    : col
+                );
             element.payload.columns = newColumns;
         } else {
             const newRows = rows.map((row, r) =>
-                r === editingCell.row ? row.map((cell, c) => (c === editingCell.col ? editingValue : cell)) : row
+                r === editingCell.row
+                    ? row.map((cell, c) => (
+                        c === editingCell.col
+                            ? { ...cell, text: editingValue ?? '' }
+                            : cell
+                        ))
+                    : row
             );
             element.payload.rows = newRows;
         }
@@ -71,7 +81,9 @@ export function TableContent({ element }: TableContentProps) {
                                 onBlur={saveCell}
                                 onKeyDown={(e) => { if (e.key === 'Enter') saveCell() }}
                             />
-                        ) : col}
+                        ) : (
+                            col.text || `Заголовок ${i + 1}`
+                        )}
                     </div>
                 )
             })}
@@ -99,7 +111,7 @@ export function TableContent({ element }: TableContentProps) {
                                     onKeyDown={(e) => { if (e.key === 'Enter') saveCell() }}
                                 />
                             ) : (
-                                cell || `Клітинка ${rowIndex + 1}×${colIndex + 1}`
+                                cell.text || `Клітинка ${rowIndex + 1}×${colIndex + 1}`
                             )}
                         </div>
                     );
