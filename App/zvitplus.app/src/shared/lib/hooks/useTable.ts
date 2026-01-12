@@ -1,4 +1,4 @@
-import type { RepElement, TableElement } from "../types";
+import type { RepElement, TableElement } from "../../types/repEditorTypes";
 
 export function useTable(
     selectedElement: TableElement,

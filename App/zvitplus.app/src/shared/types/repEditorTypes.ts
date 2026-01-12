@@ -80,20 +80,3 @@ export type Dimension = {
 export type PageDimension = {
     [key in PageSize]: Dimension
 };
-
-export type CanvasProps = {
-    handleDragStart: (e: React.MouseEvent<Element, MouseEvent>, element: RepElement, resizeHandleClass: string) => void;
-    handleDragMove: (e: React.MouseEvent<Element, MouseEvent>) => void;
-    handleDragEnd: () => void;
-
-    handleResizeStart: (e: React.MouseEvent<Element, MouseEvent>, element: RepElement) => void;
-    handleResizeMove: (e: React.MouseEvent<Element, MouseEvent>) => void;
-    handleResizeEnd: () => void;
-
-    setSelectedElement: (value: React.SetStateAction<RepElement | null>) => void;
-
-    elements: RepElement[];
-    selectedElement: RepElement | null;
-    draggedElement: string | null;
-    canvasRef: React.RefObject<HTMLDivElement | null>;
-}

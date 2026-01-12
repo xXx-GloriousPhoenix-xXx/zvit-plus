@@ -1,5 +1,5 @@
 // steps/EditorStep.tsx
-import type { RepTemplate } from "../editor/types";
+import type { RepTemplate } from "../../../../shared/types/repEditorTypes";
 import { RepEditor } from "../editor/RepEditor";
 import { Button } from "@/shared/ui/Button/Button";
 

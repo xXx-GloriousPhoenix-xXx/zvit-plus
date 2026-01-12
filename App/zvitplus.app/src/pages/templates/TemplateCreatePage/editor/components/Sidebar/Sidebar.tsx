@@ -1,29 +1,16 @@
 import { BarChart3, Image, Table, Type, X } from 'lucide-react';
 import cl from './Sidebar.module.css';
-import type { RepElement, RepElementMode, RepElementType } from '../../types';
+import { useRepEditorContext } from '@/app/context/RepEditorContext';
 
-type SidebarProps = {
-    elements: RepElement[];
-    selectedElement: RepElement | null;
-    addElement: (type: RepElementType, mode: RepElementMode) => void;
-    deleteElement: (id: string) => void;
-    setSelectedElement: React.Dispatch<React.SetStateAction<RepElement | null>>
-}
-
-export function Sidebar({ 
-    elements,
-    selectedElement,
-    addElement, 
-    deleteElement,
-    setSelectedElement
-} : SidebarProps) {
+export function Sidebar() {
+    const {elements, selectedElement, rep } = useRepEditorContext();
     return (
         <div className={cl.Sidebar}>
         <h2 className={cl.SidebarTitle}>Елементи</h2>
         
         <div className={cl.ButtonList}>
           <button 
-            onClick={() => addElement('text', 'static')} 
+            onClick={() => rep.addElement('text', 'static')} 
             className={`${cl.AddButton} ${cl.TextButton}`}
           >
             <Type size={18} />
@@ -31,7 +18,7 @@ export function Sidebar({
           </button>
           
           <button 
-            onClick={() => addElement('text', 'dynamic')} 
+            onClick={() => rep.addElement('text', 'dynamic')} 
             className={`${cl.AddButton} ${cl.TextButton}`}
           >
             <Type size={18} />
@@ -39,7 +26,7 @@ export function Sidebar({
           </button>
           
           <button 
-            onClick={() => addElement('image', 'dynamic')} 
+            onClick={() => rep.addElement('image', 'dynamic')} 
             className={`${cl.AddButton} ${cl.ImageButton}`}
           >
             <Image size={18} />
@@ -47,7 +34,7 @@ export function Sidebar({
           </button>
           
           <button 
-            onClick={() => addElement('chart', 'dynamic')} 
+            onClick={() => rep.addElement('chart', 'dynamic')} 
             className={`${cl.AddButton} ${cl.ChartButton}`}
           >
             <BarChart3 size={18} />
@@ -55,7 +42,7 @@ export function Sidebar({
           </button>
           
           <button 
-            onClick={() => addElement('table', 'dynamic')} 
+            onClick={() => rep.addElement('table', 'dynamic')} 
             className={`${cl.AddButton} ${cl.TableButton}`}
           >
             <Table size={18} />
@@ -70,7 +57,7 @@ export function Sidebar({
               {elements.map(el => (
                 <div
                   key={el.id}
-                  onClick={() => setSelectedElement(el)}
+                  onClick={() => rep.setSelectedElement(el)}
                   className={`${cl.ElementItem} ${
                     selectedElement?.id === el.id ? cl.ElementItemActive : ''
                   }`}
@@ -81,7 +68,7 @@ export function Sidebar({
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      deleteElement(el.id);
+                      rep.deleteElement(el.id);
                     }}
                     className={cl.DeleteButton}
                   >

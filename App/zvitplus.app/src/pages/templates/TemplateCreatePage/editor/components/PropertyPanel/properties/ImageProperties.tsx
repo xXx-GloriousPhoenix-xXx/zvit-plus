@@ -1,4 +1,4 @@
-import type { ImageElement, RepElement } from "../../../types";
+import type { ImageElement, RepElement } from "../../../../../../../shared/types/repEditorTypes";
 
 type ImagePropertiesProps = {
     selectedElement: ImageElement;

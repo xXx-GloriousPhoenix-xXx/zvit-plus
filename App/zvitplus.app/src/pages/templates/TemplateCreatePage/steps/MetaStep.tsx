@@ -12,10 +12,10 @@ import { fetchTemplateTypes } from "@/shared/api/templateTypes/templateTypesSlic
 
 import cl from "../TemplateCreatePage.module.css";
 
-import type { PageSize, PageOrientation } from "../editor/types";
-import { PAGE_SIZES } from "../editor/types";
+import type { PageSize, PageOrientation } from "../../../../shared/types/repEditorTypes";
+import { PAGE_SIZES } from "../../../../shared/types/repEditorTypes";
 
-import type { MetaValue } from "../editor/types";
+import type { MetaValue } from "../../../../shared/types/repEditorTypes";
 
 interface Props {
     value: MetaValue;

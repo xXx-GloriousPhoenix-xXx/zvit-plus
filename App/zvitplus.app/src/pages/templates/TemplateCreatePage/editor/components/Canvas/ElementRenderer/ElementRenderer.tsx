@@ -1,5 +1,5 @@
 import { ELEMENT_COLORS } from "@/shared/constants/editor";
-import type { RepElement } from "../../../types";
+import type { RepElement } from "../../../../../../../shared/types/repEditorTypes";
 import { BarChart3, Image } from "lucide-react";
 import cl from '../Canvas.module.css';
 import { TableContent } from "./TableContent";

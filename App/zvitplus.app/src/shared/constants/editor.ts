@@ -1,4 +1,4 @@
-import type { PageDimension, PageSize, RepElementType } from "@/pages/templates/TemplateCreatePage/editor/types";
+import type { PageDimension, PageSize, RepElementType } from "@/shared/types/repEditorTypes";
 
 // export const ELEMENT_COLORS: Record<RepElementType, string> = {
 //     text: "rgba(0, 102, 255, 0.2)",    // синій

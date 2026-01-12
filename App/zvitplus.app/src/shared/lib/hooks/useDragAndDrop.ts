@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
-import type { RepElement } from '../types';
+import type { RepElement } from '../../types/repEditorTypes';
 
 export function useDragAndDrop(
   canvasRef: React.RefObject<HTMLDivElement | null>,

@@ -1,5 +1,5 @@
 import { baseApi } from "@/shared/api/baseApi";
-import type { RepTemplate } from "@/pages/templates/TemplateCreatePage/editor/types.ts";
+import type { RepTemplate } from "@/shared/types/repEditorTypes";
 
 export interface CreateTemplateRequest {
     name: string;

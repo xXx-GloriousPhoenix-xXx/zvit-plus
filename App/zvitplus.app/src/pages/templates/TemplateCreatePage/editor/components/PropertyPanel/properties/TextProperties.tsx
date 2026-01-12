@@ -1,4 +1,4 @@
-import type { AlignType, FontWeight, RepElement, TextElement } from "../../../types";
+import type { AlignType, FontWeight, RepElement, TextElement } from "../../../../../../../shared/types/repEditorTypes";
 
 type TextPropertiesProps = {
     selectedElement: TextElement;

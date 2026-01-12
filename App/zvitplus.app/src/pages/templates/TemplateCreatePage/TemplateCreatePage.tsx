@@ -3,7 +3,7 @@ import { useState } from "react";
 import { MetaStep } from "./steps/MetaStep";
 import { EditorStep } from "./steps/EditorStep";
 import { ReviewStep } from "./steps/ReviewStep";
-import type { MetaValue, RepTemplate } from "./editor/types";
+import type { MetaValue, RepTemplate } from "../../../shared/types/repEditorTypes";
 
 import cl from "./TemplateCreatePage.module.css";
 

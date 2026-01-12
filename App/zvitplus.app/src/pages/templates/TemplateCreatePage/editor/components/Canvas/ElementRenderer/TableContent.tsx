@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { TableElement } from "../../../types";
+import type { TableElement } from "../../../../../../../shared/types/repEditorTypes";
 import cl from '../Canvas.module.css';
 
 interface TableContentProps {

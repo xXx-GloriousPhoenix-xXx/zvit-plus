@@ -1,8 +1,8 @@
-import type { RepElement, RepElementType } from "../../../types";
+import type { RepElement, RepElementType } from "../../../../../../../shared/types/repEditorTypes";
 
 type SizePropertiesProps = {
     selectedElement: RepElement;
-    updateElement: (id: string, updates: Partial<Omit<RepElement, "type">> & {
+    updateElement: (id: string, updates: Partial<RepElement> & {
         type?: RepElementType | undefined;
     }) => void
 }

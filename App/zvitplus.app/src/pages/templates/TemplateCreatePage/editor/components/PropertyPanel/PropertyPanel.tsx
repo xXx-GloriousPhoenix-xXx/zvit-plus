@@ -1,5 +1,4 @@
 import { X } from "lucide-react";
-import type { RepElement, RepElementType } from "../../types";
 
 import cl from './PropertyPanel.module.css';
 import { TextProperties } from "./properties/TextProperties";
@@ -7,22 +6,10 @@ import { TableProperties } from "./properties/TableProperties";
 import { ImageProperties } from "./properties/ImageProperties";
 import { ChartProperties } from "./properties/ChartProperties";
 import { SizeProperties } from "./properties/SizeProperties";
+import { useRepEditorContext } from "@/app/context/RepEditorContext";
 
-type PropertyPanelProps = {
-    selectedElement: RepElement | null;
-    deleteElement: (id: string) => void;
-    updateElement: (id: string, updates: Partial<Omit<RepElement, "type">> & {
-        type?: RepElementType | undefined;
-    }) => void;
-    updatePayload: (id: string, payloadUpdates: Partial<RepElement['payload']>) => void;
-}
-
-export function PropertyPanel({
-    selectedElement,
-    deleteElement,
-    updateElement,
-    updatePayload
-} : PropertyPanelProps) {
+export function PropertyPanel() {
+    const { selectedElement, rep } = useRepEditorContext();
     return (        
         <>
             {selectedElement && (
@@ -30,7 +17,7 @@ export function PropertyPanel({
                 <div className={cl.PropertiesHeader}>
                     <h2 className={cl.PropertiesTitle}>Властивості</h2>
                     <button 
-                        onClick={() => deleteElement(selectedElement.id)} 
+                        onClick={() => rep.deleteElement(selectedElement.id)} 
                         className={cl.DeleteButton}
                     >
                         <X size={20} />
@@ -47,34 +34,34 @@ export function PropertyPanel({
 
                     <SizeProperties
                         selectedElement={selectedElement}
-                        updateElement={updateElement}
+                        updateElement={rep.updateElement}
                     />
 
                     {selectedElement.type === 'text' && (
                         <TextProperties
                             selectedElement={selectedElement}
-                            updatePayload={updatePayload}
+                            updatePayload={rep.updatePayload}
                         />
                     )}
 
                     {selectedElement.type === 'table' && (
                         <TableProperties
                             selectedElement={selectedElement}
-                            updatePayload={updatePayload}
+                            updatePayload={rep.updatePayload}
                         />
                     )}
 
                     {selectedElement.type === 'chart' && (
                         <ChartProperties
                             selectedElement={selectedElement}
-                            updatePayload={updatePayload}
+                            updatePayload={rep.updatePayload}
                         />
                     )}
 
                     {selectedElement.type === 'image' && (
                         <ImageProperties
                             selectedElement={selectedElement}
-                            updatePayload={updatePayload}
+                            updatePayload={rep.updatePayload}
                         />
                     )}
                 </div>

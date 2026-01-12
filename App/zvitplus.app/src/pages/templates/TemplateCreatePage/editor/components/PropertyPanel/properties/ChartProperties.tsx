@@ -1,4 +1,4 @@
-import type { ChartElement, ChartType, RepElement } from "../../../types";
+import type { ChartElement, ChartType, RepElement } from "../../../../../../../shared/types/repEditorTypes";
 
 type ChartPropertiesProps = {
     selectedElement: ChartElement;

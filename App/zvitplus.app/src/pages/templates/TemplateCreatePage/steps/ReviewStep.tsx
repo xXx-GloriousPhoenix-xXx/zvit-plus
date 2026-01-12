@@ -1,7 +1,7 @@
 import { useAppDispatch } from "@/app/store/hooks";
 import { createTemplate } from "@/shared/api/templates/createTemplateThunk";
 import { Button } from "@/shared/ui/Button/Button";
-import type { RepTemplate } from "../editor/types";
+import type { RepTemplate } from "../../../../shared/types/repEditorTypes";
 import { useState } from "react";
 
 import cl from "../TemplateCreatePage.module.css";

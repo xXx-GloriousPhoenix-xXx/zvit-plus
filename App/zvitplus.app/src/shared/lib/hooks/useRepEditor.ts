@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import type { RepElement, RepElementType, RepElementMode, RepTemplate } from '../types';
+import type { RepElement, RepElementType, RepElementMode, RepTemplate } from '../../types/repEditorTypes';
 
 interface UseRepEditorProps {
   template: RepTemplate;
