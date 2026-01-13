@@ -16,7 +16,7 @@ import { TemplateUploadPage } from '@/pages/templates/TemplateUploadPage/Templat
 import { TemplateCreatePage } from '@/pages/templates/TemplateCreatePage/TemplateCreatePage';
 import { TemplateEditPage } from '@/pages/templates/TemplateEditPage/TemplateEditPage';
 import { HomePage } from '@/pages/general/HomePage/HomePage';
-import { ProtectedRoute } from './ProtectedRoute';
+import { ProtectedRoute } from '../../shared/components/ProtectedRoute';
 
 export const router = createBrowserRouter([
     {

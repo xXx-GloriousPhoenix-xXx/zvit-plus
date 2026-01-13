@@ -8,6 +8,7 @@ type AuthState = {
     expiresIn: number | null;
     isAuth: boolean;
     loading: boolean;
+    initialized: boolean; // ДОБАВЛЯЕМ
     error: string | null;
 };
 
@@ -17,6 +18,7 @@ const initialState: AuthState = {
     expiresIn: null,
     isAuth: false,
     loading: false,
+    initialized: false, // ДОБАВЛЯЕМ
     error: null,
 };
 
@@ -159,6 +161,19 @@ const authSlice = createSlice({
                 state.expiresIn = null;
                 state.isAuth = false;
                 state.error = action.payload ?? "Unknown refresh error";
+            })
+
+            .addCase(initAuth.pending, (state) => {
+                state.loading = true;
+                state.initialized = false;
+            })
+            .addCase(initAuth.fulfilled, (state) => {
+                state.loading = false;
+                state.initialized = true;
+            })
+            .addCase(initAuth.rejected, (state) => {
+                state.loading = false;
+                state.initialized = true;
             });
     },
 });
