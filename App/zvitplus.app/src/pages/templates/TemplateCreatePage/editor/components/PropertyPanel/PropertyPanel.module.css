@@ -4,7 +4,7 @@
     flex: 0 1 20rem;
     background-color: white;
     border-left: 1px solid #e5e7eb;
-    padding: 0 0 1rem 1rem;
+    padding: 0 1rem 1rem 1rem;
     overflow-y: auto;
 }
   
@@ -193,4 +193,8 @@
     box-shadow: var(--shadow);
     border-radius: var(--border-radius);
     border: 0.05rem solid #ddd;
+}
+
+.PropertyColorInput {
+    padding: 0.5rem;
 }

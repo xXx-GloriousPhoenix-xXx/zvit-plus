@@ -13,12 +13,7 @@ export function TableContent({ element }: TableContentProps) {
     const [editingCell, setEditingCell] = useState<Cell | null>(null);
     const [editingValue, setEditingValue] = useState<string>('');
     const inputRef = useRef<HTMLInputElement>(null);
-    const { rep } = useRepEditorContext(); // ДОБАВЛЯЕМ доступ к контексту
-
-    useEffect(() => {
-        console.log('TableContent - element:', element);
-        console.log('TableContent - rep:', rep);
-    }, [element, rep]);
+    const { rep } = useRepEditorContext();
 
     useEffect(() => {
         if (editingCell) {
@@ -35,7 +30,6 @@ export function TableContent({ element }: TableContentProps) {
 
     const saveCell = () => {
         if (!editingCell) return;
-        // if (!editingValue) return;
 
         if (editingCell.row === null) {
             const newColumns = columns.map((col, idx) => 
@@ -65,7 +59,6 @@ export function TableContent({ element }: TableContentProps) {
         
         setEditingCell(clickedCell);
         
-        // Сохраняем выбранную ячейку в контексте
         const cellData = clickedCell.row === null 
             ? columns[clickedCell.col] 
             : rows[clickedCell.row][clickedCell.col];
@@ -89,13 +82,68 @@ export function TableContent({ element }: TableContentProps) {
             styles.color = cell.color;
         }
         
+        // if (cell.align) {
+        //     styles.textAlign = cell.align;
+        // }
+        // else {
+        //     styles.textAlign = 'center';
+        // }
+
         if (cell.align) {
-            styles.textAlign = cell.align;
+            styles.justifyContent = (() => {
+                switch(cell.align) {
+                    case 'left': return 'flex-start';
+                    case 'center': return 'center';
+                    case 'right': return 'flex-end';
+                    default: return 'flex-start';
+                }
+            })();
         }
         
         if (cell.fontWeight) {
             styles.fontWeight = cell.fontWeight;
         }
+
+        if (cell.verticalAlign) {
+            switch(cell.verticalAlign) {
+                case 'top':
+                    styles.display = 'flex';
+                    styles.alignItems = 'flex-start';
+                    break;
+                case 'middle':
+                    styles.display = 'flex';
+                    styles.alignItems = 'center';
+                    break;
+                case 'bottom':
+                    styles.display = 'flex';
+                    styles.alignItems = 'flex-end';
+                    break;
+            }
+        } else {
+            styles.display = 'flex';
+            styles.alignItems = 'center';
+        }
+        
+        return styles;
+    };
+
+    const getInputStyles = (cell: any) => {
+        const styles: React.CSSProperties = {};
+        
+        if (cell.fontSize) {
+            styles.fontSize = `${cell.fontSize}px`;
+        }
+        
+        if (cell.color) {
+            styles.color = cell.color;
+        }
+        
+        if (cell.fontWeight) {
+            styles.fontWeight = cell.fontWeight;
+        }
+        
+        styles.width = '100%';
+        styles.height = '100%';
         
         return styles;
     };
@@ -111,6 +159,7 @@ export function TableContent({ element }: TableContentProps) {
             {columns.map((col, i) => {
                 const isEditing = editingCell?.row === null && editingCell?.col === i;
                 const cellStyles = getCellStyles(col);
+                const inputStyles = getInputStyles(col);
                 return (
                     <div 
                         key={`h-${i}`}
@@ -126,6 +175,7 @@ export function TableContent({ element }: TableContentProps) {
                                 onChange={(e) => setEditingValue(e.target.value)}
                                 onBlur={saveCell}
                                 onKeyDown={(e) => { if (e.key === 'Enter') saveCell() }}
+                                style={inputStyles}
                             />
                         ) : (
                             col.text || `Заголовок ${i + 1}`
@@ -139,6 +189,7 @@ export function TableContent({ element }: TableContentProps) {
                 row.map((cell, colIndex) => {
                     const isEditing = editingCell?.row === rowIndex && editingCell?.col === colIndex;
                     const cellStyles = getCellStyles(cell);
+                    const inputStyles = getInputStyles(cell);
                     return (
                         <div
                             key={`c-${rowIndex}-${colIndex}`}
@@ -154,6 +205,7 @@ export function TableContent({ element }: TableContentProps) {
                                     onChange={(e) => setEditingValue(e.target.value)}
                                     onBlur={saveCell}
                                     onKeyDown={(e) => { if (e.key === 'Enter') saveCell() }}
+                                    style={inputStyles}
                                 />
                             ) : (
                                 cell.text || `Клітинка ${rowIndex + 1}×${colIndex + 1}`

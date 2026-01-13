@@ -101,6 +101,11 @@
     padding: 0.25rem;
     background-color: #f9fafb;
     border: 0.05rem solid #ddd;
+
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    min-width: 0;
 }
 
 .TableHeaderCell:last-child {
@@ -116,9 +121,15 @@
     padding: 0.25rem;
     border: 0.05rem solid #ddd;
 
-    overflow: hidden;
+    /* overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    text-wrap: wrap; */
+
+    word-break: break-word; /* Перенос длинных слов */
+    overflow-wrap: break-word; /* Перенос при необходимости */
+    white-space: normal; /* Разрешаем перенос */
+    min-width: 0; /* Важно для flex-элементов с текстом */
 }
 
 .EmptyTableCell {
@@ -136,6 +147,10 @@
     outline: none;
     padding: 0;
     background: transparent;
+
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 /* -------------------- Hover -------------------- */

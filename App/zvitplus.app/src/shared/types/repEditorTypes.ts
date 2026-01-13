@@ -2,7 +2,8 @@
 export type RepElementType = "text" | "table" | "chart" | "image";
 export type RepElementMode = "static" | "dynamic";
 export type ChartType = "bar" | "line" | "pie";
-export type AlignType = 'left' | 'center' | 'right';
+export type HorizontalAlignType = 'left' | 'center' | 'right';
+export type VerticalAlignType = 'top' | 'middle' | 'bottom';
 export type FontWeight = 'normal' | 'bold';
 
 export interface BaseRepElement {
@@ -20,7 +21,7 @@ export interface TextElement extends BaseRepElement {
         fontSize?: number;
         fontWeight?: FontWeight;
         color?: string;
-        align?: AlignType;
+        align?: HorizontalAlignType;
     };
 }
   
@@ -41,7 +42,9 @@ export interface ChartElement extends BaseRepElement {
     };
 }
   
-export interface TableCell extends Partial<TextElement['payload']> {};
+export interface TableCell extends Partial<TextElement['payload']> {
+    verticalAlign?: VerticalAlignType;
+};
 
 export interface TableElement extends BaseRepElement {
     type: "table";

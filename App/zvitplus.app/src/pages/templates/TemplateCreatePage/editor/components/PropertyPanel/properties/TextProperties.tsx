@@ -1,4 +1,4 @@
-import type { AlignType, FontWeight, RepElement, TextElement } from "../../../../../../../shared/types/repEditorTypes";
+import type { HorizontalAlignType, FontWeight, RepElement, TextElement } from "../../../../../../../shared/types/repEditorTypes";
 
 type TextPropertiesProps = {
     selectedElement: TextElement;
@@ -56,7 +56,7 @@ export function TextProperties({
                 <select
                     value={selectedElement.payload.align || 'left'}
                     onChange={(e) => updatePayload(selectedElement.id, { 
-                        align: e.target.value as AlignType 
+                        align: e.target.value as HorizontalAlignType 
                     })}
                     className={cl.PropertySelect}
                 >

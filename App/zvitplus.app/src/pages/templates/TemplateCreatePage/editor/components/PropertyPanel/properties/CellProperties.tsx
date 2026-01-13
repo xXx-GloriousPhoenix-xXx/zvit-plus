@@ -1,6 +1,5 @@
 // properties/CellProperties.tsx - ИСПРАВЛЕННАЯ ВЕРСИЯ
-import { useState, useEffect } from "react";
-import type { AlignType, FontWeight, RepElement, TableElement, TableCell } from "@/shared/types/repEditorTypes";
+import type { HorizontalAlignType, FontWeight, RepElement, TableElement, TableCell, VerticalAlignType } from "@/shared/types/repEditorTypes";
 import cl from "../PropertyPanel.module.css";
 import { useRepEditorContext } from "@/app/context/RepEditorContext";
 
@@ -99,12 +98,14 @@ export function CellProperties({
     };
 
     return (
-        <div className={cl.PropertySection}>
-            <h3 className={cl.PropertySubtitle}>
-                {selectedCell.row === null 
+        <>
+            <div className={cl.PropertiesHeader}>
+                <h2 className={cl.PropertiesTitle}>
+                    {selectedCell.row === null 
                     ? `Властивості заголовка [${selectedCell.col + 1}]` 
                     : `Властивості ячейки [${selectedCell.row + 1},${selectedCell.col + 1}]`}
-            </h3>
+                </h2>
+            </div>
 
             <div className={cl.PropertyGroup}>
                 <label className={cl.PropertyLabel}>Текст</label>
@@ -159,7 +160,7 @@ export function CellProperties({
                     onChange={(e) => {
                         console.log('Align changing to:', e.target.value);
                         updateCellProperty({ 
-                            align: e.target.value as AlignType 
+                            align: e.target.value as HorizontalAlignType 
                         });
                     }}
                     className={cl.PropertySelect}
@@ -167,6 +168,21 @@ export function CellProperties({
                     <option value="left">Ліворуч</option>
                     <option value="center">По центру</option>
                     <option value="right">Праворуч</option>
+                </select>
+            </div>
+
+            <div className={cl.PropertyGroup}>
+                <label className={cl.PropertyLabel}>Вертикальне вирівнювання</label>
+                <select
+                    value={currentCell.verticalAlign || 'middle'}
+                    onChange={(e) => updateCellProperty({ 
+                        verticalAlign: e.target.value as VerticalAlignType 
+                    })}
+                    className={cl.PropertySelect}
+                >
+                    <option value="top">Верх</option>
+                    <option value="middle">Середина</option>
+                    <option value="bottom">Низ</option>
                 </select>
             </div>
 
@@ -188,7 +204,7 @@ export function CellProperties({
             </div>
             
             {/* Отладочная информация */}
-            <div className={cl.PropertyGroup} style={{ fontSize: '0.75rem', color: '#666', marginTop: '1rem' }}>
+            {/* <div className={cl.PropertyGroup} style={{ fontSize: '0.75rem', color: '#666', marginTop: '1rem' }}>
                 <label className={cl.PropertyLabel}>Debug info:</label>
                 <div className={cl.PropertyValue}>
                     <div>Element ID: {selectedElement.id}</div>
@@ -197,8 +213,8 @@ export function CellProperties({
                     <div>Font size: {currentCell.fontSize || 'default (14)'}</div>
                     <div>Color: {currentCell.color || 'default (#000000)'}</div>
                 </div>
-            </div>
-        </div>
+            </div> */}
+        </>
     );
 }
 

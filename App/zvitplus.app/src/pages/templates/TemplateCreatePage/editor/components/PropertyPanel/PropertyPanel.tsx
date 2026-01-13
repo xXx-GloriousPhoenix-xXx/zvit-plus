@@ -53,17 +53,16 @@ export function PropertyPanel() {
                     )}
 
                     {selectedElement.type === 'table' && (
-                        <>
-                            <TableProperties
-                                selectedElement={selectedElement}
-                                updatePayload={rep.updatePayload}
-                            />
-                            <CellProperties
-                                selectedElement={selectedElement}
-                                updatePayload={rep.updatePayload}
-                            />
-                            {/* <SimpleCellProperties /> */}
-                        </>
+                        selectedCell
+                        ? <CellProperties
+                            selectedElement={selectedElement}
+                            updatePayload={rep.updatePayload}
+                        />
+                        
+                        : <TableProperties
+                            selectedElement={selectedElement}
+                            updatePayload={rep.updatePayload}
+                        />
                     )}
 
                     {selectedElement.type === 'chart' && (
