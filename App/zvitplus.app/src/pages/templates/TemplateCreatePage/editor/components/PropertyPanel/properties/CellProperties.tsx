@@ -202,18 +202,6 @@ export function CellProperties({
                     <option value="bold">Жирний</option>
                 </select>
             </div>
-            
-            {/* Отладочная информация */}
-            {/* <div className={cl.PropertyGroup} style={{ fontSize: '0.75rem', color: '#666', marginTop: '1rem' }}>
-                <label className={cl.PropertyLabel}>Debug info:</label>
-                <div className={cl.PropertyValue}>
-                    <div>Element ID: {selectedElement.id}</div>
-                    <div>Cell position: {selectedCell.row === null ? 'header' : `row ${selectedCell.row}`}, col {selectedCell.col}</div>
-                    <div>Current text: "{currentCell.text || 'empty'}"</div>
-                    <div>Font size: {currentCell.fontSize || 'default (14)'}</div>
-                    <div>Color: {currentCell.color || 'default (#000000)'}</div>
-                </div>
-            </div> */}
         </>
     );
 }

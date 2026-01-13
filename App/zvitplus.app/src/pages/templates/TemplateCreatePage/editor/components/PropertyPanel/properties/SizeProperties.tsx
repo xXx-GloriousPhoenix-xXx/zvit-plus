@@ -145,18 +145,6 @@ export function SizeProperties({
                     />
                 </div>
             </div>
-
-            {/* Информация о пределах для отладки (можно удалить позже) */}
-            <div className={cl.PropertyGroup} style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: '#666' }}>
-                <div className={cl.PropertyLabel}>Ограничения:</div>
-                <div className={cl.PropertyValue}>
-                    <div>Canvas: {canvasDimensions.width}×{canvasDimensions.height}px</div>
-                    <div>Max X: {canvasDimensions.width - selectedElement.size.width}px</div>
-                    <div>Max Y: {canvasDimensions.height - selectedElement.size.height}px</div>
-                    <div>Max Width: {canvasDimensions.width - selectedElement.position.x}px</div>
-                    <div>Max Height: {canvasDimensions.height - selectedElement.position.y}px</div>
-                </div>
-            </div>
         </>
     );
 }

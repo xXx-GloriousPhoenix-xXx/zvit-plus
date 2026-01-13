@@ -7,7 +7,7 @@ import { ImageProperties } from "./properties/ImageProperties";
 import { ChartProperties } from "./properties/ChartProperties";
 import { SizeProperties } from "./properties/SizeProperties";
 import { useRepEditorContext } from "@/app/context/RepEditorContext";
-import { CellProperties, SimpleCellProperties } from "./properties/CellProperties";
+import { CellProperties } from "./properties/CellProperties";
 import { useEffect } from "react";
 
 export function PropertyPanel() {
@@ -53,16 +53,21 @@ export function PropertyPanel() {
                     )}
 
                     {selectedElement.type === 'table' && (
-                        selectedCell
-                        ? <CellProperties
-                            selectedElement={selectedElement}
-                            updatePayload={rep.updatePayload}
-                        />
-                        
-                        : <TableProperties
-                            selectedElement={selectedElement}
-                            updatePayload={rep.updatePayload}
-                        />
+                        <>
+                            {/* Всегда показываем свойства таблицы */}
+                            <TableProperties
+                                selectedElement={selectedElement}
+                                updatePayload={rep.updatePayload}
+                            />
+                            
+                            {/* И свойства ячейки, если она выбрана */}
+                            {selectedCell && (
+                                <CellProperties
+                                    selectedElement={selectedElement}
+                                    updatePayload={rep.updatePayload}
+                                />
+                            )}
+                        </>
                     )}
 
                     {selectedElement.type === 'chart' && (
