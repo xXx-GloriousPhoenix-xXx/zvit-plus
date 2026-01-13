@@ -56,9 +56,15 @@ export function MetaStep({ value, onNext }: Props) {
                     value: t.id,
                     label: t.name,
                 }))}
-                onChange={e =>
-                    handleFieldChange({ templateTypeId: e.target.value })
-                }
+                onChange={e => {
+                    const selectedValue = e.target.value;
+                    const selectedOption = items.find(item => item.id === selectedValue);
+                    
+                    handleFieldChange({
+                        templateTypeId: selectedValue,
+                        templateTypeName: selectedOption?.name || ''
+                    });
+                }}
             />
 
             <BoolCheckbox

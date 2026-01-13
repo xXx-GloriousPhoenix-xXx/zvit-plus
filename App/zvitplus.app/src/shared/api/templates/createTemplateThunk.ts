@@ -1,45 +1,61 @@
+// shared/api/templates/createTemplateThunk.ts
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import JSZip from "jszip";
-import { baseApi } from "@/shared/api/baseApi";
-import type { RootState } from "@/app/store/store.ts";
-import type { CreateTemplateRequest } from "./templatesApi";
+import { createRepFile, createRepFileName } from "@/shared/lib/utils/repFileManager";
+import type { RepTemplate } from "@/shared/types/repEditorTypes";
+import type { RootState } from "@/app/store/store";
+
+interface CreateTemplateArgs {
+    name: string;
+    templateTypeId: string;
+    isPrivate: boolean;
+    template: RepTemplate;
+}
 
 export const createTemplate = createAsyncThunk<
     void,
-    CreateTemplateRequest,
+    CreateTemplateArgs,
     {
         state: RootState;
         rejectValue: string;
     }
 >(
     "templates/create",
-    async ({ meta, template }, { rejectWithValue, getState }) => {
+    async ({ name, templateTypeId, isPrivate, template }, { rejectWithValue, getState }) => {
         try {
             const token = getState().auth.accessToken;
 
-            const zip = new JSZip();
-            zip.file("template.json", JSON.stringify(template, null, 2));
+            // 1. Создаем .rep файл
+            const repFile = await createRepFile(template);
+            const fileName = createRepFileName(template.meta);
 
-            const blob = await zip.generateAsync({ type: "blob" });
+            // 2. Создаем FormData
+            const formData = new FormData();
+            formData.append("Name", name);
+            formData.append("TemplateTypeId", templateTypeId);
+            formData.append("IsPrivate", String(isPrivate));
+            formData.append("File", repFile, fileName);
 
-            console.log(meta);
-            console.log(blob);
-
-            const form = new FormData();
-            form.append("Name", meta.name);
-            form.append("TemplateTypeId", meta.templateTypeId);
-            form.append("IsPrivate", String(meta.isPrivate));
-            form.append("File", blob, `${meta.name}.rep`);
-
-            var response = await baseApi.post("/templates", form, {
+            // 3. Отправляем запрос
+            const response = await fetch('/api/templates', {
+                method: 'POST',
                 headers: token
-                    ? { Authorization: `Bearer ${token}` }
-                    : undefined
+                    ? { 
+                        'Authorization': `Bearer ${token}`,
+                        // Не устанавливаем Content-Type - браузер сделает это сам
+                      }
+                    : {},
+                body: formData
             });
-            console.log(response);
-        } catch(error: any) {
-            console.error(error.response);
-            return rejectWithValue("Failed to create template");
+
+            if (!response.ok) {
+                throw new Error(`Failed to create template: ${response.statusText}`);
+            }
+
+            const result = await response.json();
+            return result;
+        } catch (error: any) {
+            console.error('Create template error:', error);
+            return rejectWithValue(error.message || "Failed to create template");
         }
     }
 );

@@ -1,55 +1,61 @@
 // steps/ReviewStep.tsx
 import { Button } from "@/shared/ui/Button/Button.tsx";
 import type { RepTemplate } from "../../../../shared/types/repEditorTypes";
+import { ReviewCanvas } from "../Review/ReviewCanvas";
 
 import cl from "../TemplateCreatePage.module.css";
 
 interface ReviewStepProps {
     template: RepTemplate;
     onBack: () => void;
-    onClearDraft?: () => void; // Делаем опциональным
+    onClearDraft?: () => void;
+    onSubmit: () => Promise<void>;
+    loading?: boolean;
 }
 
-export function ReviewStep({ template, onBack, onClearDraft }: ReviewStepProps) {
+export function ReviewStep({ 
+    template, 
+    onBack, 
+    onClearDraft, 
+    onSubmit,
+    loading = false 
+}: ReviewStepProps) {
     const handleSubmit = async () => {
-        // Отправка шаблона
-        console.log('Submitting template:', template);
+        await onSubmit();
     };
 
     return (
-        <>
-            <div className={cl.ReviewContainer}>
-                <h3>Обзор шаблона</h3>
-                <div>
-                    <strong>Название:</strong> {template.meta.templateName}
-                </div>
-                <div>
-                    <strong>Тип:</strong> {template.meta.templateTypeId}
-                </div>
-                <div>
-                    <strong>Элементов:</strong> {template.elements.length}
-                </div>
-                {/* Детали шаблона */}
+        <div className={cl.ReviewContainer}>
+            <div className={cl.ReviewCanvasSection}>
+                <ReviewCanvas template={template} />
             </div>
 
             <div className={cl.ButtonGroup}>
                 <Button
-                    text="Назад"
+                    extraClassName={cl.Button}
+                    text="Назад до редактора"
                     onClick={onBack}
+                    disabled={loading}
                 />
-                
-                {onClearDraft && (
-                    <Button
-                        text="Очистить черновик"
-                        onClick={onClearDraft}
-                    />
-                )}
                 
                 <Button
-                    text="Создать шаблон"
+                    extraClassName={cl.Button}
+                    text={loading ? "Створення..." : "Створити"}
                     onClick={handleSubmit}
+                    disabled={loading}
                 />
             </div>
-        </>
+
+            {onClearDraft && (
+                <div className={cl.DraftActions}>
+                    <Button
+                        extraClassName={cl.MarginedButton}
+                        text="Очистити"
+                        onClick={onClearDraft}
+                        disabled={loading}
+                    />
+                </div>
+            )}        
+        </div>
     );
 }

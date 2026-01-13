@@ -16,16 +16,8 @@ export function TemplateCreatePage() {
     const dispatch = useAppDispatch();
     const { meta, template, step } = useAppSelector(s => s.templateCreate);
 
-    // Очистка черновика при размонтировании (опционально)
-    // useEffect(() => {
-    //     return () => {
-    //         // Очищаем только если пользователь покинул страницу создания
-    //         // Можно добавить подтверждение
-    //     };
-    // }, []);
-
     const handleClearDraft = () => {
-        if (window.confirm('Вы уверены что хотите очистить черновик?')) {
+        if (window.confirm('Ви впевнені, що бажаєте очистити чернетку?')) {
             dispatch(clearDraft());
         }
     };
@@ -57,6 +49,7 @@ export function TemplateCreatePage() {
                         template={template}
                         onBack={() => dispatch(setStep(2))}
                         onClearDraft={handleClearDraft}
+                        onSubmit={}
                     />
                 );
             default:

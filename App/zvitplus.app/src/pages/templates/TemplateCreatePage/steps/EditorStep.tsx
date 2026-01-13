@@ -32,10 +32,12 @@ export function EditorStep({ template, onNext, onBack }: Props) {
 
             <div className={cl.ButtonGroup}>
                 <Button
+                    extraClassName={cl.Button}
                     text="Назад"
                     onClick={onBack}
                 />
                 <Button
+                    extraClassName={cl.Button}
                     text="Далее"
                     onClick={onNext}
                 />

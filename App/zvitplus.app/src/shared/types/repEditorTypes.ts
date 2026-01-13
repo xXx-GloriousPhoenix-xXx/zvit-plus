@@ -64,6 +64,7 @@ export interface RepTemplate {
 export interface MetaValue {
     templateName: string;
     templateTypeId: string;
+    templateTypeName: string;
     isPrivate: boolean;
     pageSize: PageSize;
     orientation: PageOrientation;
@@ -97,3 +98,4 @@ export type SelectedCell = {
     row: number | null; 
     col: number 
 } | null;
+
