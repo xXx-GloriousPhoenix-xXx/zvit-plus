@@ -1,7 +1,7 @@
 import { Plus, Minus } from "lucide-react";
-import type { RepElement, TableElement } from "../../../../../../../shared/types/repEditorTypes";
+import type { RepElement, TableElement } from "@/shared/types/repEditorTypes";
 import cl from "../PropertyPanel.module.css";
-import { useTable } from "../../../../../../../shared/lib/hooks/useTable";
+import { useTable } from "@/shared/lib/hooks/useTable";
 
 type TablePropertiesProps = {
     selectedElement: TableElement;

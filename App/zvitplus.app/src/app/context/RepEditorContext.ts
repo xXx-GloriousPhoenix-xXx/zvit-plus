@@ -1,6 +1,6 @@
 // editor/context/RepEditorContext.ts
 import { createContext, useContext } from 'react';
-import type { RepElement, RepElementMode, RepElementType } from '@/shared/types/repEditorTypes';
+import type { RepElement, RepElementMode, RepElementType, SelectedCell } from '@/shared/types/repEditorTypes';
 
 export interface RepEditorActions {
     addElement(type: RepElementType, mode: RepElementMode): void;
@@ -8,6 +8,7 @@ export interface RepEditorActions {
     updateElement(id: string, updates: Partial<RepElement>): void;
     updatePayload(id: string, payloadUpdates: Partial<RepElement['payload']>): void;
     setSelectedElement(element: RepElement | null): void;
+    setSelectedCell: (payload: SelectedCell) => void;
 }
 
 export interface DragActions {
@@ -28,6 +29,8 @@ export interface RepEditorContextType {
     elements: RepElement[];
     selectedElement: RepElement | null;
     draggedElement: string | null;
+
+    selectedCell: SelectedCell;
 
     rep: RepEditorActions;
     drag: DragActions;

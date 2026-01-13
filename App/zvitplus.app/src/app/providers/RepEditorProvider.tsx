@@ -19,7 +19,12 @@ export function RepEditorProvider({ template, onChange, children }: Props) {
   const drag = useDragAndDrop(canvasRef, rep.updateElement);
   const resize = useResize(canvasRef, rep.updateElement);
 
-  // Delete по клавише
+  // Отладочный лог
+  useEffect(() => {
+    console.log('RepEditorProvider - selectedCell:', rep.selectedCell);
+    console.log('RepEditorProvider - selectedElement:', rep.selectedElement);
+  }, [rep.selectedCell, rep.selectedElement]);
+
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Delete' && rep.selectedElement) {
@@ -37,7 +42,11 @@ export function RepEditorProvider({ template, onChange, children }: Props) {
         elements: rep.elements,
         selectedElement: rep.selectedElement,
         draggedElement: drag.draggedElement,
-        rep,
+        selectedCell: rep.selectedCell,
+        rep: {
+          ...rep,
+          setSelectedCell: rep.setSelectedCell
+        },
         drag,
         resize,
         canvasRef

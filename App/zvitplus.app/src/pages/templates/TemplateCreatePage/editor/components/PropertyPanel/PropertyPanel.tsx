@@ -7,9 +7,17 @@ import { ImageProperties } from "./properties/ImageProperties";
 import { ChartProperties } from "./properties/ChartProperties";
 import { SizeProperties } from "./properties/SizeProperties";
 import { useRepEditorContext } from "@/app/context/RepEditorContext";
+import { CellProperties, SimpleCellProperties } from "./properties/CellProperties";
+import { useEffect } from "react";
 
 export function PropertyPanel() {
-    const { selectedElement, rep } = useRepEditorContext();
+    const { selectedElement, rep, selectedCell } = useRepEditorContext();
+
+    useEffect(() => {
+        console.log('PropertyPanel - selectedElement:', selectedElement);
+        console.log('PropertyPanel - selectedCell:', selectedCell);
+    }, [selectedElement, selectedCell]);
+
     return (        
         <>
             {selectedElement && (
@@ -45,10 +53,17 @@ export function PropertyPanel() {
                     )}
 
                     {selectedElement.type === 'table' && (
-                        <TableProperties
-                            selectedElement={selectedElement}
-                            updatePayload={rep.updatePayload}
-                        />
+                        <>
+                            <TableProperties
+                                selectedElement={selectedElement}
+                                updatePayload={rep.updatePayload}
+                            />
+                            <CellProperties
+                                selectedElement={selectedElement}
+                                updatePayload={rep.updatePayload}
+                            />
+                            {/* <SimpleCellProperties /> */}
+                        </>
                     )}
 
                     {selectedElement.type === 'chart' && (

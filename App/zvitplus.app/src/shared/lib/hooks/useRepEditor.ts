@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import type { RepElement, RepElementType, RepElementMode, RepTemplate } from '../../types/repEditorTypes';
+import type { RepElement, RepElementType, RepElementMode, RepTemplate, SelectedCell } from '../../types/repEditorTypes';
 
 interface UseRepEditorProps {
   template: RepTemplate;
@@ -11,6 +11,11 @@ export function useRepEditor({ template, onChange }: UseRepEditorProps) {
   const [selectedElement, setSelectedElement] = useState<RepElement | null>(null);
   const isInternalUpdate = useRef(false);
   const prevElementsRef = useRef<RepElement[]>(template.elements || []);
+  const [selectedCell, setSelectedCell] = useState<SelectedCell>(null);
+
+  const handleSetSelectedCell = useCallback((payload: SelectedCell) => {
+    setSelectedCell(payload);
+  }, []);
 
   // Синхронізація з template при зміні ззовні (тільки якщо це не внутрішнє оновлення)
   useEffect(() => {
@@ -107,12 +112,21 @@ export function useRepEditor({ template, onChange }: UseRepEditorProps) {
     id: string, 
     payloadUpdates: Partial<RepElement['payload']>
   ) => {
+    console.log('useRepEditor - updatePayload called:', { id, payloadUpdates });
+
     setElements(prev => prev.map(el => {
       if (el.id === id) {
-        return {
-          ...el,
-          payload: { ...el.payload, ...payloadUpdates }
+        console.log('useRepEditor - updating element:', el.id);
+        console.log('useRepEditor - current payload:', el.payload);
+        console.log('useRepEditor - updates:', payloadUpdates);
+        
+        const updatedElement = {
+            ...el,
+            payload: { ...el.payload, ...payloadUpdates }
         } as RepElement;
+              
+        console.log('useRepEditor - updated payload:', updatedElement.payload);
+        return updatedElement;
       }
       return el;
     }));
@@ -120,10 +134,13 @@ export function useRepEditor({ template, onChange }: UseRepEditorProps) {
     setSelectedElement(prev => {
       if (!prev || prev.id !== id || !prev.payload) return prev;
       
-      return {
+      const updated = {
         ...prev,
         payload: { ...prev.payload, ...payloadUpdates }
       } as RepElement;
+    
+      console.log('useRepEditor - updated selected element:', updated);
+      return updated;
     });
   }, []);
 
@@ -134,11 +151,13 @@ export function useRepEditor({ template, onChange }: UseRepEditorProps) {
   return {
     elements,
     selectedElement,
+    selectedCell,
     setSelectedElement,
     addElement,
     deleteElement,
     updateElement,
     updatePayload,
     clearSelection,
+    setSelectedCell: handleSetSelectedCell
   };
 }

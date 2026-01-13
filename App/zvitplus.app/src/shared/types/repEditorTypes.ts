@@ -87,3 +87,10 @@ export type Cell = {
     row: number | null;
     col: number;
 }
+
+export type SelectedCell = { 
+    elementId: string; 
+    cell: TableCell; 
+    row: number | null; 
+    col: number 
+} | null;
