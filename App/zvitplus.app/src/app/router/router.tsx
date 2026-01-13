@@ -3,15 +3,15 @@ import { createBrowserRouter } from 'react-router-dom';
 import { MainOutlet } from '@/widgets/layouts/MainOutlet/MainOutlet';
 import { AuthOutlet } from '@/widgets/layouts/AuthOutlet/AuthOutlet';
 
-import { LoginPage } from '@/pages/LoginPage/LoginPage.tsx';
-import { RegisterPage } from '@/pages/RegisterPage/RegisterPage.tsx';
+import { LoginPage } from '@/pages/auth/LoginPage/LoginPage';
+import { RegisterPage } from '@/pages/auth/RegisterPage/RegisterPage';
 
-import { DiscoveryPage } from '@/pages/DiscoveryPage/DiscoveryPage.tsx';
-import { MyWorkPage } from '@/pages/MyWorkPage/MyWorkPage.tsx';
+import { DiscoveryPage } from '@/pages/general/DiscoveryPage/DiscoveryPage';
+import { MyWorkPage } from '@/pages/general/MyWorkPage/MyWorkPage';
 import { TemplatePage } from '@/pages/templates/TemplatePage/TemplatePage';
-import { ReportPage } from '@/pages/ReportPage/ReportPage.tsx';
+import { ReportPage } from '@/pages/reports/ReportPage/ReportPage';
 
-import { NotFoundPage } from '@/pages/NotFoundPage/NotFoundPage.tsx';
+import { NotFoundPage } from '@/pages/extra/NotFoundPage/NotFoundPage';
 import { TemplateUploadPage } from '@/pages/templates/TemplateUploadPage/TemplateUploadPage';
 import { TemplateCreatePage } from '@/pages/templates/TemplateCreatePage/TemplateCreatePage';
 import { TemplateEditPage } from '@/pages/templates/TemplateEditPage/TemplateEditPage';
