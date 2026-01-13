@@ -2,16 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import JSZip from "jszip";
 import { baseApi } from "@/shared/api/baseApi";
 import type { RootState } from "@/app/store/store.ts";
-import type { RepTemplate } from "@/shared/types/repEditorTypes";
-
-export interface CreateTemplateRequest {
-    meta: {
-        name: string;
-        templateTypeId: string;
-        isPrivate: boolean;
-    };
-    template: RepTemplate;
-}
+import type { CreateTemplateRequest } from "./templatesApi";
 
 export const createTemplate = createAsyncThunk<
     void,

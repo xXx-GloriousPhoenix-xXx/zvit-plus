@@ -1,65 +1,72 @@
 // TemplateCreatePage.tsx
-import { useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import { MetaStep } from "./steps/MetaStep";
 import { EditorStep } from "./steps/EditorStep";
 import { ReviewStep } from "./steps/ReviewStep";
-import type { MetaValue, RepTemplate } from "../../../shared/types/repEditorTypes";
+import { 
+    setMeta, 
+    setTemplate, 
+    setStep, 
+    clearDraft 
+} from "@/shared/api/templates/templateSlice";
 
 import cl from "./TemplateCreatePage.module.css";
 
-type Step = 1 | 2 | 3;
-
 export function TemplateCreatePage() {
-    const [step, setStep] = useState<Step>(1);
+    const dispatch = useAppDispatch();
+    const { meta, template, step } = useAppSelector(s => s.templateCreate);
 
-    const [meta, setMeta] = useState<MetaValue>({
-        templateName: "",
-        templateTypeId: "",
-        isPrivate: false,
-        pageSize: "A4",
-        orientation: "portrait"
-    });
+    // Очистка черновика при размонтировании (опционально)
+    // useEffect(() => {
+    //     return () => {
+    //         // Очищаем только если пользователь покинул страницу создания
+    //         // Можно добавить подтверждение
+    //     };
+    // }, []);
 
-    const [template, setTemplate] = useState<RepTemplate>({
-        meta: meta,
-        elements: []
-    });
+    const handleClearDraft = () => {
+        if (window.confirm('Вы уверены что хотите очистить черновик?')) {
+            dispatch(clearDraft());
+        }
+    };
 
-    function renderStep(step: number) {
-        switch (step) {
+    function renderStep(currentStep: number) {
+        switch (currentStep) {
             case 1:
-            return <MetaStep
-                value={meta}
-                onNext={(data) => {
-                    setMeta(data);
-                    setTemplate(t => ({
-                        ...t,
-                        templateName: data.templateName,
-                        templateType: data.templateTypeId
-                    }));
-                    setStep(2);
-                }}
-            />
-
+                return (
+                    <MetaStep
+                        value={meta}
+                        onNext={(data) => {
+                            dispatch(setMeta(data));
+                            dispatch(setStep(2));
+                        }}
+                    />
+                );
             case 2:
-            return <EditorStep
-                template={template}
-                onChange={setTemplate}
-                onNext={() => setStep(3)}
-                onBack={() => setStep(1)}
-            />
-
+                return (
+                    <EditorStep
+                        template={template}
+                        onChange={(newTemplate) => dispatch(setTemplate(newTemplate))}
+                        onNext={() => dispatch(setStep(3))}
+                        onBack={() => dispatch(setStep(1))}
+                    />
+                );
             case 3:
-            return <ReviewStep
-                template={template}
-                onBack={() => setStep(2)}
-            />
+                return (
+                    <ReviewStep
+                        template={template}
+                        onBack={() => dispatch(setStep(2))}
+                        onClearDraft={handleClearDraft}
+                    />
+                );
+            default:
+                return null;
         }
     }
 
     return (
         <section className={cl.Wrapper}>
-            { renderStep(step) }
+            {renderStep(step)}
         </section>
     );
 }

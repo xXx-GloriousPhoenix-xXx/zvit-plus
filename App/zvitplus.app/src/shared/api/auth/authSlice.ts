@@ -1,6 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { authApi } from "@/shared/api/auth/authApi";
 import type { TokenResponse, LoginRequest, RegisterRequest } from "@/shared/api/auth/authModels";
+import { REFRESH_TOKEN_KEY, TEMPLATE_DRAFT_KEY } from "@/shared/constants/localStorage";
+import { clearDraft } from "../templates/templateSlice";
 
 type AuthState = {
     accessToken: string | null;
@@ -8,7 +10,7 @@ type AuthState = {
     expiresIn: number | null;
     isAuth: boolean;
     loading: boolean;
-    initialized: boolean; // ДОБАВЛЯЕМ
+    initialized: boolean;
     error: string | null;
 };
 
@@ -18,7 +20,7 @@ const initialState: AuthState = {
     expiresIn: null,
     isAuth: false,
     loading: false,
-    initialized: false, // ДОБАВЛЯЕМ
+    initialized: false,
     error: null,
 };
 
@@ -47,9 +49,11 @@ export const registerUser = createAsyncThunk<void, RegisterRequest, { rejectValu
 type LogoutArgs = { refreshToken: string; accessToken: string; }
 export const logoutUser = createAsyncThunk<void, LogoutArgs, { rejectValue: string }>(
     "auth/logout",
-    async ({ refreshToken, accessToken }, { rejectWithValue }) => {
+    async ({ refreshToken, accessToken }, { rejectWithValue, dispatch }) => {
         try {
             await authApi.logout(refreshToken, accessToken);
+            // Очищаем черновик при выходе
+            dispatch(clearDraft());
         } catch {
             return rejectWithValue("Logout failed");
         }
@@ -73,14 +77,14 @@ export const initAuth = createAsyncThunk<
 >(
     "auth/init",
     async (_, { dispatch }) => {
-        const refreshTokenValue = localStorage.getItem("refreshToken");
+        const refreshTokenValue = localStorage.getItem(REFRESH_TOKEN_KEY);
 
         if (!refreshTokenValue) return;
 
         try {
             await dispatch(refreshToken(refreshTokenValue)).unwrap();
         } catch {
-            localStorage.removeItem("refreshToken");
+            localStorage.removeItem(REFRESH_TOKEN_KEY);
         }
     }
 );
@@ -115,7 +119,7 @@ const authSlice = createSlice({
                 state.isAuth = true;
                 state.loading = false;
 
-                localStorage.setItem("refreshToken", action.payload.refreshToken);
+                localStorage.setItem(REFRESH_TOKEN_KEY, action.payload.refreshToken);
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.loading = false;
@@ -142,7 +146,9 @@ const authSlice = createSlice({
                 state.expiresIn = null;
                 state.isAuth = false;
 
-                localStorage.removeItem("refreshToken");
+                localStorage.removeItem(REFRESH_TOKEN_KEY);
+                localStorage.removeItem(TEMPLATE_DRAFT_KEY);
+                // localStorage.clear();
             })
             .addCase(logoutUser.rejected, (state, action) => {
                 state.error = action.payload ?? "Unknown logout error";

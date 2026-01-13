@@ -1,34 +1,42 @@
-// steps/EditorStep.tsx
-import type { RepTemplate } from "../../../../shared/types/repEditorTypes";
-import { RepEditor } from "../editor/RepEditor";
-import { Button } from "@/shared/ui/Button/Button";
+// EditorStep.tsx
+import { useAppDispatch } from "@/app/store/hooks";
+import { Button } from "@/shared/ui/Button/Button.tsx";
+import type { RepTemplate } from "@/shared/types/repEditorTypes";
+import { setTemplate } from "@/shared/api/templates/templateSlice";
 
 import cl from "../TemplateCreatePage.module.css";
+import { RepEditor } from "../editor/RepEditor";
 
 interface Props {
     template: RepTemplate;
-    onChange: (t: RepTemplate) => void;
+    onChange: (template: RepTemplate) => void;
     onNext: () => void;
     onBack: () => void;
 }
 
-export function EditorStep({ template, onChange, onNext, onBack }: Props) {
+export function EditorStep({ template, onNext, onBack }: Props) {
+    const dispatch = useAppDispatch();
+
+    const handleTemplateChange = (newTemplate: RepTemplate) => {
+        dispatch(setTemplate(newTemplate));
+    };
+
     return (
         <>
-            <RepEditor
-                template={template}
-                onChange={onChange}
-            />
+            <div className={cl.EditorContainer}>
+                <RepEditor
+                    template={template}
+                    onChange={handleTemplateChange}
+                />
+            </div>
 
-            <div className={cl.Control}>
+            <div className={cl.ButtonGroup}>
                 <Button
-                    extraClassName={cl.Button}
-                    text='Назад'
+                    text="Назад"
                     onClick={onBack}
                 />
                 <Button
-                    extraClassName={cl.Button}
-                    text='Далі'
+                    text="Далее"
                     onClick={onNext}
                 />
             </div>

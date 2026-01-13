@@ -1,21 +1,17 @@
+// MetaStep.tsx
 import { useEffect, useState } from "react";
-
 import { Input } from "@/shared/ui/Input/Input.tsx";
 import { Button } from "@/shared/ui/Button/Button.tsx";
 import { BoolCheckbox } from "@/shared/ui/BoolCheckbox/BoolCheckbox.tsx";
 import { Select } from "@/shared/ui/Select/Select.tsx";
 import { RadioGroup } from "@/shared/ui/RadioGroup/RadioGroup.tsx";
 import { StringToggle } from "@/shared/ui/StringToggle/StringToggle.tsx";
-
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import { fetchTemplateTypes } from "@/shared/api/templateTypes/templateTypesSlice";
+import type { MetaValue, PageOrientation, PageSize } from "@/shared/types/repEditorTypes";
+import { PAGE_SIZES } from "@/shared/types/repEditorTypes";
 
 import cl from "../TemplateCreatePage.module.css";
-
-import type { PageSize, PageOrientation } from "../../../../shared/types/repEditorTypes";
-import { PAGE_SIZES } from "../../../../shared/types/repEditorTypes";
-
-import type { MetaValue } from "../../../../shared/types/repEditorTypes";
 
 interface Props {
     value: MetaValue;
@@ -25,63 +21,60 @@ interface Props {
 export function MetaStep({ value, onNext }: Props) {
     const dispatch = useAppDispatch();
     const { items, loading } = useAppSelector(s => s.templateTypes);
-
-    const [state, setState] = useState<MetaValue>(value);
+    const [formData, setFormData] = useState<MetaValue>(value);
 
     useEffect(() => {
         dispatch(fetchTemplateTypes());
     }, [dispatch]);
 
-    const isSelected = state.templateName && state.templateTypeId;
+    useEffect(() => {
+        setFormData(value);
+    }, [value]);
 
-    // useEffect(() => {
-    //     console.log(state, isSelected);
-    // }, [state])
+    const isSelected = formData.templateName && formData.templateTypeId;
+
+    const handleFieldChange = (updates: Partial<MetaValue>) => {
+        setFormData(prev => ({ ...prev, ...updates }));
+    };
 
     return (
         <>
             <Input
                 label="Назва шаблону"
                 placeholder="Invoice template"
-                value={state.templateName}
+                value={formData.templateName}
                 onChange={e =>
-                    setState(prev => ({ ...prev, templateName: e.target.value }))
+                    handleFieldChange({ templateName: e.target.value })
                 }
             />
 
             <Select
                 label="Тип шаблону"
-                value={state.templateTypeId}
+                value={formData.templateTypeId}
                 disabled={loading}
                 options={items.map(t => ({
                     value: t.id,
                     label: t.name,
                 }))}
                 onChange={e =>
-                    setState(prev => ({
-                        ...prev,
-                        templateTypeId: e.target.value,
-                    }))
+                    handleFieldChange({ templateTypeId: e.target.value })
                 }
             />
 
             <BoolCheckbox
                 label="Приватний шаблон"
-                checked={state.isPrivate}
+                checked={formData.isPrivate}
                 onChange={e =>
-                    setState(prev => ({
-                        ...prev,
-                        isPrivate: e.target.checked,
-                    }))
+                    handleFieldChange({ isPrivate: e.target.checked })
                 }
             />
 
             <RadioGroup
                 label="Розмір аркушу"
                 options={PAGE_SIZES.map(size => ({ value: size, label: size }))}
-                value={state.pageSize}
+                value={formData.pageSize}
                 onChange={v =>
-                    setState(prev => ({ ...prev, pageSize: v as PageSize }))
+                    handleFieldChange({ pageSize: v as PageSize })
                 }
             />
 
@@ -91,16 +84,16 @@ export function MetaStep({ value, onNext }: Props) {
                     { value: "portrait", label: "Портрет" },
                     { value: "landscape", label: "Альбом" },
                 ]}
-                value={state.orientation}
+                value={formData.orientation}
                 onChange={(val) =>
-                    setState(prev => ({ ...prev, orientation: val as PageOrientation }))
+                    handleFieldChange({ orientation: val as PageOrientation })
                 }
             />
 
             <Button
                 text="Далі"
                 disabled={!isSelected}
-                onClick={() => onNext(state)}
+                onClick={() => onNext(formData)}
                 extraClassName={cl.MarginedButton}
             />
         </>

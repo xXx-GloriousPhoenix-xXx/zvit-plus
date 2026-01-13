@@ -2,9 +2,11 @@ import { baseApi } from "@/shared/api/baseApi";
 import type { RepTemplate } from "@/shared/types/repEditorTypes";
 
 export interface CreateTemplateRequest {
-    name: string;
-    templateTypeId: string;
-    isPrivate: boolean;
+    meta: {
+        name: string;
+        templateTypeId: string;
+        isPrivate: boolean;
+    }
     template: RepTemplate;
 }
 

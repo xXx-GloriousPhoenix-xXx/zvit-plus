@@ -1,45 +1,53 @@
-import { useAppDispatch } from "@/app/store/hooks";
-import { createTemplate } from "@/shared/api/templates/createTemplateThunk";
-import { Button } from "@/shared/ui/Button/Button";
+// steps/ReviewStep.tsx
+import { Button } from "@/shared/ui/Button/Button.tsx";
 import type { RepTemplate } from "../../../../shared/types/repEditorTypes";
-import { useState } from "react";
 
 import cl from "../TemplateCreatePage.module.css";
 
 interface ReviewStepProps {
     template: RepTemplate;
     onBack: () => void;
+    onClearDraft?: () => void; // Делаем опциональным
 }
 
-export function ReviewStep({ template, onBack }: ReviewStepProps) {
-    const dispatch = useAppDispatch();
-    const [loading, setLoading] = useState(false);
-
-    const submit = async () => {
-        try {
-            setLoading(true);
-            // await dispatch(createTemplate({ template })).unwrap();
-            // можно navigate("/templates") или показать toast
-        } catch (err) {
-            console.error(err);
-            alert("Failed to create template");
-        } finally {
-            setLoading(false);
-        }
+export function ReviewStep({ template, onBack, onClearDraft }: ReviewStepProps) {
+    const handleSubmit = async () => {
+        // Отправка шаблона
+        console.log('Submitting template:', template);
     };
 
     return (
         <>
-            <div className={cl.Control}>
+            <div className={cl.ReviewContainer}>
+                <h3>Обзор шаблона</h3>
+                <div>
+                    <strong>Название:</strong> {template.meta.templateName}
+                </div>
+                <div>
+                    <strong>Тип:</strong> {template.meta.templateTypeId}
+                </div>
+                <div>
+                    <strong>Элементов:</strong> {template.elements.length}
+                </div>
+                {/* Детали шаблона */}
+            </div>
+
+            <div className={cl.ButtonGroup}>
                 <Button
-                    extraClassName={cl.Button}
-                    text='Назад'
+                    text="Назад"
                     onClick={onBack}
                 />
+                
+                {onClearDraft && (
+                    <Button
+                        text="Очистить черновик"
+                        onClick={onClearDraft}
+                    />
+                )}
+                
                 <Button
-                    extraClassName={cl.Button}
-                    text='Завершити'
-                    onClick={submit}
+                    text="Создать шаблон"
+                    onClick={handleSubmit}
                 />
             </div>
         </>
