@@ -19,12 +19,6 @@ export function RepEditorProvider({ template, onChange, children }: Props) {
   const drag = useDragAndDrop(canvasRef, rep.updateElement);
   const resize = useResize(canvasRef, rep.updateElement);
 
-  // Отладочный лог
-  useEffect(() => {
-    console.log('RepEditorProvider - selectedCell:', rep.selectedCell);
-    console.log('RepEditorProvider - selectedElement:', rep.selectedElement);
-  }, [rep.selectedCell, rep.selectedElement]);
-
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Delete' && rep.selectedElement) {

@@ -3,22 +3,22 @@
 .CanvasContainer {
     display: flex;
     flex-direction: column;
-    flex: 1; /* Занимает всё доступное пространство */
-    min-width: 0; /* Важно для flex-элементов */
-    overflow: hidden; /* Скрываем переполнение, не auto */
+    flex: 1; 
+    min-width: 0; 
+    overflow: hidden;
 }
 
 .CanvasArea {
     background-color: #e5e7eb;
     padding: 2rem;
-    overflow: auto; /* Внутренний скролл */
+    overflow: auto;
     position: relative;
     scrollbar-width: thin;
-    flex: 1; /* Занимает всё пространство CanvasContainer */
-    min-height: 0; /* Критически важно для flex-скролла */
+    flex: 1;
+    min-height: 0;
     display: flex;
-    justify-content: center; /* Центрируем содержимое */
-    align-items: flex-start; /* Прижимаем к верху */
+    justify-content: center;
+    align-items: flex-start;
 }
 
 .Canvas {
@@ -33,8 +33,8 @@
 }
 
 .CanvasWrapper {
-    display: block; /* Меняем с flex на block */
-    flex-shrink: 0; /* Не сжимается */
+    display: block; 
+    flex-shrink: 0;
     position: relative;
     background-color: white;
     box-shadow: var(--shadow);

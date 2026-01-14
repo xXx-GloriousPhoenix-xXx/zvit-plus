@@ -8,15 +8,9 @@ import { ChartProperties } from "./properties/ChartProperties";
 import { SizeProperties } from "./properties/SizeProperties";
 import { useRepEditorContext } from "@/app/context/RepEditorContext";
 import { CellProperties } from "./properties/CellProperties";
-import { useEffect } from "react";
 
 export function PropertyPanel() {
     const { selectedElement, rep, selectedCell } = useRepEditorContext();
-
-    useEffect(() => {
-        console.log('PropertyPanel - selectedElement:', selectedElement);
-        console.log('PropertyPanel - selectedCell:', selectedCell);
-    }, [selectedElement, selectedCell]);
 
     return (        
         <>

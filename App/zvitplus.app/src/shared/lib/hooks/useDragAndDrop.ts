@@ -2,7 +2,7 @@ import { useState, useCallback, useRef } from 'react';
 import type { RepElement } from '../../types/repEditorTypes';
 
 export function useDragAndDrop(
-  canvasRef: React.RefObject<HTMLDivElement | null>,
+  canvasWrapperRef: React.RefObject<HTMLDivElement | null>, // Принимаем ref на CanvasWrapper
   updateElement: (id: string, updates: Partial<RepElement>) => void
 ) {
   const [draggedElement, setDraggedElement] = useState<string | null>(null);
@@ -13,46 +13,50 @@ export function useDragAndDrop(
       e.stopPropagation();
       setDraggedElement(element.id);
 
-      const canvas = canvasRef.current;
-      if (!canvas) return;
+      const canvasWrapper = canvasWrapperRef.current; // Используем CanvasWrapper
+      if (!canvasWrapper) return;
 
-      const canvasRect = canvas.getBoundingClientRect();
-
+      const canvasRect = canvasWrapper.getBoundingClientRect();
+      
       dragOffset.current = {
         x: e.clientX - canvasRect.left - element.position.x,
         y: e.clientY - canvasRect.top - element.position.y
       };
+
+      console.log('CanvasWrapper rect:', canvasRect);
     },
-    [canvasRef]
+    [canvasWrapperRef]
   );
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent) => {
       if (!draggedElement) return;
 
-      const canvas = canvasRef.current;
-      if (!canvas) return;
+      const canvasWrapper = canvasWrapperRef.current; // Используем тот же CanvasWrapper
+      if (!canvasWrapper) return;
 
-      const canvasRect = canvas.getBoundingClientRect();
-      const scrollLeft = canvas.scrollLeft;
-      const scrollTop = canvas.scrollTop;
-
-      let newX = e.clientX - canvasRect.left + scrollLeft - dragOffset.current.x;
-      let newY = e.clientY - canvasRect.top + scrollTop - dragOffset.current.y;
+      const canvasRect = canvasWrapper.getBoundingClientRect();
+      
+      let newX = e.clientX - canvasRect.left - dragOffset.current.x;
+      let newY = e.clientY - canvasRect.top - dragOffset.current.y;
 
       const elementEl = document.getElementById(draggedElement);
       if (!elementEl) return;
-      const width = elementEl.offsetWidth;
-      const height = elementEl.offsetHeight;
+      
+      const elementWidth = elementEl.offsetWidth;
+      const elementHeight = elementEl.offsetHeight;
 
-      newX = Math.max(0, Math.min(newX, canvas.scrollWidth - width));
-      newY = Math.max(0, Math.min(newY, canvas.scrollHeight - height));
+      const maxX = Math.max(0, canvasRect.width - elementWidth);
+      const maxY = Math.max(0, canvasRect.height - elementHeight);
+
+      newX = Math.max(0, Math.min(newX, maxX));
+      newY = Math.max(0, Math.min(newY, maxY));
 
       updateElement(draggedElement, {
         position: { x: newX, y: newY }
       });
     },
-    [draggedElement, canvasRef, updateElement]
+    [draggedElement, canvasWrapperRef, updateElement]
   );
 
   const handleMouseUp = useCallback(() => {

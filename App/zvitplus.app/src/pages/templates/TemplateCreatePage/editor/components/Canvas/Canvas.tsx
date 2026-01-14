@@ -25,7 +25,7 @@ export type CanvasProps = {
 
 export function Canvas() {
     const { rep, drag, resize, selectedElement, elements, draggedElement, canvasRef } = useRepEditorContext();
-    const { orientation } = useAppSelector(tc => tc.templateCreate.meta)
+    const { orientation } = useAppSelector(tc => tc.templateCreate.meta);
 
   return (
     <div className={cl.CanvasContainer}>
@@ -36,7 +36,6 @@ export function Canvas() {
         handleResizeMove={resize.handleResizeMove}
         handleDragEnd={drag.handleMouseUp}
         handleResizeEnd={resize.handleResizeEnd}
-        canvasRef={canvasRef}
       >  
         <div className={cl.CanvasWrapper}
           style={{
@@ -45,6 +44,7 @@ export function Canvas() {
             minWidth: orientation === 'landscape' ? '1123px' : '794px',
             minHeight: orientation === 'portrait' ? '1123px' : '794px'
           }}
+          ref={canvasRef}
         >
           {elements.map(el => (
             <ElementRenderer

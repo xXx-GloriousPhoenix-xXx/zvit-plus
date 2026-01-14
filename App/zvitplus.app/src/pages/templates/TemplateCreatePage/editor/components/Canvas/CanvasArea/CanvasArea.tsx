@@ -5,8 +5,7 @@ interface CanvasAreaProps extends Pick<CanvasProps,
   'handleDragMove' | 
   'handleResizeMove' | 
   'handleDragEnd' | 
-  'handleResizeEnd' |
-  'canvasRef'
+  'handleResizeEnd'
 > {
   children: React.ReactNode;
 }
@@ -16,7 +15,6 @@ export function CanvasArea({
   handleResizeMove,
   handleDragEnd,
   handleResizeEnd,
-  canvasRef,
   children
 }: CanvasAreaProps) {
   
@@ -37,7 +35,7 @@ export function CanvasArea({
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
     >
-      <div className={cl.Canvas} ref={canvasRef}>
+      <div className={cl.Canvas}>
         {children}
       </div>
     </div>
