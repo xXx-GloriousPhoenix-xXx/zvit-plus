@@ -25,32 +25,23 @@ export function TemplateCreatePage() {
         }
     };
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (canvasRef?: React.RefObject<HTMLDivElement | null>) => {
         if (!meta) {
             throw new Error("Відсутні метадані шаблону");
         }
 
-        // Собираем данные для отправки
         const templateData = {
             name: meta.templateName,
             templateTypeId: meta.templateTypeId,
             isPrivate: meta.isPrivate || false,
-            template: template
+            template: template,
+            canvasRef: canvasRef
         };
 
         try {
-            // Диспатчим thunk
             const result = await dispatch(createTemplate(templateData)).unwrap();
-            
-            // Обработка успешного создания
             console.log('Template created successfully:', result);
-            
-            // Редирект на страницу шаблонов или созданного шаблона
-            navigate('/templates');
-            
-            // Можно показать уведомление об успехе
-            // dispatch(showNotification({ message: 'Шаблон успішно створено', type: 'success' }));
-            
+            navigate('/templates');           
         } catch (error: any) {
             console.error('Failed to create template:', error);
             throw error;
@@ -85,6 +76,7 @@ export function TemplateCreatePage() {
                         onBack={() => dispatch(setStep(2))}
                         onClearDraft={handleClearDraft}
                         onSubmit={handleSubmit}
+
                     />
                 );
             default:

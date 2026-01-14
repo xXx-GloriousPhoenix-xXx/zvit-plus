@@ -13,7 +13,7 @@ export function useDragAndDrop(
       e.stopPropagation();
       setDraggedElement(element.id);
 
-      const canvasWrapper = canvasWrapperRef.current; // Используем CanvasWrapper
+      const canvasWrapper = canvasWrapperRef.current;
       if (!canvasWrapper) return;
 
       const canvasRect = canvasWrapper.getBoundingClientRect();

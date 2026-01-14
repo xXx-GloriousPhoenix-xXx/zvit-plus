@@ -4,13 +4,13 @@ import type { RepTemplate } from "../../../../shared/types/repEditorTypes";
 import { ReviewCanvas } from "../Review/ReviewCanvas";
 
 import cl from "../TemplateCreatePage.module.css";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 interface ReviewStepProps {
     template: RepTemplate;
     onBack: () => void;
     onClearDraft?: () => void;
-    onSubmit: () => Promise<void>;
+    onSubmit: (canvasRef?: React.RefObject<HTMLDivElement | null>) => Promise<void>;
 }
 
 export function ReviewStep({ 
@@ -21,13 +21,14 @@ export function ReviewStep({
 }: ReviewStepProps) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const canvasRef = useRef<HTMLDivElement>(null);
 
     const handleSubmit = async () => {
         setLoading(true);
         setError(null);
         
         try {
-            await onSubmit();
+            await onSubmit(canvasRef);
         } catch (err: any) {
             setError(err.message || "Помилка при створенні шаблону");
         } finally {
@@ -38,7 +39,7 @@ export function ReviewStep({
     return (
         <div className={cl.ReviewContainer}>
             <div className={cl.ReviewCanvasSection}>
-                <ReviewCanvas template={template} />
+                <ReviewCanvas template={template} canvasRef={canvasRef}/>
             </div>
 
             <div className={cl.ButtonGroup}>

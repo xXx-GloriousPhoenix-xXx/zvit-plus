@@ -4,12 +4,14 @@ import { ELEMENT_COLORS } from "@/shared/constants/editor";
 import { BarChart3, Image } from "lucide-react";
 import cl from './ReviewCanvas.module.css';
 import { ReviewTableContent } from "./ReviewTableContent";
+import type React from "react";
 
 interface ReviewCanvasProps {
     template: RepTemplate;
+    canvasRef: React.RefObject<HTMLDivElement | null>;
 }
 
-export function ReviewCanvas({ template }: ReviewCanvasProps) {
+export function ReviewCanvas({ template, canvasRef }: ReviewCanvasProps) {
     const { elements, meta } = template;
     
     // Стили для канваса на основе meta
@@ -24,7 +26,7 @@ export function ReviewCanvas({ template }: ReviewCanvasProps) {
 
     return (
         <div className={cl.ReviewCanvasWrapper}>
-            <div className={cl.ReviewCanvas} style={canvasStyle}>
+            <div className={cl.ReviewCanvas} style={canvasStyle} ref={canvasRef}>
                 {elements.map(element => (
                     <ReviewElement
                         key={element.id}

@@ -10,6 +10,7 @@ interface CreateTemplateArgs {
     templateTypeId: string;
     isPrivate: boolean;
     template: RepTemplate;
+    canvasRef?: React.RefObject<HTMLElement | null>;
 }
 
 interface CreateTemplateResponse {
@@ -27,7 +28,7 @@ export const createTemplate = createAsyncThunk<
     }
 >(
     "templates/create",
-    async ({ name, templateTypeId, isPrivate, template }, { rejectWithValue, getState }) => {
+    async ({ name, templateTypeId, isPrivate, template, canvasRef }, { rejectWithValue, getState }) => {
         try {
             const token = getState().auth.accessToken;
             
@@ -36,7 +37,7 @@ export const createTemplate = createAsyncThunk<
             }
 
             // 1. Создаем .rep файл
-            const repFile = await createRepFile(template);
+            const repFile = await createRepFile(template, canvasRef!.current);
             const fileName = createRepFileName(template.meta);
 
             // 2. Создаем FormData
