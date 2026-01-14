@@ -3,6 +3,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { createRepFile, createRepFileName } from "@/shared/lib/utils/repFileManager";
 import type { RepTemplate } from "@/shared/types/repEditorTypes";
 import type { RootState } from "@/app/store/store";
+import { baseApi } from "../baseApi";
 
 interface CreateTemplateArgs {
     name: string;
@@ -11,8 +12,14 @@ interface CreateTemplateArgs {
     template: RepTemplate;
 }
 
+interface CreateTemplateResponse {
+    id: string;
+    name: string;
+    // другие поля ответа
+}
+
 export const createTemplate = createAsyncThunk<
-    void,
+    CreateTemplateResponse,
     CreateTemplateArgs,
     {
         state: RootState;
@@ -23,6 +30,10 @@ export const createTemplate = createAsyncThunk<
     async ({ name, templateTypeId, isPrivate, template }, { rejectWithValue, getState }) => {
         try {
             const token = getState().auth.accessToken;
+            
+            if (!template.meta) {
+                throw new Error("Відсутні метадані шаблону");
+            }
 
             // 1. Создаем .rep файл
             const repFile = await createRepFile(template);
@@ -35,27 +46,38 @@ export const createTemplate = createAsyncThunk<
             formData.append("IsPrivate", String(isPrivate));
             formData.append("File", repFile, fileName);
 
-            // 3. Отправляем запрос
-            const response = await fetch('/api/templates', {
-                method: 'POST',
-                headers: token
-                    ? { 
-                        'Authorization': `Bearer ${token}`,
-                        // Не устанавливаем Content-Type - браузер сделает это сам
-                      }
-                    : {},
-                body: formData
-            });
-
-            if (!response.ok) {
-                throw new Error(`Failed to create template: ${response.statusText}`);
+            // 3. Настраиваем headers
+            const headers: Record<string, string> = {};
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
             }
 
-            const result = await response.json();
-            return result;
+            // 4. Отправляем через baseApi
+            const response = await baseApi.post<CreateTemplateResponse>(
+                '/templates',
+                formData,
+                {
+                    headers: {
+                        ...headers,
+                        'Content-Type': 'multipart/form-data',
+                    }
+                }
+            );
+
+            return response.data;
         } catch (error: any) {
             console.error('Create template error:', error);
-            return rejectWithValue(error.message || "Failed to create template");
+            
+            let errorMessage = "Не вдалося створити шаблон";
+            if (error.response) {
+                errorMessage = `Помилка ${error.response.status}: ${error.response.data || error.response.statusText}`;
+            } else if (error.request) {
+                errorMessage = "Не вдалося отримати відповідь від сервера";
+            } else {
+                errorMessage = error.message || errorMessage;
+            }
+            
+            return rejectWithValue(errorMessage);
         }
     }
 );

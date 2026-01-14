@@ -7,18 +7,53 @@ import {
     setMeta, 
     setTemplate, 
     setStep, 
-    clearDraft 
+    clearDraft
 } from "@/shared/api/templates/templateSlice";
+import { createTemplate } from "@/shared/api/templates/createTemplateThunk";
 
 import cl from "./TemplateCreatePage.module.css";
+import { useNavigate } from "react-router-dom";
 
 export function TemplateCreatePage() {
     const dispatch = useAppDispatch();
     const { meta, template, step } = useAppSelector(s => s.templateCreate);
+    const navigate = useNavigate();
 
     const handleClearDraft = () => {
         if (window.confirm('Ви впевнені, що бажаєте очистити чернетку?')) {
             dispatch(clearDraft());
+        }
+    };
+
+    const handleSubmit = async () => {
+        if (!meta) {
+            throw new Error("Відсутні метадані шаблону");
+        }
+
+        // Собираем данные для отправки
+        const templateData = {
+            name: meta.templateName,
+            templateTypeId: meta.templateTypeId,
+            isPrivate: meta.isPrivate || false,
+            template: template
+        };
+
+        try {
+            // Диспатчим thunk
+            const result = await dispatch(createTemplate(templateData)).unwrap();
+            
+            // Обработка успешного создания
+            console.log('Template created successfully:', result);
+            
+            // Редирект на страницу шаблонов или созданного шаблона
+            navigate('/templates');
+            
+            // Можно показать уведомление об успехе
+            // dispatch(showNotification({ message: 'Шаблон успішно створено', type: 'success' }));
+            
+        } catch (error: any) {
+            console.error('Failed to create template:', error);
+            throw error;
         }
     };
 
@@ -49,7 +84,7 @@ export function TemplateCreatePage() {
                         template={template}
                         onBack={() => dispatch(setStep(2))}
                         onClearDraft={handleClearDraft}
-                        onSubmit={}
+                        onSubmit={handleSubmit}
                     />
                 );
             default:

@@ -1,7 +1,7 @@
 .PropertiesPanel {
     display: flex;
     flex-flow: column nowrap;
-    flex: 0 1 20rem;
+    width: 20rem;
     background-color: white;
     border-left: 1px solid #e5e7eb;
     padding: 0 1rem 1rem 1rem;

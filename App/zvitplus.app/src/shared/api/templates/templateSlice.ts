@@ -1,8 +1,8 @@
 // shared/api/templates/templateSlice.ts
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import type { MetaValue, RepTemplate } from "@/shared/types/repEditorTypes";
-import { templatesApi, type CreateTemplateRequest } from "@/shared/api/templates/templatesApi";
 import { TEMPLATE_DRAFT_KEY } from "@/shared/constants/localStorage";
+import { createTemplate } from "./createTemplateThunk";
 
 type TemplateCreateState = {
     meta: MetaValue;
@@ -36,6 +36,7 @@ const getInitialState = (): TemplateCreateState => {
         meta: {
             templateName: "",
             templateTypeId: "",
+            templateTypeName: "",
             isPrivate: false,
             pageSize: "A4",
             orientation: "portrait"
@@ -44,6 +45,7 @@ const getInitialState = (): TemplateCreateState => {
             meta: {
                 templateName: "",
                 templateTypeId: "",
+                templateTypeName: "",
                 isPrivate: false,
                 pageSize: "A4",
                 orientation: "portrait"
@@ -71,34 +73,6 @@ const clearStorage = () => {
     localStorage.removeItem(TEMPLATE_DRAFT_KEY);
 };
 
-export const createTemplate = createAsyncThunk<
-    void,
-    void,
-    {
-        state: { templateCreate: TemplateCreateState };
-        rejectValue: string;
-    }
->(
-    "templateCreate/create",
-    async (_, { getState, rejectWithValue }) => {
-        try {
-            const state = getState().templateCreate;
-            const request: CreateTemplateRequest = {
-                meta: {
-                    name: state.meta.templateName,
-                    templateTypeId: state.meta.templateTypeId,
-                    isPrivate: state.meta.isPrivate
-                },
-                template: state.template
-            };
-            
-            await templatesApi.create(request);
-            return;
-        } catch (error: any) {
-            return rejectWithValue(error.message || "Failed to create template");
-        }
-    }
-);
 
 const templateCreateSlice = createSlice({
     name: "templateCreate",
@@ -143,6 +117,7 @@ const templateCreateSlice = createSlice({
             state.meta = {
                 templateName: "",
                 templateTypeId: "",
+                templateTypeName: "",
                 isPrivate: false,
                 pageSize: "A4",
                 orientation: "portrait"
@@ -151,6 +126,7 @@ const templateCreateSlice = createSlice({
                 meta: {
                     templateName: "",
                     templateTypeId: "",
+                    templateTypeName: "",
                     isPrivate: false,
                     pageSize: "A4",
                     orientation: "portrait"
@@ -173,7 +149,7 @@ const templateCreateSlice = createSlice({
             })
             .addCase(createTemplate.fulfilled, (state) => {
                 state.loading = false;
-                clearStorage();
+                templateCreateSlice.caseReducers.clearDraft(state);
             })
             .addCase(createTemplate.rejected, (state, action) => {
                 state.loading = false;

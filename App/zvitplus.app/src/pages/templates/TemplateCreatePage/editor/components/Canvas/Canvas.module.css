@@ -1,27 +1,43 @@
 /* -------------------- Canvas -------------------- */
 
 .CanvasContainer {
-    flex: 1;
     display: flex;
     flex-direction: column;
+    flex: 1; /* Занимает всё доступное пространство */
+    min-width: 0; /* Важно для flex-элементов */
+    overflow: hidden; /* Скрываем переполнение, не auto */
 }
 
 .CanvasArea {
-    flex: 1;
     background-color: #e5e7eb;
     padding: 2rem;
-    overflow: auto;
+    overflow: auto; /* Внутренний скролл */
     position: relative;
     scrollbar-width: thin;
+    flex: 1; /* Занимает всё пространство CanvasContainer */
+    min-height: 0; /* Критически важно для flex-скролла */
+    display: flex;
+    justify-content: center; /* Центрируем содержимое */
+    align-items: flex-start; /* Прижимаем к верху */
 }
 
 .Canvas {
+    background-color: transparent;
+    margin: 0 auto;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    max-width: 100%;
+}
+
+.CanvasWrapper {
+    display: block; /* Меняем с flex на block */
+    flex-shrink: 0; /* Не сжимается */
+    position: relative;
     background-color: white;
     box-shadow: var(--shadow);
-    margin: 0 auto;
-    width: 794px;
-    height: 1123px;
-    position: relative;
 }
 
 /* -------------------- Elements -------------------- */

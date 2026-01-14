@@ -1,5 +1,7 @@
 .Sidebar {
-    width: 16rem;
+  display: flex;
+  flex-flow: column nowrap;
+    width: 15rem;
     background-color: white;
     border-right: 1px solid #e5e7eb;
     padding: 0 1rem 1rem 0;
