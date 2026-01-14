@@ -1,5 +1,5 @@
 // pages/templates/TemplatePage.tsx
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import cl from './TemplatePage.module.css';
 import { NavLink } from 'react-router-dom';
 import { TemplateList } from '@/shared/ui/TemplateList/TemplateList.tsx';
@@ -17,30 +17,67 @@ export function TemplatePage() {
         error,
         currentPage, 
         totalPages, 
-        totalCount,
         searchParams 
     } = useAppSelector(state => state.templatesGet);
     
     useEffect(() => {
-        console.log('TemplatePage useEffect triggered:', { currentPage, searchParams });
         loadTemplates();
     }, [currentPage, searchParams]);
     
-    const loadTemplates = () => {
-        console.log('Loading templates with:', { 
-            page: currentPage, 
-            itemsPerPage: 6, 
-            searchParams 
-        });
-        
+    const loadTemplates = () => {        
         dispatch(getTemplates({
             page: currentPage,
             itemsPerPage: 6,
             searchParams
-        })).then((result) => {
-            console.log('getTemplates result:', result);
-        });
+        }));
     };
+
+    const handleKeyDown = useCallback((e: KeyboardEvent) => {
+        const activeElement = document.activeElement;
+        const isInput = activeElement?.tagName === 'INPUT' || 
+                       activeElement?.tagName === 'TEXTAREA' || 
+                       activeElement?.hasAttribute('contenteditable');
+        
+        if (isInput) return;
+        
+        switch (e.key) {
+            case 'ArrowLeft':
+                e.preventDefault();
+                if (currentPage > 1) {
+                    dispatch(setPage(currentPage - 1));
+                }
+                break;
+                
+            case 'ArrowRight':
+                e.preventDefault();
+                if (currentPage < totalPages) {
+                    dispatch(setPage(currentPage + 1));
+                }
+                break;
+                
+            case 'Home':
+                e.preventDefault();
+                if (currentPage !== 1) {
+                    dispatch(setPage(1));
+                }
+                break;
+                
+            case 'End':
+                e.preventDefault();
+                if (currentPage !== totalPages) {
+                    dispatch(setPage(totalPages));
+                }
+                break;
+        }
+    }, [currentPage, totalPages, dispatch]);
+    
+    useEffect(() => {
+        window.addEventListener('keydown', handleKeyDown);
+        
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [handleKeyDown]);
 
     const handlePageChange = (page: number) => {
         dispatch(setPage(page));
