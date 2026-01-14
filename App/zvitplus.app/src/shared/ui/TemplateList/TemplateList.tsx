@@ -1,18 +1,18 @@
-import { Template } from "../Template/Template";
-import type { TemplateProps } from "../Template/Template";
+import type { TemplateItemDTO } from "@/shared/api/templates/templateModels";
+import { TemplateCard } from "../TemplateCard/TemplateCard";
 
 import cl from './TemplateList.module.css';
 
-type TemplateListProps = {
-    templates: TemplateProps[]
+interface TemplateListProps {
+    templates: TemplateItemDTO[];
 }
 
 export function TemplateList({ templates }: TemplateListProps) {
     return (
         <div className={cl.Wrapper}>
             {
-                templates.map((prop, i) => {
-                    return <Template key={i} data={prop.data}/>
+                templates.map((t, i) => {
+                    return <TemplateCard key={i} template={t}/>
                 })
             }
         </div>

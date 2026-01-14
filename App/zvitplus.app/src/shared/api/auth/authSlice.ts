@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { authApi } from "@/shared/api/auth/authApi";
 import type { TokenResponse, LoginRequest, RegisterRequest } from "@/shared/api/auth/authModels";
 import { REFRESH_TOKEN_KEY, TEMPLATE_DRAFT_KEY } from "@/shared/constants/localStorage";
-import { clearDraft } from "../templates/templateSlice";
+import { clearDraft } from "../templates/templateCreateSlice";
 
 type AuthState = {
     accessToken: string | null;

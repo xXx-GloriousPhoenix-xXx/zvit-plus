@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using ZvitPlus.API.Context.Interfaces;
 using ZvitPlus.API.DTOs.TemplateDTOs;
+using ZvitPlus.BLL.DTOs.AdditionalDTOs;
 using ZvitPlus.BLL.DTOs.FileDTOs;
 using ZvitPlus.BLL.DTOs.FileEntityDTOs;
 using ZvitPlus.BLL.DTOs.TemplateDTOs;
 using ZvitPlus.BLL.Services.Interfaces;
-using GetTemplatePageDTO = ZvitPlus.BLL.DTOs.AdditionalDTOs.PagedResponse<ZvitPlus.BLL.DTOs.FileEntityDTOs.GetFileEntityDTO>;
 
 namespace ZvitPlus.API.Controllers
 {
@@ -82,7 +82,7 @@ namespace ZvitPlus.API.Controllers
         }
 
         [HttpGet("{page}/{itemsPerPage}")]
-        public async Task<ActionResult<GetTemplatePageDTO>> GetPageAsync(
+        public async Task<ActionResult<PagedResponse<GetFileEntityDTO>>> GetPageAsync(
             [FromRoute] int page = 1,
             [FromRoute] int itemsPerPage = 10,
             [FromQuery] SearchFileEntityDTO? dto = null,

@@ -8,7 +8,7 @@ import {
     setTemplate, 
     setStep, 
     clearDraft
-} from "@/shared/api/templates/templateSlice";
+} from "@/shared/api/templates/templateCreateSlice";
 import { createTemplate } from "@/shared/api/templates/createTemplateThunk";
 
 import cl from "./TemplateCreatePage.module.css";

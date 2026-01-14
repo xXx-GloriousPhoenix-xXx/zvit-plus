@@ -1,13 +1,15 @@
 import { authReducer } from "@/shared/api/auth/authSlice";
 import { templateTypesReducer } from "@/shared/api/templateTypes/templateTypesSlice";
-import { templateCreateReducer } from "@/shared/api/templates/templateSlice";
+import { templateCreateReducer } from "@/shared/api/templates/templateCreateSlice";
+import { templatesGetReducer } from "@/shared/api/templates/templatesGetSlice";
 import { configureStore } from "@reduxjs/toolkit";
 
 export const store = configureStore({
     reducer: {
         auth: authReducer,
         templateTypes: templateTypesReducer,
-        templateCreate: templateCreateReducer
+        templateCreate: templateCreateReducer,
+        templatesGet: templatesGetReducer
     },
 });
 

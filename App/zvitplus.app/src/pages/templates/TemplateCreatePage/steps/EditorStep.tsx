@@ -2,7 +2,7 @@
 import { useAppDispatch } from "@/app/store/hooks";
 import { Button } from "@/shared/ui/Button/Button.tsx";
 import type { RepTemplate } from "@/shared/types/repEditorTypes";
-import { setTemplate } from "@/shared/api/templates/templateSlice";
+import { setTemplate } from "@/shared/api/templates/templateCreateSlice";
 
 import cl from "../TemplateCreatePage.module.css";
 import { RepEditor } from "../editor/RepEditor";

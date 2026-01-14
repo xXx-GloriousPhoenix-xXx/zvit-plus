@@ -254,7 +254,7 @@ namespace ZvitPlus.BLL.Services.Implementations
             }
 
             var totalCount = await query.CountAsync(ct);
-            var totalPages = (Math.Min(totalCount, 1) - 1) / pageSize + 1;
+            var totalPages = (totalCount + pageSize - 1) / pageSize;
 
             // Фільтрація користувача
             if (search is not null)
