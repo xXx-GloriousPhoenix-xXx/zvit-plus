@@ -253,9 +253,6 @@ namespace ZvitPlus.BLL.Services.Implementations
                 query = query.Where(f => f.Report != null);
             }
 
-            var totalCount = await query.CountAsync(ct);
-            var totalPages = (totalCount + pageSize - 1) / pageSize;
-
             // Фільтрація користувача
             if (search is not null)
             {
@@ -294,6 +291,9 @@ namespace ZvitPlus.BLL.Services.Implementations
             {
                 query = query.Where(f => f.IsDeleted == false);
             }
+
+            var totalCount = await query.CountAsync(ct);
+            var totalPages = (totalCount + pageSize - 1) / pageSize;
 
             var collection = await query
                 .OrderBy(f => f.CreatedAt)

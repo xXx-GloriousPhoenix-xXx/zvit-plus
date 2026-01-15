@@ -38,10 +38,16 @@ const templatesGetSlice = createSlice({
         setSearchParams: (state, action) => {
             state.searchParams = action.payload;
             state.currentPage = 1;
+            state.totalPages = 0;
+            state.totalCount = 0;
+            state.items = [];
         },
         clearSearchParams: (state) => {
             state.searchParams = {};
             state.currentPage = 1;
+            state.totalPages = 0;
+            state.totalCount = 0;
+            state.items = [];
         },
         setPage: (state, action) => {
             state.currentPage = action.payload;

@@ -37,7 +37,32 @@ export function SearchBar({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSearch(params);
+        
+        const cleanedParams: SearchTemplateParams = {};
+        
+        if (params.name && params.name.trim() !== '') {
+            cleanedParams.name = params.name.trim();
+        }
+        if (params.author && params.author.trim() !== '') {
+            cleanedParams.author = params.author.trim();
+        }
+        if (params.templateType && params.templateType.trim() !== '') {
+            cleanedParams.templateType = params.templateType.trim();
+        }
+        if (params.createdFrom && params.createdFrom.trim() !== '') {
+            cleanedParams.createdFrom = params.createdFrom.trim();
+        }
+        if (params.createdTo && params.createdTo.trim() !== '') {
+            cleanedParams.createdTo = params.createdTo.trim();
+        }
+        if (params.updatedFrom && params.updatedFrom.trim() !== '') {
+            cleanedParams.updatedFrom = params.updatedFrom.trim();
+        }
+        if (params.updatedTo && params.updatedTo.trim() !== '') {
+            cleanedParams.updatedTo = params.updatedTo.trim();
+        }
+        
+        onSearch(cleanedParams);
     };
 
     const handleClear = () => {

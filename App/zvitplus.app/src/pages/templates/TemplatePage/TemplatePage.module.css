@@ -56,3 +56,14 @@
 .Templates {
     width: 100%;
 }
+
+.EmptyState {
+    width: 100%;
+    display: flex;
+    background-color: var(--white);
+    border: 0.05rem solid #ddd;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 1rem;
+    flex-flow: column nowrap;
+}

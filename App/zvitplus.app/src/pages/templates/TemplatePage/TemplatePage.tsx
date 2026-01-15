@@ -13,9 +13,15 @@ import {
     setSearchParams,
     clearSearchParams 
 } from '@/shared/api/templates/templatesGetSlice';
+import { fetchTemplateTypes } from '@/shared/api/templateTypes/templateTypesSlice';
 
 export function TemplatePage() {
     const dispatch = useAppDispatch();
+    useEffect(() => {
+        if (templateTypes.length === 0) {
+            dispatch(fetchTemplateTypes());
+        }
+    }, []);
     const { 
         items: templates, 
         loading, 
@@ -121,7 +127,7 @@ export function TemplatePage() {
                 )}
             </div>
 
-            {totalPages > 1 && (
+            {totalPages > 1 && templates.length > 0 && (
                 <div className={cl.PaginationContainer}>
                     <Pagination
                         currentPage={currentPage}

@@ -4,6 +4,7 @@ import type { GetTemplatesArgs, TemplateItemDTO } from "./templateModels";
 import type { RootState } from "@/app/store/store";
 import { baseApi } from "../baseApi";
 
+// getTemplatesThunk.ts - исправляем отправку параметров
 export const getTemplates = createAsyncThunk<
     PagedResponse<TemplateItemDTO>,
     GetTemplatesArgs,
@@ -17,31 +18,50 @@ export const getTemplates = createAsyncThunk<
         try {
             const token = getState().auth.accessToken;
             
-            // Строим query параметры
+            // Строим query параметры - ТОЛЬКО если значение не пустое
             const params = new URLSearchParams();
             params.append('page', page.toString());
             params.append('itemsPerPage', itemsPerPage.toString());
             
-            // Добавляем search параметры если они есть
-            if (searchParams.name) params.append('name', searchParams.name);
-            if (searchParams.author) params.append('author', searchParams.author);
-            if (searchParams.templateType) params.append('templateType', searchParams.templateType);
-            if (searchParams.createdFrom) params.append('createdFrom', searchParams.createdFrom);
-            if (searchParams.createdTo) params.append('createdTo', searchParams.createdTo);
-            if (searchParams.updatedFrom) params.append('updatedFrom', searchParams.updatedFrom);
-            if (searchParams.updatedTo) params.append('updatedTo', searchParams.updatedTo);
+            // Добавляем search параметры ТОЛЬКО если они не пустые
+            if (searchParams.name && searchParams.name.trim() !== '') {
+                params.append('name', searchParams.name.trim());
+            }
+            if (searchParams.author && searchParams.author.trim() !== '') {
+                params.append('author', searchParams.author.trim());
+            }
+            if (searchParams.templateType && searchParams.templateType.trim() !== '') {
+                params.append('templateType', searchParams.templateType.trim());
+            }
+            if (searchParams.createdFrom && searchParams.createdFrom.trim() !== '') {
+                params.append('createdFrom', searchParams.createdFrom.trim());
+            }
+            if (searchParams.createdTo && searchParams.createdTo.trim() !== '') {
+                params.append('createdTo', searchParams.createdTo.trim());
+            }
+            if (searchParams.updatedFrom && searchParams.updatedFrom.trim() !== '') {
+                params.append('updatedFrom', searchParams.updatedFrom.trim());
+            }
+            if (searchParams.updatedTo && searchParams.updatedTo.trim() !== '') {
+                params.append('updatedTo', searchParams.updatedTo.trim());
+            }
             
             const headers: Record<string, string> = {};
             if (token) {
                 headers['Authorization'] = `Bearer ${token}`;
             }
             
+            // Формируем URL
+            const url = `/templates/${page}/${itemsPerPage}${params.toString() ? '?' + params.toString() : ''}`;
+            
+            console.log('Request URL:', url);
+            
             const response = await baseApi.get<PagedResponse<TemplateItemDTO>>(
-                `/templates/${page}/${itemsPerPage}?${params.toString()}`,
+                url,
                 { headers }
             );
             
-            console.log(response.data);
+            console.log('Response:', response.data);
             return response.data;
         } catch (error: any) {
             console.error('Get templates error:', error);
