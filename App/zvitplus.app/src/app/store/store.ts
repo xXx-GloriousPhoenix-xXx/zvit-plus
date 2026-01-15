@@ -1,4 +1,6 @@
 import { authReducer } from "@/shared/api/auth/authSlice";
+import { myWorksReducer } from "@/shared/api/myWorks/myWorksSlice";
+import { reportsReducer } from "@/shared/api/reports/reportSlice";
 import { templateTypesReducer } from "@/shared/api/templateTypes/templateTypesSlice";
 import { templateCreateReducer } from "@/shared/api/templates/templateCreateSlice";
 import { templatesGetReducer } from "@/shared/api/templates/templatesGetSlice";
@@ -9,7 +11,9 @@ export const store = configureStore({
         auth: authReducer,
         templateTypes: templateTypesReducer,
         templateCreate: templateCreateReducer,
-        templatesGet: templatesGetReducer
+        templatesGet: templatesGetReducer,
+        myWorks: myWorksReducer,
+        reports: reportsReducer
     },
 });
 

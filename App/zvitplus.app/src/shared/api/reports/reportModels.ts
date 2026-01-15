@@ -1,4 +1,4 @@
-export interface SearchTemplateParams {
+export interface SearchReportParams {
     name?: string;
     author?: string;
     templateType?: string;
@@ -8,13 +8,13 @@ export interface SearchTemplateParams {
     updatedTo?: string;
 }
 
-export interface GetTemplatesArgs {
+export interface GetReportArgs {
     page?: number;
     itemsPerPage?: number;
-    searchParams?: SearchTemplateParams;
+    searchParams?: SearchReportParams;
 }
 
-export interface TemplateItemDTO {
+export interface ReportItemDTO {
     id: string;
     name: string;
     author: string;

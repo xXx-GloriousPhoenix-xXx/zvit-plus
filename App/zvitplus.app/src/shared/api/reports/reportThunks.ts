@@ -1,18 +1,18 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import type { PagedResponse } from "../models";
-import type { GetTemplatesArgs, TemplateItemDTO } from "./templateModels";
+import type { GetReportArgs, ReportItemDTO } from "./reportModels";
 import type { RootState } from "@/app/store/store";
 import { baseApi } from "../baseApi";
 
-export const getTemplates = createAsyncThunk<
-    PagedResponse<TemplateItemDTO>,
-    GetTemplatesArgs,
+export const getReports = createAsyncThunk<
+    PagedResponse<ReportItemDTO>,
+    GetReportArgs,
     {
         state: RootState;
         rejectValue: string;
     }
 >(
-    "templates/getAll",
+    "reports/getAll",
     async ({ page = 1, itemsPerPage = 6, searchParams = {} }, { rejectWithValue, getState }) => {
         try {
             const token = getState().auth.accessToken;
@@ -48,16 +48,13 @@ export const getTemplates = createAsyncThunk<
                 headers['Authorization'] = `Bearer ${token}`;
             }
             
-            const url = `/templates/${page}/${itemsPerPage}${params.toString() ? '?' + params.toString() : ''}`;
+            const url = `/reports/${page}/${itemsPerPage}${params.toString() ? '?' + params.toString() : ''}`;
             
-            console.log('Request URL:', url);
-            
-            const response = await baseApi.get<PagedResponse<TemplateItemDTO>>(
+            const response = await baseApi.get<PagedResponse<ReportItemDTO>>(
                 url,
                 { headers }
             );
             
-            console.log('Response:', response.data);
             return response.data;
         } catch (error: any) {
             console.error('Get templates error:', error);

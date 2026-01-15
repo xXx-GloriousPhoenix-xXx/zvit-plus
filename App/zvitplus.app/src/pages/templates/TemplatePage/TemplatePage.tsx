@@ -17,11 +17,13 @@ import { fetchTemplateTypes } from '@/shared/api/templateTypes/templateTypesSlic
 
 export function TemplatePage() {
     const dispatch = useAppDispatch();
+    
     useEffect(() => {
         if (templateTypes.length === 0) {
             dispatch(fetchTemplateTypes());
         }
-    }, []);
+    }, [dispatch]);
+
     const { 
         items: templates, 
         loading, 

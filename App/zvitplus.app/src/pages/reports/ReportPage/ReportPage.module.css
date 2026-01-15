@@ -1,0 +1,69 @@
+.Wrapper {
+    display: flex;
+    flex-flow: column nowrap;
+    width: 100%;
+    gap: 1em;
+}
+.Control {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 1em;
+}
+.Option {
+    flex: 1 1 49%;
+    padding: 2em 1em;
+
+    display: flex;
+    flex-flow: column nowrap;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+
+    color: var(--white);
+    background-color: var(--white);
+    box-shadow: var(--shadow);
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+}
+.Option:hover {
+    transform: translateY(-0.25em);
+}
+.Option a {
+    text-decoration: none;
+}
+.Option i {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1;
+    color: var(--white);
+    font-size: 2em;
+    width: 100%;
+    width: 2em;
+    border-radius: 50%;
+    background-color: var(--secondary-color);
+}
+.Header {
+    color: var(--primary-color);
+    font-size: 1.25rem;
+    margin: 1em 0 0.25em;
+}
+.Description {
+    font-size: 1rem;
+    color: var(--text-light);
+    margin: 0;
+}
+.Items {
+    width: 100%;
+}
+
+.EmptyState {
+    width: 100%;
+    display: flex;
+    background-color: var(--white);
+    border: 0.05rem solid #ddd;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 1rem;
+    flex-flow: column nowrap;
+}
