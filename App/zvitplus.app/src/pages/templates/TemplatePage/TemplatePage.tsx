@@ -1,13 +1,18 @@
-// pages/templates/TemplatePage.tsx
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 import cl from './TemplatePage.module.css';
 import { NavLink } from 'react-router-dom';
 import { TemplateList } from '@/shared/ui/TemplateList/TemplateList.tsx';
 import { useAppDispatch, useAppSelector } from '@/app/store/hooks';
-import { setPage } from '@/shared/api/templates/templatesGetSlice';
 import { getTemplates } from '@/shared/api/templates/getTemplatesThunk';
 import { Button } from '@/shared/ui/Button/Button';
 import { Pagination } from '@/shared/ui/Pagination/Pagination';
+import { useKeyboardNavigation } from '@/shared/lib/hooks/useKeyboardNavigation';
+import { SearchBar } from '@/shared/ui/SearchBar/SearchBar';
+import { 
+    setPage, 
+    setSearchParams,
+    clearSearchParams 
+} from '@/shared/api/templates/templatesGetSlice';
 
 export function TemplatePage() {
     const dispatch = useAppDispatch();
@@ -17,9 +22,11 @@ export function TemplatePage() {
         error,
         currentPage, 
         totalPages, 
-        searchParams 
+        searchParams,
     } = useAppSelector(state => state.templatesGet);
     
+    const { items: templateTypes } = useAppSelector(state => state.templateTypes);
+
     useEffect(() => {
         loadTemplates();
     }, [currentPage, searchParams]);
@@ -32,55 +39,25 @@ export function TemplatePage() {
         }));
     };
 
-    const handleKeyDown = useCallback((e: KeyboardEvent) => {
-        const activeElement = document.activeElement;
-        const isInput = activeElement?.tagName === 'INPUT' || 
-                       activeElement?.tagName === 'TEXTAREA' || 
-                       activeElement?.hasAttribute('contenteditable');
-        
-        if (isInput) return;
-        
-        switch (e.key) {
-            case 'ArrowLeft':
-                e.preventDefault();
-                if (currentPage > 1) {
-                    dispatch(setPage(currentPage - 1));
-                }
-                break;
-                
-            case 'ArrowRight':
-                e.preventDefault();
-                if (currentPage < totalPages) {
-                    dispatch(setPage(currentPage + 1));
-                }
-                break;
-                
-            case 'Home':
-                e.preventDefault();
-                if (currentPage !== 1) {
-                    dispatch(setPage(1));
-                }
-                break;
-                
-            case 'End':
-                e.preventDefault();
-                if (currentPage !== totalPages) {
-                    dispatch(setPage(totalPages));
-                }
-                break;
-        }
-    }, [currentPage, totalPages, dispatch]);
-    
-    useEffect(() => {
-        window.addEventListener('keydown', handleKeyDown);
-        
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown);
-        };
-    }, [handleKeyDown]);
+    useKeyboardNavigation({
+        currentPage,
+        totalPages,
+        onPrevPage: () => dispatch(setPage(currentPage - 1)),
+        onNextPage: () => dispatch(setPage(currentPage + 1)),
+        onFirstPage: () => dispatch(setPage(1)),
+        onLastPage: () => dispatch(setPage(totalPages))
+    });
 
     const handlePageChange = (page: number) => {
         dispatch(setPage(page));
+    };
+
+    const handleSearch = (newParams: typeof searchParams) => {
+        dispatch(setSearchParams(newParams));
+    };
+
+    const handleClearSearch = () => {
+        dispatch(clearSearchParams());
     };
 
     if (loading && templates.length === 0) {
@@ -113,6 +90,15 @@ export function TemplatePage() {
                     </p>
                 </div>
             </div>
+
+            <SearchBar
+                onSearch={handleSearch}
+                onClear={handleClearSearch}
+                initialParams={searchParams}
+                templateTypes={templateTypes}
+                isLoading={loading}
+            />
+
             {error && (
                 <div className={cl.Error}>
                     {error}

@@ -1,0 +1,44 @@
+.SearchBar {
+    display: flex;
+    flex-flow: column nowrap;
+    background: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 1rem;
+    gap: 1rem;
+    color: var(--text-color);
+}
+
+.MainRow {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 1rem;
+}
+.MainRow > * {
+    flex: 1 1 30%;
+}
+
+.SearchInput {
+    min-width: 0;
+}
+
+.AdvancedFilters {
+    margin-bottom: 1.5rem;
+}
+
+.ActionButtons {
+    display: flex;
+    flex-direction: row wrap;
+    gap: 1rem;
+    min-width: 100%;
+}
+
+.FilterGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+
+.FilterGroup {
+    min-width: 0;
+}

@@ -36,7 +36,11 @@ export function TemplateCard({ template }: TemplateCardProps) {
                     </div>
                     <div className={cl.InfoRow}>
                         <i className="fa-solid fa-calendar"></i>
-                        <span>Створено: {formatDate(template.createdAt)}</span>
+                        <span>{formatDate(template.createdAt)}</span>
+                    </div>
+                    <div className={cl.InfoRow}>
+                        <i className="fa-solid fa-arrows-rotate"></i>
+                        <span>{formatDate(template.updatedAt)}</span>
                     </div>
                 </div>
                 <div className={cl.IconPanel}>
