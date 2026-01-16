@@ -1,11 +1,9 @@
-// components/ProtectedRoute.tsx
 import { useAppSelector } from "@/app/store/hooks.ts";
 import { Navigate, Outlet } from "react-router-dom";
 
-export function ProtectedRoute() {
+export function ProtectedOutlet() {
     const { isAuth, initialized } = useAppSelector(s => s.auth);
 
-    // Если еще не инициализировали авторизацию, показываем загрузку
     if (!initialized) {
         return (
             <div className="flex items-center justify-center min-h-screen">

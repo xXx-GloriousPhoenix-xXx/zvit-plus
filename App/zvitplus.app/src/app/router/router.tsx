@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { Navigate, createBrowserRouter } from 'react-router-dom';
 
 import { MainOutlet } from '@/widgets/layouts/MainOutlet/MainOutlet';
 import { AuthOutlet } from '@/widgets/layouts/AuthOutlet/AuthOutlet';
@@ -6,27 +6,25 @@ import { AuthOutlet } from '@/widgets/layouts/AuthOutlet/AuthOutlet';
 import { LoginPage } from '@/pages/auth/LoginPage/LoginPage';
 import { RegisterPage } from '@/pages/auth/RegisterPage/RegisterPage';
 
-import { DiscoveryPage } from '@/pages/general/DiscoveryPage/DiscoveryPage';
 import { MyWorkPage } from '@/pages/general/MyWorkPage/MyWorkPage';
 import { TemplatePage } from '@/pages/templates/TemplatePage/TemplatePage';
 import { ReportPage } from '@/pages/reports/ReportPage/ReportPage';
 
 import { NotFoundPage } from '@/pages/extra/NotFoundPage/NotFoundPage';
-import { TemplateUploadPage } from '@/pages/templates/TemplateUploadPage/TemplateUploadPage';
 import { TemplateCreatePage } from '@/pages/templates/TemplateCreatePage/TemplateCreatePage';
-import { TemplateEditPage } from '@/pages/templates/TemplateEditPage/TemplateEditPage';
 import { HomePage } from '@/pages/general/HomePage/HomePage';
-import { ProtectedRoute } from '../../shared/components/ProtectedRoute';
+import { ProtectedOutlet } from '@/widgets/layouts/ProtectedOutlet/ProtectedOutlet';
+import { ReportCreatePage } from '@/pages/reports/ReportCreatePage/ReportCreatePage';
+import { EditPage } from '@/pages/general/EditPage/EditPage';
+import { UploadPage } from '@/pages/general/UploadPage/UploadPage';
 
 export const router = createBrowserRouter([
     {
         element: <MainOutlet/>,
         children: [
-            { path: "/", element: <HomePage/> },
-            { path: "/discovery", element: <DiscoveryPage/> },
-            { path: "/my-works", element: <MyWorkPage/> },
-            { path: "/reports", element: <ReportPage/> },
+            { index: true, element: <Navigate to="/home" replace /> },
             { path: "/home", element: <HomePage/> },
+            { path: "/my-works", element: <MyWorkPage/> },
 
             // { path: "/tutorials", element: <TutorialPage/> },
             // { path: "/faq", element: <FAQPage/> },
@@ -47,15 +45,28 @@ export const router = createBrowserRouter([
         children: [
             { index: true, element: <TemplatePage/> },
             {
-                element: <ProtectedRoute />,
+                element: <ProtectedOutlet />,
                 children: [
-                    { path: "upload", element: <TemplateUploadPage /> },
+                    { path: "upload", element: <UploadPage mode="template" /> },
                     { path: "create", element: <TemplateCreatePage /> },
-                    { path: ":id/edit", element:
-                        <TemplateEditPage
-                            mode="template"
-                            readonly={false}    
-                        /> }
+                    { path: ":id", element: <EditPage mode="template" readonly={true} />},
+                    { path: ":id/edit", element: <EditPage mode="template" readonly={false} /> }
+                ]
+            }
+        ]
+    },
+    {
+        path: "/reports",
+        element: <MainOutlet/>,
+        children: [
+            { index: true, element: <ReportPage/> },
+            {
+                element: <ProtectedOutlet />,
+                children: [
+                    { path: "upload", element: <UploadPage mode="report" /> },
+                    { path: "create", element: <ReportCreatePage /> },
+                    { path: ":id", element: <EditPage mode="report" readonly={true} />},
+                    { path: ":id/edit", element: <EditPage mode="report" readonly={false} /> }
                 ]
             }
         ]

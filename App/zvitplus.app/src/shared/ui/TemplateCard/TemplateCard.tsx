@@ -50,12 +50,6 @@ export function TemplateCard({ template }: TemplateCardProps) {
                     >
                         <i className="fa-solid fa-eye"></i> Переглянути
                     </NavLink>
-                    <NavLink 
-                        to={`/templates/${template.id}/edit`}
-                        className={cl.ControlButton}
-                    >
-                        <i className="fa-solid fa-pen-to-square"></i> Заповнити
-                    </NavLink>
                 </div>
             </div>
         </div>
