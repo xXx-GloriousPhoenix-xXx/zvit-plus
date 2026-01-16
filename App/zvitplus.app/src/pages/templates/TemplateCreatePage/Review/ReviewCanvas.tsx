@@ -125,8 +125,8 @@ function ReviewElement({ element }: ReviewElementProps) {
         width: `${element.size.width}px`,
         height: `${element.size.height}px`,
         backgroundColor: ELEMENT_COLORS[element.type] || '#f3f4f6',
-        border: '1px solid #d1d5db',
-        borderRadius: '4px',
+        border: '0.05rem solid #ddd',
+        borderRadius: 'var(--border-radius)',
         overflow: 'hidden'
     };
 

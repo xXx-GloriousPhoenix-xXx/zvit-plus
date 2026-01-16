@@ -1,7 +1,18 @@
 // shared/utils/templatePackage.ts
 import JSZip from "jszip";
-import type { RepTemplate, MetaValue } from "@/shared/types/repEditorTypes";
+import type { RepTemplate, MetaValue, RepElement } from "@/shared/types/repEditorTypes";
 import html2canvas from "html2canvas";
+
+export interface RepTemplateData {
+    meta: MetaValue;
+    elements: RepElement[];
+}
+
+export interface RepTemplateFiles {
+    previewUrl?: string;
+    dataFiles: Record<string, string>;
+    mediaFiles: Record<string, string>;
+}
 
 export interface RepFileStructure {
     // meta.json - основні метадані
@@ -54,7 +65,10 @@ export async function createRepFile(template: RepTemplate, previewElement?: HTML
     return await zip.generateAsync({ type: "blob" });
 }
 
-export async function unpackRepFile(blob: Blob): Promise<RepTemplate> {
+export async function unpackRepFile(blob: Blob): Promise<{
+    data: RepTemplateData;
+    files: RepTemplateFiles;
+}> {
     const zip = new JSZip();
     const zipData = await zip.loadAsync(blob);
     
@@ -70,18 +84,18 @@ export async function unpackRepFile(blob: Blob): Promise<RepTemplate> {
     if (!structContent) {
         throw new Error("Файл struct.json не найден в архиве");
     }
-    const struct = JSON.parse(structContent) as { elements: RepTemplate['elements'] };
+    const struct = JSON.parse(structContent) as { elements: RepElement[] };
     
-    // Читаем preview (если есть)
-    let previewBlob: Blob | undefined;
+    // Создаем URL для файлов
+    let previewUrl: string | undefined;
     const previewFile = zipData.file("preview.jpg") || zipData.file("preview.jpeg");
     if (previewFile) {
-        previewBlob = await previewFile.async("blob");
+        const previewBlob = await previewFile.async("blob");
+        previewUrl = URL.createObjectURL(previewBlob);
     }
     
-    // Читаем дополнительные файлы из data/ и media/
-    const dataFiles: Record<string, Blob> = {};
-    const mediaFiles: Record<string, Blob> = {};
+    const dataFiles: Record<string, string> = {};
+    const mediaFiles: Record<string, string> = {};
     
     const dataFolder = zipData.folder("data");
     if (dataFolder) {
@@ -89,7 +103,7 @@ export async function unpackRepFile(blob: Blob): Promise<RepTemplate> {
             const file = dataFolder.file(filename);
             if (file && !file.dir) {
                 const blob = await file.async("blob");
-                dataFiles[filename] = blob;
+                dataFiles[filename] = URL.createObjectURL(blob);
             }
         });
         await Promise.all(dataFilePromises);
@@ -101,18 +115,22 @@ export async function unpackRepFile(blob: Blob): Promise<RepTemplate> {
             const file = mediaFolder.file(filename);
             if (file && !file.dir) {
                 const blob = await file.async("blob");
-                mediaFiles[filename] = blob;
+                mediaFiles[filename] = URL.createObjectURL(blob);
             }
         });
         await Promise.all(mediaFilePromises);
     }
     
     return {
-        meta,
-        elements: struct.elements,
-        // preview: previewBlob,
-        // dataFiles,
-        // mediaFiles
+        data: {
+            meta,
+            elements: struct.elements
+        },
+        files: {
+            previewUrl,
+            dataFiles,
+            mediaFiles
+        }
     };
 }
 

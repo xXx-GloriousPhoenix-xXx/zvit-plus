@@ -2,8 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import type { FileGetArgs, FileItemDTO } from "./models";
 import type { RootState } from "@/app/store/store";
 import { baseApi } from "../baseApi";
-import type { RepTemplate } from "@/shared/types/repEditorTypes";
-import { unpackRepFile } from "@/shared/lib/utils/repFileManager";
+import { unpackRepFile, type RepTemplateData, type RepTemplateFiles } from "@/shared/lib/utils/repFileManager";
 
 export const getMeta = createAsyncThunk<
     FileItemDTO,
@@ -46,7 +45,10 @@ export const getMeta = createAsyncThunk<
 )
 
 export const getFile = createAsyncThunk<
-    RepTemplate,
+    {
+        data: RepTemplateData,
+        files: RepTemplateFiles
+    },
     FileGetArgs,
     {
         state: RootState;
@@ -70,9 +72,8 @@ export const getFile = createAsyncThunk<
                 responseType: 'blob' 
             });
 
-            const template = await unpackRepFile(response.data);
-            
-            return template;
+            const data = await unpackRepFile(response.data);
+            return data;
         }
         catch (error: any) {
             console.error('Download file error:', error);

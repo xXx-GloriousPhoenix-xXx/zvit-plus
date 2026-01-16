@@ -100,4 +100,3 @@ export type SelectedCell = {
     row: number | null; 
     col: number 
 } | null;
-

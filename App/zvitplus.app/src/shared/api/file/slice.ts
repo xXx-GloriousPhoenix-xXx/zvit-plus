@@ -1,7 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { FileItemDTO } from "./models";
 import { getFile, getMeta } from "./thunks";
-import type { RepTemplate } from "@/shared/types/repEditorTypes";
+// import type { RepTemplate } from "@/shared/types/repEditorTypes";
+import type { RepTemplateData, RepTemplateFiles } from "@/shared/lib/utils/repFileManager";
 
 type FileState = {
     meta: {
@@ -10,7 +11,8 @@ type FileState = {
         error: string | null;
     }
     file: {
-        item: RepTemplate | null;
+        data: RepTemplateData | null; 
+        files: RepTemplateFiles | null;
         loading: boolean;
         error: string | null;
     }
@@ -23,7 +25,8 @@ const initialState: FileState = {
         error: null
     },
     file: {
-        item: null,
+        data: null,
+        files: null,
         loading: false,
         error: null
     }
@@ -37,7 +40,24 @@ const fileSlice = createSlice({
             state.meta.error = null;
             state.file.error = null;
         },
-        reset: () => initialState
+        reset: () => initialState,
+        revokeFileUrls: (state) => {
+            if (state.file.files) {
+                if (state.file.files.previewUrl) {
+                    URL.revokeObjectURL(state.file.files.previewUrl);
+                }
+                
+                Object.values(state.file.files.dataFiles).forEach(url => {
+                    URL.revokeObjectURL(url);
+                });
+                
+                Object.values(state.file.files.mediaFiles).forEach(url => {
+                    URL.revokeObjectURL(url);
+                });
+                
+                state.file.files = null;
+            }
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -63,14 +83,16 @@ const fileSlice = createSlice({
         })
         .addCase(getFile.fulfilled, (state, action) => {
             state.file.loading = false;
-            state.file.item = action.payload; 
+
+            state.file.data = action.payload.data;
+            state.file.files = action.payload.files;
         })
         .addCase(getFile.rejected, (state, action) => {
             state.file.loading = false;
-            // state.file.error = action.payload || "Помилка завантаження файлу";
+            state.file.error = action.payload || "Помилка завантаження файлу";
         })
     }
 })
 
-export const { clearError, reset } = fileSlice.actions;
+export const { clearError, reset, revokeFileUrls } = fileSlice.actions;
 export const filesReducer = fileSlice.reducer;
