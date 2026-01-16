@@ -35,24 +35,20 @@ export const createTemplate = createAsyncThunk<
                 throw new Error("Відсутні метадані шаблону");
             }
 
-            // 1. Создаем .rep файл
             const repFile = await createRepFile(template, canvasRef!.current);
             const fileName = createRepFileName(template.meta);
 
-            // 2. Создаем FormData
             const formData = new FormData();
             formData.append("Name", name);
             formData.append("TemplateTypeId", templateTypeId);
             formData.append("IsPrivate", String(isPrivate));
             formData.append("File", repFile, fileName);
 
-            // 3. Настраиваем headers
             const headers: Record<string, string> = {};
             if (token) {
                 headers['Authorization'] = `Bearer ${token}`;
             }
 
-            // 4. Отправляем через baseApi
             const response = await baseApi.post<CreateTemplateResponse>(
                 '/templates',
                 formData,

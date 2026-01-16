@@ -40,11 +40,9 @@
 
 .CanvasContainer {
     background: white;
-    border-radius: 8px;
-    padding: 20px;
-    margin-top: 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    min-height: 400px;
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    box-shadow: var(--shadow);
 }
 
 .DebugInfo {

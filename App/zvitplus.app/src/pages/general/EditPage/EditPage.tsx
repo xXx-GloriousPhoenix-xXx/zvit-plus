@@ -19,7 +19,6 @@ export function EditPage({ mode, readonly }: Props) {
     const dispatch = useAppDispatch();
     const canvasRef = useRef<HTMLDivElement>(null);
     
-    // Получаем состояние из Redux
     const { 
         data: templateData, 
         files: templateFiles,
@@ -79,24 +78,14 @@ export function EditPage({ mode, readonly }: Props) {
                 </p>
             </header>
 
-            {templateFiles?.previewUrl && (
-                <div className={cl.PreviewSection}>
-                    <h3>Прев'ю:</h3>
-                    <img 
-                        src={templateFiles.previewUrl} 
-                        alt="Прев'ю шаблону"
-                        className={cl.PreviewImage}
-                    />
-                </div>
-            )}
+            <div ref={canvasRef} className={cl.CanvasContainer}>
+                <ReviewCanvas
+                    template={templateData}
+                    canvasRef={canvasRef}
+                />
+            </div>
 
-            <ReviewCanvas
-                template={templateData}
-                canvasRef={canvasRef}
-            />
-            
-            <div ref={canvasRef} className={cl.CanvasContainer}></div>
-
+            {/* Информация о файлах */}
             {templateFiles && (
                 <div className={cl.FilesInfo}>
                     <h3>Файли в шаблоні:</h3>
@@ -106,6 +95,7 @@ export function EditPage({ mode, readonly }: Props) {
                 </div>
             )}
 
+            {/* Дебаг информация */}
             <div className={cl.DebugInfo}>
                 <p>ID: {id}</p>
                 <p>Назва: {templateData.meta.templateName}</p>
