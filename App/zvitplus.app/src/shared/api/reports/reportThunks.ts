@@ -18,8 +18,6 @@ export const getReports = createAsyncThunk<
             const token = getState().auth.accessToken;
             
             const params = new URLSearchParams();
-            params.append('page', page.toString());
-            params.append('itemsPerPage', itemsPerPage.toString());
             
             if (searchParams.name && searchParams.name.trim() !== '') {
                 params.append('name', searchParams.name.trim());
@@ -72,3 +70,5 @@ export const getReports = createAsyncThunk<
         }
     }
 );
+
+// export const getReport = createAsyncThunk<>

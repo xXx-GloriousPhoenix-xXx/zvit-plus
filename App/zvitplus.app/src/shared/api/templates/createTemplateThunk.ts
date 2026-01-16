@@ -16,7 +16,6 @@ interface CreateTemplateArgs {
 interface CreateTemplateResponse {
     id: string;
     name: string;
-    // другие поля ответа
 }
 
 export const createTemplate = createAsyncThunk<
