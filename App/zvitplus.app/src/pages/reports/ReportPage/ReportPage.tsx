@@ -37,7 +37,7 @@ export function ReportPage() {
                     <NavLink to="upload">
                         <i className="fa-solid fa-arrow-up-from-bracket"></i>
                     </NavLink>
-                    <h4 className={cl.Header}>Створюйте звіти</h4>
+                    <h4 className={cl.Header}>Завантажуйте звіти</h4>
                     <p className={cl.Description}>Завантажуйте власні звіти з локального сховища</p>
                 </div>
             </div>

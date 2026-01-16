@@ -1,5 +1,5 @@
 export function formatFileSize(bytes: number): string {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) return '0 Б';
     
     const k = 1024;
     const sizes = ['Б', 'КБ', 'МБ', 'ГБ'];
@@ -15,4 +15,14 @@ export function formatDate(dateString: string): string {
         month: '2-digit',
         year: 'numeric'
     });
+}
+
+export function formatQuantity(quantity: number): string {
+    if (quantity === 0) return '0';
+
+    const k = 1000;
+    const sizes = ['', ' K', ' M', ' B', ' T'];
+    const i = Math.floor(Math.log(quantity) / Math.log(k));
+
+    return parseFloat((quantity / Math.pow(k, i)).toFixed(1)) + sizes[i];
 }

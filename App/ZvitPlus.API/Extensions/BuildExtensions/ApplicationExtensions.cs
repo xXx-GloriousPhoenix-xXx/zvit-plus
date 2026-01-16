@@ -25,6 +25,7 @@ namespace ZvitPlus.API.Extensions.BuildExtensions
             services.AddScoped<IReportService, ReportService>();
             services.AddScoped<ITemplateService, TemplateService>();
             services.AddScoped<ITemplateTypeService, TemplateTypeService>();
+            services.AddScoped<IStatsService, StatsService>();
 
             services.AddSingleton<ITokenGenerator, TokenGenerator>();
 

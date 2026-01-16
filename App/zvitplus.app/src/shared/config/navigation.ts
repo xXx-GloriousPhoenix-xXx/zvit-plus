@@ -1,5 +1,5 @@
 export const mainNav = [
-    { label: 'Перегляд', path: '/discovery' },
+    { label: 'Домашня сторінка', path: '/home' },
     { label: 'Мої роботи', path: '/my-works' },
     { label: 'Шаблони', path: '/templates' },
     { label: 'Звіти', path: '/reports' },
