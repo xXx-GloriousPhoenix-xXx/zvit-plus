@@ -84,14 +84,14 @@ export function HomePage() {
             <HeaderLine>Звіти</HeaderLine>
             <div className={cl.Control}>
                 <div className={cl.Option}>
-                    <NavLink to="/templates" replace>
+                    <NavLink to="/templates">
                         <i className="fa-solid fa-pen-to-square"></i>
                     </NavLink>
                     <h4 className={cl.Header}>Створюйте звіти</h4>
                     <p className={cl.Description}>Оберіть шаблон з переліку існуючих і створіть з його допогомогою звіт</p>
                 </div>
                 <div className={cl.Option}>
-                    <NavLink to="upload">
+                    <NavLink to="/reports/upload">
                         <i className="fa-solid fa-arrow-up-from-bracket"></i>
                     </NavLink>
                     <h4 className={cl.Header}>Завантажуйте звіти</h4>
