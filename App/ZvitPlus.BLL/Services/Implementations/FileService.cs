@@ -152,28 +152,6 @@ namespace ZvitPlus.BLL.Services.Implementations
             return response;
         }
 
-        public async Task<(FileEntity entity, Stream stream)?> GetWithStreamAsync(Guid entityId, CancellationToken ct = default)
-        {
-            AppLogger.LogActionStarted(_logger, "читання файлу", entityId);
-
-            var entity = await _unitOfWork.Files.GetByIdAsync(entityId, ct);
-            if (entity is null)
-            {
-                AppLogger.LogActionFailed(_logger, "читання файлу", entityId);
-                throw new BusinessException("Файл не знайдено");
-            }
-
-            var file = await ReadFromFileAsync(entity.FilePath, ct);
-            if (file is null)
-            {
-                AppLogger.LogActionFailed(_logger, "читання файлу", entityId);
-                throw new BusinessException("Файл не знайдено");
-            }
-
-            AppLogger.LogActionCompleted(_logger, "Читання файлу", entityId);
-            return (entity, file);
-        }
-
         public async Task DeleteAsync(Guid entityId, UserContext context, CancellationToken ct = default)
         {
             AppLogger.LogActionStarted(_logger, "видалення файлу", entityId);
@@ -219,14 +197,7 @@ namespace ZvitPlus.BLL.Services.Implementations
             }
         }
 
-
-        public async Task<PagedResponse<GetFileEntityDTO>> GetPageAsync(
-            UserContext context,
-            FileType ft,
-            int page = 1,
-            int pageSize = 10,
-            SearchFileEntityDTO? search = null, 
-            CancellationToken ct = default)
+        public async Task<PagedResponse<GetFileEntityDTO>> GetPageAsync(UserContext context, FileType ft, int page = 1, int pageSize = 10, SearchFileEntityDTO? search = null, CancellationToken ct = default)
         {
             if (page < 1)
             {
@@ -395,7 +366,7 @@ namespace ZvitPlus.BLL.Services.Implementations
             AppLogger.LogActionCompleted(_logger, "Збереження файлу");
         }
             
-        private async Task<Stream> ReadFromFileAsync(string filePath, CancellationToken ct = default)
+        public async Task<Stream> ReadFromFileAsync(string filePath, CancellationToken ct = default)
         {
             AppLogger.LogActionStarted(_logger, "читання з файлу");
 
@@ -411,7 +382,7 @@ namespace ZvitPlus.BLL.Services.Implementations
                 throw new BusinessException("Файл не існує");
             }
 
-            await using var fs = new FileStream(
+            var stream = new FileStream(
                 filePath,
                 FileMode.Open,
                 FileAccess.Read,
@@ -419,9 +390,9 @@ namespace ZvitPlus.BLL.Services.Implementations
                 bufferSize: 4096,
                 useAsync: true);
 
-            ct.ThrowIfCancellationRequested();
+            AppLogger.LogActionCompleted(_logger, "читання файлу");
 
-            return fs;
+            return stream;
         }
     
     }

@@ -12,18 +12,6 @@ interface ReportsState {
         error: string | null;
         searchParams: SearchReportParams;
     };
-
-    current: {
-        item: ReportItemDTO | null;
-        loading: boolean;
-        error: string | null;
-    };
-
-    mutation: {
-        loading: boolean;
-        error: string | null;
-        success: boolean;
-    };
 }
 
 const initialState: ReportsState = {
@@ -35,16 +23,6 @@ const initialState: ReportsState = {
         loading: false,
         error: null,
         searchParams: {}
-    },
-    current: {
-        item: null,
-        loading: false,
-        error: null
-    },
-    mutation: {
-        loading: false,
-        error: null,
-        success: false
     }
 };
 

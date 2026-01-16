@@ -6,6 +6,7 @@ export type HorizontalAlignType = 'left' | 'center' | 'right';
 export type VerticalAlignType = 'top' | 'middle' | 'bottom';
 export type FontWeight = 'normal' | 'bold';
 export type EditorMode = "template" | "report";
+export type FileType = EditorMode;
 
 export interface BaseRepElement {
     id: string;

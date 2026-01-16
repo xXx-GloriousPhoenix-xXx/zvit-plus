@@ -14,7 +14,6 @@ interface ReviewCanvasProps {
 export function ReviewCanvas({ template, canvasRef }: ReviewCanvasProps) {
     const { elements, meta } = template;
     
-    // Стили для канваса на основе meta
     const canvasStyle: React.CSSProperties = {
         width: meta.orientation === 'landscape' ? '1123px' : '794px',
         height: meta.orientation === 'portrait' ? '1123px' : '794px',
@@ -35,7 +34,6 @@ export function ReviewCanvas({ template, canvasRef }: ReviewCanvasProps) {
                 ))}
             </div>
             
-            {/* Информация о шаблоне */}
             <div className={cl.TemplateInfo}>
                 <h3>Інформація про шаблон</h3>
                 <div className={cl.InfoGrid}>

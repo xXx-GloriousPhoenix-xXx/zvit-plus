@@ -32,7 +32,7 @@ export function LoginPage() {
     }
     useEffect(() => {
         if (accessToken) {
-            navigate("/discovery");
+            navigate("/home");
         }
     }, [accessToken, navigate]);
     // ----

@@ -77,7 +77,7 @@ namespace ZvitPlus.API.Controllers
 
         [HttpGet("{id}")]
         [Authorize(Policy = "UserLevel")]
-        public async Task<ActionResult<GetFullFileEntityDTO>> GetById(
+        public async Task<ActionResult<GetFileEntityDTO>> GetById(
             [FromRoute] Guid id,
             CancellationToken ct = default)
         {
@@ -95,6 +95,17 @@ namespace ZvitPlus.API.Controllers
             var userContext = _context.CreateUserContext();
             var result = await _service.GetMyPageAsync(userContext, page, itemsPerPage, ct);
             return Ok(result);
+        }
+
+        [HttpGet("{id}/download")]
+        [Authorize]
+        public async Task<IActionResult> DownloadAsync([FromRoute] Guid id, CancellationToken ct = default)
+        {
+            var (entity, stream) = await _service.DownloadAsync(id, ct);
+            return File(
+                stream,
+                "application/octet-stream",
+                $"{entity.Name}.rep");
         }
     }
 }

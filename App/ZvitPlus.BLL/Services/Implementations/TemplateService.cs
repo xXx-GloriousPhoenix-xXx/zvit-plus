@@ -130,7 +130,7 @@ namespace ZvitPlus.BLL.Services.Implementations
             }
         }
 
-        public async Task<GetFullFileEntityDTO> GetByIdAsync(Guid id, CancellationToken ct = default)
+        public async Task<GetFileEntityDTO> GetByIdAsync(Guid id, CancellationToken ct = default)
         {
             AppLogger.LogActionStarted(_logger, "читання шаблону", id);
 
@@ -142,15 +142,6 @@ namespace ZvitPlus.BLL.Services.Implementations
                 throw new BusinessException("Шаблон не знайдено");
             }
 
-            // Отримуємо файл з системи
-            var result = await _fileService.GetWithStreamAsync(entity.FileId, ct);
-            if (result is null)
-            {
-                AppLogger.LogActionFailed(_logger, "читання шаблону", id);
-                throw new BusinessException("Файл не знайдено");
-            }
-            var fileStream = result.Value.stream;
-
             // Отримуємо неповну DTO файлу
             var fileEntityDto = await _fileService.GetByIdAsync(entity.FileId, ct);
             if (fileEntityDto is null)
@@ -159,23 +150,12 @@ namespace ZvitPlus.BLL.Services.Implementations
                 throw new BusinessException("Не вдалося сформувати початкову DTO файлу");
             }
 
-            // Будуємо DTO
-            var dto = new GetFullFileEntityDTO(
-                Meta: fileEntityDto,
-                File: fileStream
-                );
-
             AppLogger.LogActionCompleted(_logger, "Читання шаблону", id);
 
-            return dto;
+            return fileEntityDto;
         }
 
-        public async Task<PagedResponse<GetFileEntityDTO>> GetPageAsync(
-            UserContext context,
-            int page = 1,
-            int pageSize = 10,
-            SearchFileEntityDTO? search = null,
-            CancellationToken ct = default)
+        public async Task<PagedResponse<GetFileEntityDTO>> GetPageAsync(UserContext context, int page = 1, int pageSize = 10, SearchFileEntityDTO? search = null, CancellationToken ct = default)
         {
             if (page < 1)
             {
@@ -305,6 +285,15 @@ namespace ZvitPlus.BLL.Services.Implementations
             AppLogger.LogActionCompleted(_logger, "Читання шаблону", id);
 
             return response;
+        }
+
+        public async Task<(FileEntity, Stream)> DownloadAsync(Guid id, CancellationToken ct = default)
+        {
+            var template = await _unitOfWork.Templates.GetByIdAsync(id, ct, t => t.File);
+            var file = template!.File;
+            var path = file!.FilePath;
+            var stream = await _fileService.ReadFromFileAsync(path, ct);
+            return (file, stream);
         }
     }
 }

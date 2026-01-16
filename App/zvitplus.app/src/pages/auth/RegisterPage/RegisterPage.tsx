@@ -6,8 +6,7 @@ import { Form } from "@/shared/ui/Form/Form";
 export function RegisterPage() {
     return (
         <section className={cl.Section}>
-            <Form
-                
+            <Form    
                 extraClassName={cl.Form}
                 method="register"
                 onSubmit={(data) => {

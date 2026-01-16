@@ -30,7 +30,7 @@ export async function createRepFile(template: RepTemplate, previewElement?: HTML
     if (previewElement) {
         try {
           const canvas = await html2canvas(previewElement, {
-            scale: 0.5, // Уменьшаем размер для превью
+            scale: 0.5,
             backgroundColor: "#ffffff",
             useCORS: true,
             logging: false
@@ -39,7 +39,7 @@ export async function createRepFile(template: RepTemplate, previewElement?: HTML
           const previewBlob = await new Promise<Blob>((resolve) => {
             canvas.toBlob((blob) => {
               if (blob) resolve(blob);
-            }, 'image/jpeg', 0.7); // JPEG с качеством 70%
+            }, 'image/jpeg', 0.7);
           });
           
           zip.file("preview.jpg", previewBlob);
@@ -52,6 +52,68 @@ export async function createRepFile(template: RepTemplate, previewElement?: HTML
     zip.folder("media");
     
     return await zip.generateAsync({ type: "blob" });
+}
+
+export async function unpackRepFile(blob: Blob): Promise<RepTemplate> {
+    const zip = new JSZip();
+    const zipData = await zip.loadAsync(blob);
+    
+    // Читаем meta.json
+    const metaContent = await zipData.file("meta.json")?.async("text");
+    if (!metaContent) {
+        throw new Error("Файл meta.json не найден в архиве");
+    }
+    const meta = JSON.parse(metaContent) as MetaValue;
+    
+    // Читаем struct.json
+    const structContent = await zipData.file("struct.json")?.async("text");
+    if (!structContent) {
+        throw new Error("Файл struct.json не найден в архиве");
+    }
+    const struct = JSON.parse(structContent) as { elements: RepTemplate['elements'] };
+    
+    // Читаем preview (если есть)
+    let previewBlob: Blob | undefined;
+    const previewFile = zipData.file("preview.jpg") || zipData.file("preview.jpeg");
+    if (previewFile) {
+        previewBlob = await previewFile.async("blob");
+    }
+    
+    // Читаем дополнительные файлы из data/ и media/
+    const dataFiles: Record<string, Blob> = {};
+    const mediaFiles: Record<string, Blob> = {};
+    
+    const dataFolder = zipData.folder("data");
+    if (dataFolder) {
+        const dataFilePromises = Object.keys(dataFolder.files).map(async (filename) => {
+            const file = dataFolder.file(filename);
+            if (file && !file.dir) {
+                const blob = await file.async("blob");
+                dataFiles[filename] = blob;
+            }
+        });
+        await Promise.all(dataFilePromises);
+    }
+    
+    const mediaFolder = zipData.folder("media");
+    if (mediaFolder) {
+        const mediaFilePromises = Object.keys(mediaFolder.files).map(async (filename) => {
+            const file = mediaFolder.file(filename);
+            if (file && !file.dir) {
+                const blob = await file.async("blob");
+                mediaFiles[filename] = blob;
+            }
+        });
+        await Promise.all(mediaFilePromises);
+    }
+    
+    return {
+        meta,
+        elements: struct.elements,
+        // preview: previewBlob,
+        // dataFiles,
+        // mediaFiles
+    };
 }
 
 export function createRepFileName(meta: MetaValue): string {

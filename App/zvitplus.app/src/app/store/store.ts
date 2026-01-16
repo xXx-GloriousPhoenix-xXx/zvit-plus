@@ -1,4 +1,5 @@
 import { authReducer } from "@/shared/api/auth/authSlice";
+import { filesReducer } from "@/shared/api/file/slice";
 import { myWorksReducer } from "@/shared/api/myWorks/myWorksSlice";
 import { reportsReducer } from "@/shared/api/reports/reportSlice";
 import { statsReducer } from "@/shared/api/stats/slice";
@@ -15,7 +16,8 @@ export const store = configureStore({
         templatesGet: templatesGetReducer,
         myWorks: myWorksReducer,
         reports: reportsReducer,
-        stats: statsReducer
+        stats: statsReducer,
+        files: filesReducer
     },
 });
 

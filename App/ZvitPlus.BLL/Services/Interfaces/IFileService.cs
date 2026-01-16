@@ -12,7 +12,6 @@ namespace ZvitPlus.BLL.Services.Interfaces
         Task<(Guid fileId, string filePath)> AddAsync(CreateFileDTO dto, Guid authorId, CancellationToken ct = default);
         Task<FileEntity> UpdateAsync(Guid entityId, UpdateFileDTO dto, CancellationToken ct = default);
         Task<GetFileEntityDTO?> GetByIdAsync(Guid entityId, CancellationToken ct = default);
-        Task<(FileEntity entity, Stream stream)?> GetWithStreamAsync(Guid entityId, CancellationToken ct = default);
         Task<bool> ExistsAsync(Guid entityId, CancellationToken ct = default);
         Task DeleteAsync(Guid entityId, UserContext context, CancellationToken ct = default);
         Task<PagedResponse<GetFileEntityDTO>> GetPageAsync(
@@ -23,5 +22,6 @@ namespace ZvitPlus.BLL.Services.Interfaces
             SearchFileEntityDTO? search = null,
             CancellationToken ct = default);
         Task<PagedResponse<GetFileEntityDTO>> GetMyPageAsync(Guid userId, FileType ft, int page, int pageSize, CancellationToken ct = default);
+        Task<Stream> ReadFromFileAsync(string filePath, CancellationToken ct = default);
     }
 }
