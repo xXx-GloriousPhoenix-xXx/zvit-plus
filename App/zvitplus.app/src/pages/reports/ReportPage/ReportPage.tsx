@@ -1,15 +1,27 @@
-import { useKeyboardNavigation } from "@/shared/lib/hooks/useKeyboardNavigation";
 import { useReportPage } from "@/shared/lib/hooks/useReportPage.ts";
 
 import cl from './ReportPage.module.css';
 import { NavLink } from "react-router-dom";
 
 import { SearchBar } from "@/shared/ui/SearchBar/SearchBar";
+import { Button } from "@/shared/ui/Button/Button";
+import { ItemList } from "@/shared/ui/ItemList/ItemList";
+import { Pagination } from "@/shared/ui/Pagination/Pagination";
 
 export function ReportPage() {
-    const reportPage = useReportPage();
-    // const navigation = useKeyboardNavigation();
-
+    const {
+        onSearch,
+        onClear,
+        error,
+        templateTypes,
+        searchParams,
+        isLoading,
+        loadReports,
+        reports,
+        totalPages,
+        onPageChange,
+        currentPage
+    } = useReportPage();
 
     return (
         <section className={cl.Wrapper}>
@@ -31,12 +43,44 @@ export function ReportPage() {
             </div>
 
             <SearchBar
-                onSearch={reportPage.onSearch}
-                onClear={reportPage.onClear}
-                // initialParams={}
-                templateTypes={reportPage.templateTypes}
-                // isLoading={loading}
+                onSearch={onSearch}
+                onClear={onClear}
+                initialParams={searchParams}
+                templateTypes={templateTypes}
+                isLoading={isLoading}
             />
+
+            {error && (
+                <div className={cl.Error}>
+                    {error}
+                    <Button
+                        onClick={loadReports}
+                        text='Повторити'
+                    />
+                </div>
+            )}
+
+            <div className={cl.Reports}>
+                {reports.length === 0 ? (
+                    <div className={cl.EmptyState}>
+                        <i className="fa-solid fa-file-circle-question"></i>
+                        <h3>Звітів не знайдено</h3>
+                        <p>Створіть перший звіт або змініть параметри пошуку</p>
+                    </div>
+                ) : (
+                    <ItemList type='report' items={reports} />
+                )}
+            </div>
+
+            {totalPages > 1 && reports.length > 0 && (
+                <div className={cl.PaginationContainer}>
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={onPageChange}
+                    />
+                </div>
+            )}
         </section>
     );
 }

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import cl from './TemplatePage.module.css';
 import { NavLink } from 'react-router-dom';
-import { TemplateList } from '@/shared/ui/TemplateList/TemplateList.tsx';
+import { ItemList } from '@/shared/ui/ItemList/ItemList';
 import { useAppDispatch, useAppSelector } from '@/app/store/hooks';
 import { getTemplates } from '@/shared/api/templates/getTemplatesThunk';
 import { Button } from '@/shared/ui/Button/Button';
@@ -125,7 +125,7 @@ export function TemplatePage() {
                         <p>Створіть перший шаблон або змініть параметри пошуку</p>
                     </div>
                 ) : (
-                    <TemplateList templates={templates} />
+                    <ItemList type='template' items={templates} />
                 )}
             </div>
 

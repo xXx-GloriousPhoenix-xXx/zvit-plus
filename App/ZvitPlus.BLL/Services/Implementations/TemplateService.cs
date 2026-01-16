@@ -194,6 +194,21 @@ namespace ZvitPlus.BLL.Services.Implementations
             return response;
         }
 
+        public async Task<PagedResponse<GetFileEntityDTO>> GetMyPageAsync(UserContext context, int page = 1, int pageSize = 10, CancellationToken ct = default)
+        {
+            if (page < 1)
+            {
+                page = 1;
+            }
+            if (pageSize < 2)
+            {
+                pageSize = 10;
+            }
+
+            var response = await _fileService.GetMyPageAsync(context.UserId, FileType.Template, page, pageSize, ct);
+            return response;
+        }
+
         public async Task<GetFileEntityDTO> UpdateAsync(Guid id, UpdateTemplateDTO dto, UserContext context, CancellationToken ct = default)
         {
             AppLogger.LogActionStarted(_logger, "оновлення шаблону", id);

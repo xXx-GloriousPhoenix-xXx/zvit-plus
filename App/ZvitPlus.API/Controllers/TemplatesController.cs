@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using ZvitPlus.API.Context.Interfaces;
 using ZvitPlus.API.DTOs.TemplateDTOs;
@@ -100,6 +101,18 @@ namespace ZvitPlus.API.Controllers
             CancellationToken ct = default)
         {
             var result = await _service.GetByIdAsync(id, ct);
+            return Ok(result);
+        }
+
+        [HttpGet("my/{page}/{itemsPerPage}")]
+        [Authorize(Policy = "UserLevel")]
+        public async Task<ActionResult<PagedResponse<GetFileEntityDTO>>> GetMyPageAsync(
+            [FromRoute] int page = 1,
+            [FromRoute] int itemsPerPage = 10,
+            CancellationToken ct = default)
+        {
+            var userContext = _contextFactory.CreateUserContext();
+            var result = await _service.GetMyPageAsync(userContext, page, itemsPerPage, ct);
             return Ok(result);
         }
     }

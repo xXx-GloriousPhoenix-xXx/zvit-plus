@@ -318,6 +318,49 @@ namespace ZvitPlus.BLL.Services.Implementations
             return response;
         }
 
+        public async Task<PagedResponse<GetFileEntityDTO>> GetMyPageAsync(Guid userId, FileType ft, int page, int pageSize, CancellationToken ct = default)
+        {
+            var query = _unitOfWork.Files.AsQueryable();
+
+            // Автор
+            query = query.Where(f => f.AuthorId == userId);
+
+            // Типізація
+            if (ft == FileType.Template)
+            {
+                query = query.Where(f => f.Template != null);
+            }
+            else
+            {
+                query = query.Where(f => f.Report != null);
+            }
+
+            var totalCount = await query.CountAsync(ct);
+            var totalPages = (totalCount + pageSize - 1) / pageSize;
+
+            var collection = await query
+                .OrderBy(f => f.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Include(f => f.Author)
+                .Include(f => f.Template)
+                    .ThenInclude(t => t.TemplateType)
+                .Include(f => f.Report)
+                    .ThenInclude(r => r.Template)
+                        .ThenInclude(t => t.TemplateType)
+                .ToListAsync(ct);
+
+            var result = _mapper.Map<List<GetFileEntityDTO>>(collection);
+
+            var response = new PagedResponse<GetFileEntityDTO>(
+                Items: result,
+                CurrentPage: page,
+                TotalCount: totalCount,
+                TotalPages: totalPages);
+
+            return response;
+        }
+
         private string GetDirectoryPath(Guid authorId, FileType ft, Guid entityId)
         {
             return $"{_basePath}\\{authorId}\\{ft}\\{entityId}.{_fileExtension}";
@@ -351,7 +394,7 @@ namespace ZvitPlus.BLL.Services.Implementations
 
             AppLogger.LogActionCompleted(_logger, "Збереження файлу");
         }
-
+            
         private async Task<Stream> ReadFromFileAsync(string filePath, CancellationToken ct = default)
         {
             AppLogger.LogActionStarted(_logger, "читання з файлу");
@@ -380,5 +423,6 @@ namespace ZvitPlus.BLL.Services.Implementations
 
             return fs;
         }
+    
     }
 }

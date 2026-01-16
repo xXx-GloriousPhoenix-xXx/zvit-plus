@@ -1,14 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using ZvitPlus.API.Context.Interfaces;
+using ZvitPlus.API.DTOs.ReportDTOs;
+using ZvitPlus.API.DTOs.TemplateDTOs;
+using ZvitPlus.BLL.Context;
+using ZvitPlus.BLL.DTOs.AdditionalDTOs;
 using ZvitPlus.BLL.DTOs.FileEntityDTOs;
 using ZvitPlus.BLL.DTOs.ReportDTOs;
-using ZvitPlus.BLL.Context;
 using ZvitPlus.BLL.Services.Interfaces;
-
-using GetReportPageDTO = ZvitPlus.BLL.DTOs.AdditionalDTOs.PagedResponse<ZvitPlus.BLL.DTOs.FileEntityDTOs.GetFileEntityDTO>;
-using Microsoft.AspNetCore.Authorization;
-using ZvitPlus.API.Context.Interfaces;
-using ZvitPlus.API.DTOs.TemplateDTOs;
-using ZvitPlus.API.DTOs.ReportDTOs;
 
 namespace ZvitPlus.API.Controllers
 {
@@ -65,7 +64,7 @@ namespace ZvitPlus.API.Controllers
         }
 
         [HttpGet("{page}/{itemsPerPage}")]
-        public async Task<ActionResult<GetReportPageDTO>> GetPageAsync(
+        public async Task<ActionResult<PagedResponse<GetFileEntityDTO>>> GetPageAsync(
             [FromRoute] int page = 1,
             [FromRoute] int itemsPerPage = 10,
             [FromQuery] SearchFileEntityDTO? dto = null,
@@ -83,6 +82,18 @@ namespace ZvitPlus.API.Controllers
             CancellationToken ct = default)
         {
             var result = await _service.GetByIdAsync(id, ct);
+            return Ok(result);
+        }
+
+        [HttpGet("my/{page}/{itemsPerPage}")]
+        [Authorize(Policy = "UserLevel")]
+        public async Task<ActionResult<PagedResponse<GetFileEntityDTO>>> GetMyPageAsync(
+            [FromRoute] int page = 1,
+            [FromRoute] int itemsPerPage = 10,
+            CancellationToken ct = default)
+        {
+            var userContext = _context.CreateUserContext();
+            var result = await _service.GetMyPageAsync(userContext, page, itemsPerPage, ct);
             return Ok(result);
         }
     }

@@ -14,6 +14,11 @@ export interface GetTemplatesArgs {
     searchParams?: SearchTemplateParams;
 }
 
+export interface GetMyTemplatesArgs {
+    page?: number;
+    itemsPerPage?: number;
+}
+
 export interface TemplateItemDTO {
     id: string;
     name: string;

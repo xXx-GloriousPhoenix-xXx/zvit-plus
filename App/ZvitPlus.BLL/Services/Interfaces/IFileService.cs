@@ -22,5 +22,6 @@ namespace ZvitPlus.BLL.Services.Interfaces
             int pageSize = 10, 
             SearchFileEntityDTO? search = null,
             CancellationToken ct = default);
+        Task<PagedResponse<GetFileEntityDTO>> GetMyPageAsync(Guid userId, FileType ft, int page, int pageSize, CancellationToken ct = default);
     }
 }

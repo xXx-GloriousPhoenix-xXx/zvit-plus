@@ -25,3 +25,8 @@ export interface ReportItemDTO {
     createdAt: string;
     updatedAt: string;
 }
+
+export interface GetMyReportArgs {
+    page?: number;
+    itemsPerPage?: number;
+}

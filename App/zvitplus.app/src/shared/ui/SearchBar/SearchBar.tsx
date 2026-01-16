@@ -87,7 +87,7 @@ export function SearchBar({
                 <div className={cl.SearchInput}>
                     <Input
                         label="Пошук за назвою"
-                        placeholder="Введіть назву шаблону..."
+                        placeholder="Введіть назву..."
                         value={params.name || ''}
                         onChange={(e) => handleInputChange('name', e.target.value)}
                     />

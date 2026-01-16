@@ -1,30 +1,83 @@
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
-import { fetchMyWorks } from "@/shared/api/myWorks/myWorksThunks";
+import { getMyWorks, getMyTemplates, getMyReports } from "@/shared/api/myWorks/myWorksThunks";
+import { ItemList } from "@/shared/ui/ItemList/ItemList";
+import { HeaderLine } from "@/shared/ui/HeaderLine/HeaderLine";
+import { Pagination } from "@/shared/ui/Pagination/Pagination";
+
+import cl from './MyWorkPage.module.css';
+import { setReportPage, setTemplatePage } from "@/shared/api/myWorks/myWorksSlice";
 
 export function MyWorkPage() {
     const dispatch = useAppDispatch();
-    const { templates, reports, loading } = useAppSelector(
+    const { templates, reports } = useAppSelector(
         state => state.myWorks
     );
+    const { isAuth, loading } = useAppSelector(
+        state => state.auth
+    )
 
-    useEffect(() => {
-        dispatch(fetchMyWorks());
-    }, [dispatch]);
-
-    if (loading) {
-        return <h3>Завантаження...</h3>;
+    const loadMyWorks = () => {
+        if (isAuth) {
+            dispatch(getMyWorks());
+        }
     }
 
-    return (
-        <section>
-            <h1>Мої роботи</h1>
+    const loadMyReports = () => {
+        if (isAuth) {
+            dispatch(getMyReports({
+                page: reports.currentPage,
+                itemsPerPage: 9
+            }));
+        }
+    }
 
-            <h2>Шаблони ({templates.length})</h2>
-            {/* reuse <TemplateList /> */}
+    const loadMyTemplates = () => {
+        if (isAuth) {
+            dispatch(getMyTemplates({
+                page: templates.currentPage,
+                itemsPerPage: 9
+            }));
+        }
+    }
+
+    useEffect(loadMyWorks, [dispatch, isAuth, loading]);
+    useEffect(loadMyTemplates, [templates.currentPage]);
+    useEffect(loadMyReports, [reports.currentPage]);
+
+    const handleTemplatePageChange = (page: number) => {
+        dispatch(setTemplatePage(page));
+    };
+
+    const handleReportPageChange = (page: number) => {
+        dispatch(setReportPage(page));
+    };
+
+    return (
+        <section className={cl.Wrapper}>
+            <HeaderLine>Шаблони ({templates.totalCount})</HeaderLine>
+            <ItemList type="template" items={templates.items} />
+            {templates.totalPages > 1 && templates.totalCount > 0 && (
+                <div className={cl.PaginationContainer}>
+                    <Pagination
+                        currentPage={templates.currentPage}
+                        totalPages={templates.totalPages}
+                        onPageChange={handleTemplatePageChange}
+                    />
+                </div>
+            )}
             
-            <h2>Звіти ({reports.length})</h2>
-            {/* reuse <ReportList /> */}
+            <HeaderLine>Звіти ({reports.totalCount})</HeaderLine>
+            <ItemList type="report" items={reports.items} />
+            {reports.totalPages > 1 && reports.totalCount > 0 && (
+                <div className={cl.PaginationContainer}>
+                    <Pagination
+                        currentPage={reports.currentPage}
+                        totalPages={reports.totalPages}
+                        onPageChange={handleReportPageChange}
+                    />
+                </div>
+            )}
         </section>
     );
 }

@@ -1,0 +1,67 @@
+.Wrapper {
+    display: flex;
+    flex-flow: column nowrap;
+    padding: 1em;
+    gap: 1em;
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+
+    flex: 1 1 calc(33.333% - 1rem);
+}
+.Wrapper:hover {
+    transform: translateY(-0.25em);
+}
+.InfoRow {
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 0.5rem;
+}
+.CardHeader {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    color: var(--primary-color);
+}
+.CardBody {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    align-items: end;
+    gap: 0.25rem;
+}
+.Data {
+    display: flex;
+    flex-flow: column nowrap;
+    gap: 0.25rem;
+}
+.Title {
+    margin: 0;
+}
+.Wrapper i {
+    color: var(--primary-color);
+}
+.Wrapper span {
+    color: var(--text-color);
+}
+.IconPanel a {
+    text-decoration: none;
+    color: var(--text-color);
+    transition: var(--transition);
+}
+.IconPanel a:hover {
+    color: var(--primary-color);
+}
+.IconPanel i {
+    width: 1em;
+}
+.ControlButton {
+    display: flex;
+    gap: 0.5rem;
+}
+.IconPanel {
+    display: flex;
+    flex-flow: column nowrap;
+    gap: 0.25rem;
+}

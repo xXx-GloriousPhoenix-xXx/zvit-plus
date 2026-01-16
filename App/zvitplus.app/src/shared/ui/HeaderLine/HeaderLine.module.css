@@ -1,0 +1,17 @@
+.Wrapper {
+    display: flex;
+    width: 100%;
+    padding: 1rem;
+    justify-content: center;
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    border: 0.05rem solid #ddd;
+}
+
+.Header {
+    font-size: 1.5rem;
+    font-weight: normal;
+    margin: 0;
+    color: var(--primary-color);
+}

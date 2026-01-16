@@ -57,9 +57,9 @@ export const getReports = createAsyncThunk<
             
             return response.data;
         } catch (error: any) {
-            console.error('Get templates error:', error);
+            console.error('Get reports error:', error);
             
-            let errorMessage = "Не вдалося отримати список шаблонів";
+            let errorMessage = "Не вдалося отримати список звітів";
             if (error.response) {
                 errorMessage = `Помилка ${error.response.status}: ${error.response.data || error.response.statusText}`;
             } else if (error.request) {
