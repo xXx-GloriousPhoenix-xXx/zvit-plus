@@ -11,7 +11,6 @@ import { TemplatePage } from '@/pages/templates/TemplatePage/TemplatePage';
 import { ReportPage } from '@/pages/reports/ReportPage/ReportPage';
 
 import { NotFoundPage } from '@/pages/extra/NotFoundPage/NotFoundPage';
-import { TemplateCreatePage } from '@/pages/templates/TemplateCreatePage/TemplateCreatePage';
 import { HomePage } from '@/pages/general/HomePage/HomePage';
 import { ProtectedOutlet } from '@/widgets/layouts/ProtectedOutlet/ProtectedOutlet';
 import { ReportCreatePage } from '@/pages/reports/ReportCreatePage/ReportCreatePage';

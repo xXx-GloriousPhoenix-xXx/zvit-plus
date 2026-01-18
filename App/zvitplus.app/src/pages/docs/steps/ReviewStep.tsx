@@ -2,7 +2,7 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/shared/ui/Button/Button";
-import { ReviewCanvas } from "../Review/ReviewCanvas";
+import { ReviewCanvas } from "../../templates/TemplateCreatePage/Review/ReviewCanvas";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import { 
   setEditorStep, 
@@ -13,7 +13,7 @@ import { createTemplate, updateTemplate } from "@/shared/api/doc/thunks";
 import type { RepTemplate } from "@/shared/types/repEditorTypes";
 import type { EditorMode, EditorType } from "@/shared/api/doc/slice";
 
-import cl from "../TemplateCreatePage.module.css";
+import cl from "./Step.module.css";
 
 interface ReviewStepProps {
   mode: EditorMode;

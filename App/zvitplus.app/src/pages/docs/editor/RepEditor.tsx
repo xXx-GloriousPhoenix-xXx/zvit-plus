@@ -1,6 +1,6 @@
 // editor/RepEditor.tsx
 import { useState, useEffect } from "react";
-import type { RepTemplate } from "../../../../shared/types/repEditorTypes";
+import type { RepTemplate } from "@/shared/types/repEditorTypes";
 import { Sidebar } from "./components/Sidebar/Sidebar";
 import { Canvas } from "./components/Canvas/Canvas";
 import { PropertyPanel } from "./components/PropertyPanel/PropertyPanel";

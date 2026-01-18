@@ -12,10 +12,11 @@ import {
 import { fetchReportById, fetchTemplateById } from "@/shared/api/doc/thunks";
 
 import cl from "./DocEditorPage.module.css";
-import { ReviewStep } from "../templates/TemplateCreatePage/steps/ReviewStep";
-import { MetaStep } from "../templates/TemplateCreatePage/steps/MetaStep";
-import { EditorStep } from "../templates/TemplateCreatePage/steps/EditorStep";
-import { DataStep } from "../templates/TemplateCreatePage/steps/DataStep";
+
+import { ReviewStep } from "./steps/ReviewStep";
+import { MetaStep } from "./steps/MetaStep";
+import { EditorStep } from "./steps/EditorStep";
+import { DataStep } from "./steps/DataStep";
 
 interface Props {
     mode: EditorMode;
@@ -60,71 +61,74 @@ export function DocEditorPage({ mode, type }: Props) {
         }
     }, [mode, type, id, docState.current.data, dispatch]);
 
+    console.log(editor.step);
+
     const renderStep = () => {
         // Если режим просмотра и данные загружены
         if (mode === 'view' && docState.current.data) {
-        return (
-            <ReviewStep
-            mode="view"
-            type={type}
-            template={editor.template || {
-                meta: docState.current.data.meta,
-                elements: docState.current.data.elements
-            }}
-            onClose={() => navigate(`/${type}s`)}
-            />
-        );
+            return (
+                <ReviewStep
+                    mode="view"
+                    type={type}
+                    template={editor.template || {
+                        meta: docState.current.data.meta,
+                        elements: docState.current.data.elements
+                    }}
+                    onClose={() => navigate(`/${type}s`)}
+                />
+            );
         }
 
         if (mode !== 'create' && !docState.current.data) {
-        return null;
+            return null;
         }
 
         switch (editor.step) {
-        case 1:
-            return (
-            <MetaStep
-                mode={mode}
-                type={type}
-                value={editor.meta}
-                onNext={() => {}}
-                onBack={() => navigate(`/${type}s`)}
-            />
-            );
-        case 2:
-            if (type === 'report' && (mode === 'edit' || mode === 'create')) {
-            // Для отчетов - шаг заполнения данных
-            return (
-                <DataStep
-                    mode={mode}
-                    type={type}
-                    template={editor.template}
-                    onNext={() => dispatch(setEditorStep(3))}
-                    onBack={() => dispatch(setEditorStep(1))}
-                />
-            );
-            } else {
-            // Для шаблонов - редактор структуры
-            return (
-                <EditorStep
-                mode={mode}
-                type={type}
-                template={editor.template}
-                />
-            );
-            }
-        case 3:
-            return (
-            <ReviewStep
-                mode={mode}
-                type={type}
-                template={editor.template}
-                onClose={() => navigate(`/${type}s`)}
-                onClearDraft={mode === 'create' ? handleClearDraft : undefined}
-            />
-            );
-        default:
-            return null;
+            case 1:
+                return (
+                    <MetaStep
+                        mode={mode}
+                        type={type}
+                        value={editor.meta}
+                        onNext={() => {}}
+                        onBack={() => navigate(`/${type}s`)}
+                    />
+                );
+            case 2:
+                if (type === 'report' && (mode === 'edit' || mode === 'create')) {
+                    // Для отчетов - шаг заполнения данных
+                    return (
+                        <DataStep
+                            mode={mode}
+                            type={type}
+                            template={editor.template}
+                            onNext={() => dispatch(setEditorStep(3))}
+                            onBack={() => dispatch(setEditorStep(1))}
+                        />
+                    );
+                }
+                else {
+                    // Для шаблонов - редактор структуры
+                    return (
+                        <EditorStep
+                            mode={mode}
+                            type={type}
+                            template={editor.template}
+                        />
+                    );
+                }
+            case 3:
+                return (
+                    <ReviewStep
+                        mode={mode}
+                        type={type}
+                        template={editor.template}
+                        onClose={() => navigate(`/${type}s`)}
+                        onClearDraft={mode === 'create' ? handleClearDraft : undefined}
+                    />
+                );
+            default:
+                return null;
         }
     };
 

@@ -6,7 +6,7 @@ import { setEditorStep } from "@/shared/api/doc/slice";
 import type { RepTemplate } from "@/shared/types/repEditorTypes";
 import type { EditorMode, EditorType } from "@/shared/api/doc/slice";
 
-import cl from "../TemplateCreatePage.module.css";
+import cl from "./Step.module.css";
 
 interface Props {
   mode: EditorMode;

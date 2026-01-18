@@ -18,8 +18,7 @@ import type {
 import { PAGE_SIZES } from "@/shared/types/repEditorTypes";
 import type { EditorMode, EditorType } from "@/shared/api/doc/slice";
 
-import cl from "../TemplateCreatePage.module.css";
-import mscl from './MetaStep.module.css';
+import cl from "./Step.module.css";
 
 interface Props {
     mode: EditorMode;
@@ -65,7 +64,7 @@ export function MetaStep({ mode, type, value, onNext, onBack }: Props) {
     };
 
     return (
-        <div className={mscl.Wrapper}>
+        <div className={cl.Wrapper}>
             <Input
                 label="Назва"
                 placeholder={type === 'template' ? "Invoice template" : "Monthly report"}
