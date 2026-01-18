@@ -61,8 +61,6 @@ export function DocEditorPage({ mode, type }: Props) {
         }
     }, [mode, type, id, docState.current.data, dispatch]);
 
-    console.log(editor.step);
-
     const renderStep = () => {
         // Если режим просмотра и данные загружены
         if (mode === 'view' && docState.current.data) {

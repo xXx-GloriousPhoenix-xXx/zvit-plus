@@ -62,6 +62,8 @@ export interface RepTemplate {
 }
 
 export interface MetaValue {
+    id: string | null;
+    templateId: string | null;
     templateName: string;
     templateTypeId: string;
     templateTypeName: string;

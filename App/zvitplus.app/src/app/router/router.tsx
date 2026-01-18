@@ -13,8 +13,6 @@ import { ReportPage } from '@/pages/reports/ReportPage/ReportPage';
 import { NotFoundPage } from '@/pages/extra/NotFoundPage/NotFoundPage';
 import { HomePage } from '@/pages/general/HomePage/HomePage';
 import { ProtectedOutlet } from '@/widgets/layouts/ProtectedOutlet/ProtectedOutlet';
-import { ReportCreatePage } from '@/pages/reports/ReportCreatePage/ReportCreatePage';
-import { EditPage } from '@/pages/general/EditPage/EditPage';
 import { UploadPage } from '@/pages/general/UploadPage/UploadPage';
 import { DocEditorPage } from '@/pages/docs/DocEditorPage';
 

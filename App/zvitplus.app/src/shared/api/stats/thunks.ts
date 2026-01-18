@@ -16,12 +16,9 @@ export const getStats = createAsyncThunk<
         try {
             const url = "stats";
             const response = await baseApi.get<GetStatsDTO>(url);
-            console.log(response.data);
             return response.data;
         }
-        catch (error: any) {
-            console.error('Get stats error:', error);
-            
+        catch (error: any) {            
             let errorMessage = "Не вдалося отримати статистику";
             if (error.response) {
                 errorMessage = `Помилка ${error.response.status}: ${error.response.data || error.response.statusText}`;

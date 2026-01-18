@@ -77,7 +77,7 @@ export function MetaStep({ mode, type, value, onNext, onBack }: Props) {
             <Select
                 label="Тип"
                 value={formData.templateTypeId}
-                disabled={loading || mode === 'view' || (mode === 'edit' && type === 'report')}
+                disabled={loading || mode === 'view' || type === 'report'}
                 options={items.map(t => ({
                     value: t.id,
                     label: t.name,
@@ -87,8 +87,8 @@ export function MetaStep({ mode, type, value, onNext, onBack }: Props) {
                     const selectedOption = items.find(item => item.id === selectedValue);
                     
                     handleFieldChange({
-                    templateTypeId: selectedValue,
-                    templateTypeName: selectedOption?.name || ''
+                        templateTypeId: selectedValue,
+                        templateTypeName: selectedOption?.name || ''
                     });
                 }}
             />
@@ -111,7 +111,7 @@ export function MetaStep({ mode, type, value, onNext, onBack }: Props) {
                 onChange={v =>
                     handleFieldChange({ pageSize: v as PageSize })
                 }
-                disabled={mode === 'view'}
+                disabled={mode === 'view' || type === 'report'}
             />
 
             <StringToggle
@@ -124,7 +124,7 @@ export function MetaStep({ mode, type, value, onNext, onBack }: Props) {
                 onChange={(val) =>
                     handleFieldChange({ orientation: val as PageOrientation })
                 }
-                disabled={mode === 'view'}
+                disabled={mode === 'view' || type === 'report'}
             />
 
             <div className={cl.ButtonGroup}>

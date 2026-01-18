@@ -1,6 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import type { PagedResponse } from "../models";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { DocItemDTO, RepDocData, RepDocFiles, SearchParams } from "./models";
 import { createTemplate, deleteTemplate, fetchReportById, fetchReportsPage, fetchTemplateById, fetchTemplatesPage, updateTemplate } from "./thunks";
@@ -79,15 +78,19 @@ const loadDraft = (workMode: EditorType): EditorState => {
         mode: 'create',
         workMode,
         meta: {
-        templateName: "",
-        templateTypeId: "",
-        templateTypeName: "",
-        isPrivate: false,
-        pageSize: "A4",
-        orientation: "portrait"
+            id: null,
+            templateId: null,
+            templateName: "",
+            templateTypeId: "",
+            templateTypeName: "",
+            isPrivate: false,
+            pageSize: "A4",
+            orientation: "portrait"
         },
         template: {
         meta: {
+            id: null,
+            templateId: null,
             templateName: "",
             templateTypeId: "",
             templateTypeName: "",
@@ -280,6 +283,8 @@ const docsSlice = createSlice({
             mode: 'create',
             workMode: state.editor.workMode,
             meta: {
+              id: null,
+              templateId: null,
               templateName: "",
               templateTypeId: "",
               templateTypeName: "",
@@ -289,6 +294,8 @@ const docsSlice = createSlice({
             },
             template: {
               meta: {
+                id: null,
+                templateId: null,
                 templateName: "",
                 templateTypeId: "",
                 templateTypeName: "",
@@ -352,6 +359,39 @@ const docsSlice = createSlice({
         clearSearchParams(state, action: PayloadAction<EditorType>) {
             state[`${action.payload}s`].list.searchParams = {};
             state[`${action.payload}s`].list.currentPage = 1;
+        },
+
+        cloneTemplateToReport(state) {
+            const currentTemplate = state.templates.current;
+            const newMeta = {
+              ...currentTemplate.data!.meta,
+              id: null,
+              templateId: currentTemplate.data!.meta.id,
+              templateName: ""
+            
+            }
+            state.reports.current = {
+                ...currentTemplate,
+                data: {
+                    ...currentTemplate.data!,
+                    meta: newMeta
+                }
+            }
+
+            state.editor = {
+              ...state.editor,
+              mode: 'create' as EditorMode,
+              workMode: 'report' as EditorType,
+              meta: newMeta,
+              template: {
+                  meta: newMeta,
+                  elements: currentTemplate.data!.elements || []
+              },
+              step: 1,
+            };
+          
+            saveDraft(state.editor);
+            console.log(state.reports.current);
         }
     },
     extraReducers: (builder) => {
@@ -505,7 +545,8 @@ export const {
     markAsDirty,
     setPage,
     setSearchParams,
-    clearSearchParams
+    clearSearchParams,
+    cloneTemplateToReport
 } = docsSlice.actions;
   
 export const docsReducer = docsSlice.reducer;

@@ -7,7 +7,8 @@ import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import { 
   setEditorStep, 
   clearEditorDraft,
-  resetSaveState 
+  resetSaveState, 
+  cloneTemplateToReport
 } from "@/shared/api/doc/slice";
 import { createTemplate, updateTemplate } from "@/shared/api/doc/thunks";
 import type { RepTemplate } from "@/shared/types/repEditorTypes";
@@ -16,12 +17,12 @@ import type { EditorMode, EditorType } from "@/shared/api/doc/slice";
 import cl from "./Step.module.css";
 
 interface ReviewStepProps {
-  mode: EditorMode;
-  type: EditorType;
-  template: RepTemplate;
-  onClose: () => void;
-  onClearDraft?: () => void;
-  onSubmit?: (canvasRef?: React.RefObject<HTMLDivElement | null>) => Promise<void>;
+    mode: EditorMode;
+    type: EditorType;
+    template: RepTemplate;
+    onClose: () => void;
+    onClearDraft?: () => void;
+    onSubmit?: (canvasRef?: React.RefObject<HTMLDivElement | null>) => Promise<void>;
 }
 
 export function ReviewStep({ 
@@ -143,13 +144,21 @@ export function ReviewStep({
               onClick={onClose}
               extraClassName={cl.Button}
             />
-            {type === 'report' && (
-              <Button
-                text="Завантажити PDF"
-                onClick={() => {/* логика загрузки PDF */}}
-                extraClassName={cl.Button}
-              />
-            )}
+            {type === 'report'
+                ? <Button
+                    text="Завантажити PDF"
+                    onClick={() => {/* логика загрузки PDF */}}
+                    extraClassName={cl.Button}
+                />
+                : <Button
+                    text="Заповнити шаблон"
+                    onClick={() => {
+                        navigate(`/reports/create`);
+                        dispatch(cloneTemplateToReport());
+                    }}
+                    extraClassName={cl.Button}
+                /> 
+            }
           </>
         ) : (
           <>
