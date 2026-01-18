@@ -1,3 +1,4 @@
+// properties/SizeProperties.tsx
 import { useState, useEffect } from "react";
 import type { RepElement, RepElementType } from "@/shared/types/repEditorTypes";
 import cl from '../PropertyPanel.module.css';
@@ -7,12 +8,14 @@ type SizePropertiesProps = {
     selectedElement: RepElement;
     updateElement: (id: string, updates: Partial<RepElement> & {
         type?: RepElementType | undefined;
-    }) => void
+    }) => void;
+    readonly?: boolean;
 }
 
 export function SizeProperties({
     selectedElement,
-    updateElement
+    updateElement,
+    readonly = false
 }: SizePropertiesProps) {
     const { canvasRef } = useRepEditorContext();
     const [canvasDimensions, setCanvasDimensions] = useState({ width: 0, height: 0 });
@@ -37,7 +40,7 @@ export function SizeProperties({
     }, [canvasRef]);
 
     const handlePositionChange = (axis: 'x' | 'y', value: number) => {
-        if (!canvasRef.current) return;
+        if (!canvasRef.current || readonly) return;
 
         const canvas = canvasRef.current;
         const elementEl = document.getElementById(selectedElement.id);
@@ -71,7 +74,7 @@ export function SizeProperties({
     };
 
     const handleSizeChange = (dimension: 'width' | 'height', value: number) => {
-        if (!canvasRef.current) return;
+        if (!canvasRef.current || readonly) return;
 
         const canvas = canvasRef.current;
         const minSize = dimension === 'width' ? 80 : 40;
@@ -98,51 +101,79 @@ export function SizeProperties({
             <div className={cl.PropertyRow}>
                 <div className={cl.PropertyGroup}>
                     <label className={cl.PropertyLabel}>X</label>
-                    <input
-                        type="number"
-                        value={Math.round(selectedElement.position.x)}
-                        onChange={(e) => handlePositionChange('x', parseInt(e.target.value) || 0)}
-                        className={cl.PropertyInput}
-                        min="0"
-                        max={canvasDimensions.width - selectedElement.size.width}
-                    />
+                    {readonly ? (
+                        <div className={cl.PropertyValue}>
+                            {Math.round(selectedElement.position.x)} px
+                        </div>
+                    ) : (
+                        <input
+                            type="number"
+                            value={Math.round(selectedElement.position.x)}
+                            onChange={(e) => handlePositionChange('x', parseInt(e.target.value) || 0)}
+                            className={cl.PropertyInput}
+                            min="0"
+                            max={canvasDimensions.width - selectedElement.size.width}
+                            disabled={readonly}
+                        />
+                    )}
                 </div>
             
                 <div className={cl.PropertyGroup}>
                     <label className={cl.PropertyLabel}>Y</label>
-                    <input
-                        type="number"
-                        value={Math.round(selectedElement.position.y)}
-                        onChange={(e) => handlePositionChange('y', parseInt(e.target.value) || 0)}
-                        className={cl.PropertyInput}
-                        min="0"
-                        max={canvasDimensions.height - selectedElement.size.height}
-                    />
+                    {readonly ? (
+                        <div className={cl.PropertyValue}>
+                            {Math.round(selectedElement.position.y)} px
+                        </div>
+                    ) : (
+                        <input
+                            type="number"
+                            value={Math.round(selectedElement.position.y)}
+                            onChange={(e) => handlePositionChange('y', parseInt(e.target.value) || 0)}
+                            className={cl.PropertyInput}
+                            min="0"
+                            max={canvasDimensions.height - selectedElement.size.height}
+                            disabled={readonly}
+                        />
+                    )}
                 </div>
             </div>
 
             <div className={cl.PropertyRow}>
                 <div className={cl.PropertyGroup}>
                     <label className={cl.PropertyLabel}>Ширина</label>
-                    <input
-                        type="number"
-                        value={Math.round(selectedElement.size.width)}
-                        onChange={(e) => handleSizeChange('width', parseInt(e.target.value) || 80)}
-                        className={cl.PropertyInput}
-                        min="80"
-                        max={canvasDimensions.width - selectedElement.position.x}
-                    />
+                    {readonly ? (
+                        <div className={cl.PropertyValue}>
+                            {Math.round(selectedElement.size.width)} px
+                        </div>
+                    ) : (
+                        <input
+                            type="number"
+                            value={Math.round(selectedElement.size.width)}
+                            onChange={(e) => handleSizeChange('width', parseInt(e.target.value) || 80)}
+                            className={cl.PropertyInput}
+                            min="80"
+                            max={canvasDimensions.width - selectedElement.position.x}
+                            disabled={readonly}
+                        />
+                    )}
                 </div>
                 <div className={cl.PropertyGroup}>
                     <label className={cl.PropertyLabel}>Висота</label>
-                    <input
-                        type="number"
-                        value={Math.round(selectedElement.size.height)}
-                        onChange={(e) => handleSizeChange('height', parseInt(e.target.value) || 40)}
-                        className={cl.PropertyInput}
-                        min="40"
-                        max={canvasDimensions.height - selectedElement.position.y}
-                    />
+                    {readonly ? (
+                        <div className={cl.PropertyValue}>
+                            {Math.round(selectedElement.size.height)} px
+                        </div>
+                    ) : (
+                        <input
+                            type="number"
+                            value={Math.round(selectedElement.size.height)}
+                            onChange={(e) => handleSizeChange('height', parseInt(e.target.value) || 40)}
+                            className={cl.PropertyInput}
+                            min="40"
+                            max={canvasDimensions.height - selectedElement.position.y}
+                            disabled={readonly}
+                        />
+                    )}
                 </div>
             </div>
         </>

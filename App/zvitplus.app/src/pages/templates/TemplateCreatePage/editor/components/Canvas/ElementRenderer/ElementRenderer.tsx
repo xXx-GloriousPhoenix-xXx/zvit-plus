@@ -1,17 +1,21 @@
+// editor/components/ElementRenderer/ElementRenderer.tsx
 import { ELEMENT_COLORS } from "@/shared/constants/editor";
-import type { RepElement } from "../../../../../../../shared/types/repEditorTypes";
+import type { RepElement } from "@/shared/types/repEditorTypes";
 import { BarChart3, Image } from "lucide-react";
 import cl from '../Canvas.module.css';
 import { TableContent } from "./TableContent";
+import type { EditorType } from "@/shared/api/doc/slice";
 
 interface ElementRendererProps {
   element: RepElement;
   isSelected: boolean;
   isDragged: boolean;
-  onDragStart: (e: React.MouseEvent, element: RepElement) => void;
-  onResizeStart: (e: React.MouseEvent, element: RepElement) => void;
-  onSelect: (element: RepElement) => void;
+  onDragStart: ((e: React.MouseEvent, element: RepElement) => void) | undefined;
+  onResizeStart: ((e: React.MouseEvent, element: RepElement) => void) | undefined;
+  onSelect: ((element: RepElement) => void) | undefined;
   resizeHandleClass: string;
+  readonly: boolean;
+  mode: EditorType;
 }
 
 export function ElementRenderer({
@@ -21,12 +25,19 @@ export function ElementRenderer({
   onDragStart,
   onResizeStart,
   onSelect,
-  resizeHandleClass
+  resizeHandleClass,
+  readonly,
+  mode
 }: ElementRendererProps) {
   
   const renderContent = () => {
     switch (element.type) {
       case 'text':
+        // Для отчетов показываем данные, для шаблонов - текст
+        const text = element.mode === 'dynamic' && mode === 'report' 
+          ? `{${element.payload.text || 'data'}}`
+          : (element.payload.text || 'Текст');
+        
         return (
           <div 
             style={{
@@ -37,35 +48,56 @@ export function ElementRenderer({
             }}
             className={cl.TextContent}
           >
-            {element.payload.text || 'Порожній текст'}
+            {text}
           </div>
         );
       case 'image':
         return (
           <div className={cl.PlaceholderIcon}>
             <Image size={32} />
+            {mode === 'report' && element.mode === 'dynamic' && (
+              <div className={cl.ImageLabel}>[Зображення]</div>
+            )}
           </div>
         );
       case 'chart':
         return (
           <div className={cl.PlaceholderIcon}>
             <BarChart3 size={32} />
+            {mode === 'report' && element.mode === 'dynamic' && (
+              <div className={cl.ChartLabel}>[Дані графіка]</div>
+            )}
           </div>
         );
       case 'table':
-        return <TableContent element={element} />;
+        return <TableContent element={element} mode={mode} />;
       default:
         return null;
     }
   };
 
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (readonly) return;
+    
+    if (onDragStart) {
+      onDragStart(e, element);
+    }
+    
+    if (onSelect) {
+      onSelect(element);
+    }
+  };
+
+  const handleResizeMouseDown = (e: React.MouseEvent) => {
+    if (readonly || !onResizeStart) return;
+    e.stopPropagation();
+    onResizeStart(e, element);
+  };
+
   return (
     <div
       id={element.id}
-      onMouseDown={(e) => {
-        onDragStart(e, element);
-        onSelect(element);
-      }}
+      onMouseDown={handleMouseDown}
       style={{
         position: 'absolute',
         left: element.position.x,
@@ -74,22 +106,37 @@ export function ElementRenderer({
         height: element.size.height,
         backgroundColor: ELEMENT_COLORS[element.type],
         borderWidth: '0.05rem',
-        borderColor: 'var(--secondary-color)',
+        borderColor: isSelected ? '#3b82f6' : 'var(--secondary-color)',
         borderStyle: isSelected ? 'solid' : 'dashed',
-        cursor: isDragged ? 'grabbing' : 'grab',
+        cursor: readonly ? 'default' : (isDragged ? 'grabbing' : 'grab'),
         borderRadius: 'var(--border-radius)',
-        transition: 'none',
+        transition: isDragged ? 'none' : 'all 0.2s',
+        opacity: isDragged ? 0.8 : 1,
+        userSelect: 'none'
       }}
       className={cl.Element}
+      data-mode={mode}
+      data-readonly={readonly}
     >
       <div className={cl.ElementContent}>
         {renderContent()}
       </div>
 
-      {isSelected && (
+      {isSelected && !readonly && (
         <div
           className={resizeHandleClass}
-          onMouseDown={(e) => onResizeStart(e, element)}
+          onMouseDown={handleResizeMouseDown}
+          style={{
+            position: 'absolute',
+            right: 0,
+            bottom: 0,
+            width: '12px',
+            height: '12px',
+            backgroundColor: '#3b82f6',
+            border: '1px solid white',
+            borderRadius: '2px',
+            cursor: 'nwse-resize'
+          }}
         />
       )}
     </div>

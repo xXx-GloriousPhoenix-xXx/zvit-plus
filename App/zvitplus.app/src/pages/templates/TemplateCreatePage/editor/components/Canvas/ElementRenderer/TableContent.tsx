@@ -1,22 +1,27 @@
+// editor/components/TableContent.tsx
 import { useEffect, useRef, useState } from "react";
 import type { Cell, TableElement } from "@/shared/types/repEditorTypes";
 import cl from '../Canvas.module.css';
 import { useRepEditorContext } from "@/app/context/RepEditorContext";
+import type { EditorType } from "@/shared/api/doc/slice";
 
 interface TableContentProps {
     element: TableElement;
+    mode?: EditorType;
 }
 
-export function TableContent({ element }: TableContentProps) {
+export function TableContent({ element, mode = 'template' }: TableContentProps) {
     const { columns = [], rows = [] } = element.payload;
 
     const [editingCell, setEditingCell] = useState<Cell | null>(null);
     const [editingValue, setEditingValue] = useState<string>('');
     const inputRef = useRef<HTMLInputElement>(null);
-    const { rep } = useRepEditorContext();
+    const { rep, readonly } = useRepEditorContext();
+
+    const isEditable = !readonly && mode === 'template';
 
     useEffect(() => {
-        if (editingCell) {
+        if (editingCell && isEditable) {
             if (editingCell.row === null) {
                 setEditingValue(columns[editingCell.col]?.text ?? '');
             } else {
@@ -26,10 +31,10 @@ export function TableContent({ element }: TableContentProps) {
             inputRef.current?.focus();
             inputRef.current?.select();
         }
-    }, [editingCell, columns, rows]);
+    }, [editingCell, columns, rows, isEditable]);
 
     const saveCell = () => {
-        if (!editingCell) return;
+        if (!editingCell || !isEditable) return;
 
         if (editingCell.row === null) {
             const newColumns = columns.map((col, idx) => 
@@ -55,6 +60,8 @@ export function TableContent({ element }: TableContentProps) {
     }
 
     const handleCellClick = (clickedCell: Cell) => {
+        if (!isEditable) return;
+        
         if (editingCell?.row === clickedCell.row && editingCell?.col === clickedCell.col) return;
         
         setEditingCell(clickedCell);
@@ -82,13 +89,6 @@ export function TableContent({ element }: TableContentProps) {
             styles.color = cell.color;
         }
         
-        // if (cell.align) {
-        //     styles.textAlign = cell.align;
-        // }
-        // else {
-        //     styles.textAlign = 'center';
-        // }
-
         if (cell.align) {
             styles.justifyContent = (() => {
                 switch(cell.align) {
@@ -127,25 +127,20 @@ export function TableContent({ element }: TableContentProps) {
         return styles;
     };
 
-    const getInputStyles = (cell: any) => {
-        const styles: React.CSSProperties = {};
-        
-        if (cell.fontSize) {
-            styles.fontSize = `${cell.fontSize}px`;
+    const getCellContent = (rowIndex: number | null, colIndex: number, cell: any) => {
+        if (rowIndex === null) {
+            // Header
+            if (mode === 'report' && element.mode === 'dynamic') {
+                return `{${cell.text || `header_${colIndex + 1}`}}`;
+            }
+            return cell.text || `Заголовок ${colIndex + 1}`;
+        } else {
+            // Body
+            if (mode === 'report' && element.mode === 'dynamic') {
+                return `{${cell.text || `cell_${rowIndex + 1}_${colIndex + 1}`}}`;
+            }
+            return cell.text || `Клітинка ${rowIndex + 1}×${colIndex + 1}`;
         }
-        
-        if (cell.color) {
-            styles.color = cell.color;
-        }
-        
-        if (cell.fontWeight) {
-            styles.fontWeight = cell.fontWeight;
-        }
-        
-        styles.width = '100%';
-        styles.height = '100%';
-        
-        return styles;
     };
 
     if (!columns.length) return null;
@@ -159,7 +154,8 @@ export function TableContent({ element }: TableContentProps) {
             {columns.map((col, i) => {
                 const isEditing = editingCell?.row === null && editingCell?.col === i;
                 const cellStyles = getCellStyles(col);
-                const inputStyles = getInputStyles(col);
+                const inputStyles = { ...getCellStyles(col), width: '100%', height: '100%' };
+                
                 return (
                     <div 
                         key={`h-${i}`}
@@ -167,7 +163,7 @@ export function TableContent({ element }: TableContentProps) {
                         onClick={() => handleCellClick({ row: null, col: i })}
                         style={cellStyles}
                     >
-                        {isEditing ? (
+                        {isEditing && isEditable ? (
                             <input
                                 ref={inputRef}
                                 className={cl.TableCellInput}
@@ -178,7 +174,7 @@ export function TableContent({ element }: TableContentProps) {
                                 style={inputStyles}
                             />
                         ) : (
-                            col.text || `Заголовок ${i + 1}`
+                            getCellContent(null, i, col)
                         )}
                     </div>
                 )
@@ -189,7 +185,8 @@ export function TableContent({ element }: TableContentProps) {
                 row.map((cell, colIndex) => {
                     const isEditing = editingCell?.row === rowIndex && editingCell?.col === colIndex;
                     const cellStyles = getCellStyles(cell);
-                    const inputStyles = getInputStyles(cell);
+                    const inputStyles = { ...getCellStyles(cell), width: '100%', height: '100%' };
+                    
                     return (
                         <div
                             key={`c-${rowIndex}-${colIndex}`}
@@ -197,7 +194,7 @@ export function TableContent({ element }: TableContentProps) {
                             onClick={() => handleCellClick({ row: rowIndex, col: colIndex })}
                             style={cellStyles}
                         >
-                            {isEditing ? (
+                            {isEditing && isEditable ? (
                                 <input
                                     ref={inputRef}
                                     className={cl.TableCellInput}
@@ -208,7 +205,7 @@ export function TableContent({ element }: TableContentProps) {
                                     style={inputStyles}
                                 />
                             ) : (
-                                cell.text || `Клітинка ${rowIndex + 1}×${colIndex + 1}`
+                                getCellContent(rowIndex, colIndex, cell)
                             )}
                         </div>
                     );

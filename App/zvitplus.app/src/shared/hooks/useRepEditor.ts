@@ -1,12 +1,21 @@
+// shared/hooks/useRepEditor.ts
 import { useState, useCallback, useEffect, useRef } from 'react';
-import type { RepElement, RepElementType, RepElementMode, RepTemplate, SelectedCell } from '../../types/repEditorTypes';
+import type { RepElement, RepElementType, RepElementMode, RepTemplate, SelectedCell } from '../types/repEditorTypes';
+import type { EditorType } from '@/shared/api/doc/slice';
 
 interface UseRepEditorProps {
   template: RepTemplate;
   onChange: (t: RepTemplate) => void;
+  mode?: EditorType; // 'template' | 'report'
+  readonly?: boolean;
 }
 
-export function useRepEditor({ template, onChange }: UseRepEditorProps) {
+export function useRepEditor({ 
+  template, 
+  onChange, 
+  mode = 'template',
+  readonly = false 
+}: UseRepEditorProps) {
   const [elements, setElements] = useState<RepElement[]>(template.elements || []);
   const [selectedElement, setSelectedElement] = useState<RepElement | null>(null);
   const isInternalUpdate = useRef(false);
@@ -17,11 +26,10 @@ export function useRepEditor({ template, onChange }: UseRepEditorProps) {
     setSelectedCell(payload);
   }, []);
 
-  // Синхронізація з template при зміні ззовні (тільки якщо це не внутрішнє оновлення)
+  // Синхронізація з template при зміні ззовні
   useEffect(() => {
     if (!isInternalUpdate.current) {
       const newElements = template.elements || [];
-      // Перевіряємо чи дійсно змінилися елементи
       if (JSON.stringify(newElements) !== JSON.stringify(prevElementsRef.current)) {
         setElements(newElements);
         prevElementsRef.current = newElements;
@@ -32,7 +40,6 @@ export function useRepEditor({ template, onChange }: UseRepEditorProps) {
 
   // Синхронізація з onChange при зміні elements
   useEffect(() => {
-    // Перевіряємо чи дійсно змінилися елементи
     if (JSON.stringify(elements) !== JSON.stringify(prevElementsRef.current)) {
       isInternalUpdate.current = true;
       prevElementsRef.current = elements;
@@ -47,16 +54,18 @@ export function useRepEditor({ template, onChange }: UseRepEditorProps) {
     return `el_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }, []);
 
-  const addElement = useCallback((type: RepElementType, mode: RepElementMode = 'dynamic') => {
+  const addElement = useCallback((type: RepElementType, modeType: RepElementMode = 'dynamic') => {
+    if (readonly) return;
+    
     const newElement: RepElement = {
       id: generateId(),
       type,
-      mode,
+      mode: modeType,
       position: { x: 50, y: 50 },
       size: { width: 200, height: 100 },
       payload: type === 'text' 
         ? { 
-            text: mode === 'static' ? 'Статичний текст' : '{dynamic_text}', 
+            text: modeType === 'static' ? 'Статичний текст' : '{dynamic_text}', 
             fontSize: 16, 
             fontWeight: 'normal', 
             color: '#000000', 
@@ -66,24 +75,31 @@ export function useRepEditor({ template, onChange }: UseRepEditorProps) {
         ? { src: '', alt: '' }
         : type === 'chart'
         ? { chartType: 'bar', dataSource: '', title: '' }
-        : { columns: ['Колонка 1', 'Колонка 2'], rows: [
-          ['', '']
-        ] }
+        : { 
+            columns: [{ text: 'Колонка 1' }, { text: 'Колонка 2' }], 
+            rows: [
+              [{ text: '' }, { text: '' }]
+            ] 
+          }
     } as RepElement;
 
     setElements(prev => [...prev, newElement]);
     setSelectedElement(newElement);
-  }, [generateId]);
+  }, [generateId, readonly]);
 
   const deleteElement = useCallback((id: string) => {
+    if (readonly) return;
+    
     setElements(prev => prev.filter(el => el.id !== id));
     setSelectedElement(prev => prev?.id === id ? null : prev);
-  }, []);
+  }, [readonly]);
 
   const updateElement = useCallback((
     id: string, 
     updates: Partial<Omit<RepElement, 'type'>> & { type?: RepElementType }
   ) => {
+    if (readonly) return;
+    
     setElements(prev => prev.map(el => {
       if (el.id === id) {
         const updatedElement = { ...el, ...updates };
@@ -106,12 +122,14 @@ export function useRepEditor({ template, onChange }: UseRepEditorProps) {
       }
       return updated as RepElement;
     });
-  }, []);
+  }, [readonly]);
 
   const updatePayload = useCallback((
     id: string, 
     payloadUpdates: Partial<RepElement['payload']>
   ) => {
+    if (readonly) return;
+    
     console.log('useRepEditor - updatePayload called:', { id, payloadUpdates });
 
     setElements(prev => prev.map(el => {
@@ -121,8 +139,8 @@ export function useRepEditor({ template, onChange }: UseRepEditorProps) {
         console.log('useRepEditor - updates:', payloadUpdates);
         
         const updatedElement = {
-            ...el,
-            payload: { ...el.payload, ...payloadUpdates }
+          ...el,
+          payload: { ...el.payload, ...payloadUpdates }
         } as RepElement;
               
         console.log('useRepEditor - updated payload:', updatedElement.payload);
@@ -142,11 +160,19 @@ export function useRepEditor({ template, onChange }: UseRepEditorProps) {
       console.log('useRepEditor - updated selected element:', updated);
       return updated;
     });
-  }, []);
+  }, [readonly]);
 
   const clearSelection = useCallback(() => {
     setSelectedElement(null);
   }, []);
+
+  // Для режима report добавляем специальные методы
+  const updateReportData = useCallback((elementId: string, data: any) => {
+    if (mode !== 'report' || readonly) return;
+    
+    // Логика обновления данных отчета
+    console.log('Updating report data for element:', elementId, data);
+  }, [mode, readonly]);
 
   return {
     elements,
@@ -158,6 +184,9 @@ export function useRepEditor({ template, onChange }: UseRepEditorProps) {
     updateElement,
     updatePayload,
     clearSelection,
-    setSelectedCell: handleSetSelectedCell
+    setSelectedCell: handleSetSelectedCell,
+    updateReportData,
+    isReadonly: readonly,
+    mode
   };
 }

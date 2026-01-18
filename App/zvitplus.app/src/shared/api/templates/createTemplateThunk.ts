@@ -1,6 +1,6 @@
 // shared/api/templates/createTemplateThunk.ts
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { createRepFile, createRepFileName } from "@/shared/lib/utils/repFileManager";
+import { packRepFile, createRepFileName } from "@/shared/utils/repFileManager";
 import type { RepTemplate } from "@/shared/types/repEditorTypes";
 import type { RootState } from "@/app/store/store";
 import { baseApi } from "../baseApi";
@@ -35,7 +35,7 @@ export const createTemplate = createAsyncThunk<
                 throw new Error("Відсутні метадані шаблону");
             }
 
-            const repFile = await createRepFile(template, canvasRef!.current);
+            const repFile = await packRepFile(template, canvasRef!.current);
             const fileName = createRepFileName(template.meta);
 
             const formData = new FormData();

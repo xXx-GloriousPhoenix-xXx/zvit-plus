@@ -1,73 +1,186 @@
-// steps/ReviewStep.tsx
-import { Button } from "@/shared/ui/Button/Button.tsx";
-import type { RepTemplate } from "../../../../shared/types/repEditorTypes";
+// ReviewStep.tsx (обновленная версия)
+import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/shared/ui/Button/Button";
 import { ReviewCanvas } from "../Review/ReviewCanvas";
+import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
+import { 
+  setEditorStep, 
+  clearEditorDraft,
+  resetSaveState 
+} from "@/shared/api/doc/slice";
+import { createTemplate, updateTemplate } from "@/shared/api/doc/thunks";
+import type { RepTemplate } from "@/shared/types/repEditorTypes";
+import type { EditorMode, EditorType } from "@/shared/api/doc/slice";
 
 import cl from "../TemplateCreatePage.module.css";
-import { useRef, useState } from "react";
 
 interface ReviewStepProps {
-    template: RepTemplate;
-    onBack: () => void;
-    onClearDraft?: () => void;
-    onSubmit: (canvasRef?: React.RefObject<HTMLDivElement | null>) => Promise<void>;
+  mode: EditorMode;
+  type: EditorType;
+  template: RepTemplate;
+  onClose: () => void;
+  onClearDraft?: () => void;
+  onSubmit?: (canvasRef?: React.RefObject<HTMLDivElement | null>) => Promise<void>;
 }
 
 export function ReviewStep({ 
-    template, 
-    onBack, 
-    onClearDraft, 
-    onSubmit
+  mode,
+  type,
+  template, 
+  onClose,
+  onClearDraft,
+  onSubmit
 }: ReviewStepProps) {
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const canvasRef = useRef<HTMLDivElement>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const canvasRef = useRef<HTMLDivElement>(null);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  
+  const saveState = useAppSelector(state => 
+    type === 'template' 
+      ? state.docs.templates.save 
+      : state.docs.reports.save
+  );
 
-    const handleSubmit = async () => {
-        setLoading(true);
-        setError(null);
-        
-        try {
-            await onSubmit(canvasRef);
-        } catch (err: any) {
-            setError(err.message || "Помилка при створенні шаблону");
-        } finally {
-            setLoading(false);
+  const handleBack = () => {
+    if (mode === 'view') {
+      onClose();
+    } else {
+      dispatch(setEditorStep(2));
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (onSubmit) {
+      await onSubmit(canvasRef);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    
+    try {
+      if (mode === 'create') {
+        if (type === 'template') {
+          const result = await dispatch(createTemplate({
+            name: template.meta.templateName,
+            templateTypeId: template.meta.templateTypeId,
+            isPrivate: template.meta.isPrivate || false,
+            template,
+            canvasRef
+          })).unwrap();
+          
+          console.log(`${type} created successfully:`, result);
+          navigate(`/${type}s`);
+        } else {
+          // TODO: Добавить создание отчета
+          console.log('Создание отчета пока не реализовано');
         }
-    };
+      } else if (mode === 'edit') {
+        // Получаем originalId из редактора
+        const { editor } = useAppSelector(state => state.docs);
+        
+        if (!editor.originalId) {
+          throw new Error("ID шаблона не найден");
+        }
+        
+        if (type === 'template') {
+          const result = await dispatch(updateTemplate({
+            id: editor.originalId,
+            name: template.meta.templateName,
+            templateTypeId: template.meta.templateTypeId,
+            isPrivate: template.meta.isPrivate,
+            template,
+            canvasRef
+          })).unwrap();
+          
+          console.log(`${type} updated successfully:`, result);
+          navigate(`/${type}s`);
+        } else {
+          // TODO: Добавить обновление отчета
+          console.log('Обновление отчета пока не реализовано');
+        }
+      }
+    } catch (err: any) {
+      setError(err.message || `Помилка при ${mode === 'create' ? 'створенні' : 'редагуванні'} ${type === 'template' ? 'шаблону' : 'звіту'}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return (
-        <div className={cl.ReviewContainer}>
-            <div className={cl.ReviewCanvasSection}>
-                <ReviewCanvas template={template} canvasRef={canvasRef}/>
-            </div>
+  // Используем loading из saveState
+  const isLoading = loading || saveState.loading;
+  const displayError = error || saveState.error;
 
-            <div className={cl.ButtonGroup}>
-                <Button
-                    extraClassName={cl.Button}
-                    text="Назад до редактора"
-                    onClick={onBack}
-                    disabled={loading}
-                />
-                
-                <Button
-                    extraClassName={cl.Button}
-                    text={loading ? "Створення..." : "Створити"}
-                    onClick={handleSubmit}
-                    disabled={loading}
-                />
-            </div>
+  return (
+    <div className={cl.Wrapper}>
+      <div className={cl.ReviewCanvasSection}>
+        <ReviewCanvas
+          template={template}
+          canvasRef={canvasRef}
+        />
+      </div>
 
-            {onClearDraft && (
-                <div className={cl.DraftActions}>
-                    <Button
-                        extraClassName={cl.MarginedButton}
-                        text="Очистити"
-                        onClick={onClearDraft}
-                        disabled={loading}
-                    />
-                </div>
-            )}        
+      {displayError && (
+        <div className={cl.ErrorMessage}>
+          {displayError}
         </div>
-    );
+      )}
+
+      {saveState.success && (
+        <div className={cl.SuccessMessage}>
+          {type === 'template' ? 'Шаблон успішно збережено!' : 'Звіт успішно збережено!'}
+        </div>
+      )}
+
+      <div className={cl.ButtonGroup}>
+        {mode === 'view' ? (
+          <>
+            <Button
+              text="Закрити"
+              onClick={onClose}
+              extraClassName={cl.Button}
+            />
+            {type === 'report' && (
+              <Button
+                text="Завантажити PDF"
+                onClick={() => {/* логика загрузки PDF */}}
+                extraClassName={cl.Button}
+              />
+            )}
+          </>
+        ) : (
+          <>
+            <Button
+              text="Назад"
+              onClick={handleBack}
+              disabled={isLoading}
+              extraClassName={cl.Button}
+            />
+            
+            {mode === 'create' && onClearDraft && (
+              <Button
+                text="Очистити чернетку"
+                onClick={onClearDraft}
+                disabled={isLoading}
+                extraClassName={cl.Button}
+              />
+            )}
+            
+            <Button
+              text={isLoading 
+                ? (mode === 'create' ? 'Створення...' : 'Збереження...')
+                : (mode === 'create' ? 'Створити' : 'Зберегти зміни')
+              }
+              onClick={handleSubmit}
+              disabled={isLoading}
+              extraClassName={cl.Button}
+            />
+          </>
+        )}
+      </div>
+    </div>
+  );
 }

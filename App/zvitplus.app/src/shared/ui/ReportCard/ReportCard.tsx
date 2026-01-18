@@ -1,6 +1,6 @@
 import cl from './ReportCard.module.css';
 import { NavLink } from 'react-router-dom';
-import { formatFileSize, formatDate } from '@/shared/lib/utils/formatters';
+import { formatFileSize, formatDate } from '@/shared/utils/formatters';
 import type { ReportItemDTO } from '@/shared/api/reports/reportModels';
 
 interface ReportCardProps {

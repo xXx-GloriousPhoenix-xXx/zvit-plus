@@ -13,7 +13,7 @@
     transition: 250ms;
 }
 .Input {
-    background-color: transparent;
+    background-color: var(--white);
     padding: 0.5em 1em;
     border-radius: var(--border-radius);
     box-shadow: var(--shadow);

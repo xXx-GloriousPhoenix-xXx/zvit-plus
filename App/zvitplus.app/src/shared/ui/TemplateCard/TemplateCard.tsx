@@ -2,7 +2,7 @@
 import type { TemplateItemDTO } from '@/shared/api/templates/templateModels';
 import cl from './TemplateCard.module.css';
 import { NavLink } from 'react-router-dom';
-import { formatFileSize, formatDate } from '@/shared/lib/utils/formatters';
+import { formatFileSize, formatDate } from '@/shared/utils/formatters';
 
 interface TemplateCardProps {
     template: TemplateItemDTO;

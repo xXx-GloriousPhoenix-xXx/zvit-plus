@@ -17,6 +17,7 @@ import { ProtectedOutlet } from '@/widgets/layouts/ProtectedOutlet/ProtectedOutl
 import { ReportCreatePage } from '@/pages/reports/ReportCreatePage/ReportCreatePage';
 import { EditPage } from '@/pages/general/EditPage/EditPage';
 import { UploadPage } from '@/pages/general/UploadPage/UploadPage';
+import { DocEditorPage } from '@/pages/docs/DocEditorPage';
 
 export const router = createBrowserRouter([
     {
@@ -48,9 +49,9 @@ export const router = createBrowserRouter([
                 element: <ProtectedOutlet />,
                 children: [
                     { path: "upload", element: <UploadPage mode="template" /> },
-                    { path: "create", element: <TemplateCreatePage /> },
-                    { path: ":id", element: <EditPage mode="template" readonly={true} />},
-                    { path: ":id/edit", element: <EditPage mode="template" readonly={false} /> }
+                    { path: "create", element: <DocEditorPage mode="create" type="template" /> },
+                    { path: ":id", element: <DocEditorPage mode="view" type="template" /> },
+                    { path: ":id/edit", element: <DocEditorPage mode="edit" type="template" /> }
                 ]
             }
         ]
@@ -64,9 +65,9 @@ export const router = createBrowserRouter([
                 element: <ProtectedOutlet />,
                 children: [
                     { path: "upload", element: <UploadPage mode="report" /> },
-                    { path: "create", element: <ReportCreatePage /> },
-                    { path: ":id", element: <EditPage mode="report" readonly={true} />},
-                    { path: ":id/edit", element: <EditPage mode="report" readonly={false} /> }
+                    { path: "create", element: <DocEditorPage mode="create" type="report" /> },
+                    { path: ":id", element: <DocEditorPage mode="view" type="report" /> },
+                    { path: ":id/edit", element: <DocEditorPage mode="edit" type="report" /> }
                 ]
             }
         ]

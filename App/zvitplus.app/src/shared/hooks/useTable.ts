@@ -1,5 +1,5 @@
 import { useRepEditorContext } from "@/app/context/RepEditorContext";
-import type { RepElement, TableElement } from "../../types/repEditorTypes";
+import type { RepElement, TableElement } from "../types/repEditorTypes";
 import { useCallback } from "react";
 
 export function useTable(

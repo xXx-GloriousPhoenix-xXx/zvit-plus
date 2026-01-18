@@ -3,17 +3,20 @@ import cl from './TemplatePage.module.css';
 import { NavLink } from 'react-router-dom';
 import { ItemList } from '@/shared/ui/ItemList/ItemList';
 import { useAppDispatch, useAppSelector } from '@/app/store/hooks';
-import { getTemplates } from '@/shared/api/templates/getTemplatesThunk';
+// import { getTemplates } from '@/shared/api/templates/getTemplatesThunk';
 import { Button } from '@/shared/ui/Button/Button';
 import { Pagination } from '@/shared/ui/Pagination/Pagination';
-import { useKeyboardNavigation } from '@/shared/lib/hooks/useKeyboardNavigation';
+import { useKeyboardNavigation } from '@/shared/hooks/useKeyboardNavigation';
 import { SearchBar } from '@/shared/ui/SearchBar/SearchBar';
-import { 
-    setPage, 
-    setSearchParams,
-    clearSearchParams 
-} from '@/shared/api/templates/templatesGetSlice';
+// import { 
+//     setPage, 
+//     setSearchParams,
+//     clearSearchParams 
+// } from '@/shared/api/templates/templatesGetSlice';
 import { fetchTemplateTypes } from '@/shared/api/templateTypes/templateTypesSlice';
+import { setPage } from '@/shared/api/reports/reportSlice';
+import { fetchTemplatesPage } from '@/shared/api/doc/thunks';
+import { clearSearchParams, setSearchParams } from '@/shared/api/doc/slice';
 
 export function TemplatePage() {
     const dispatch = useAppDispatch();
@@ -31,7 +34,7 @@ export function TemplatePage() {
         currentPage, 
         totalPages, 
         searchParams,
-    } = useAppSelector(state => state.templatesGet);
+    } = useAppSelector(state => state.docs.templates.list);
     
     const { items: templateTypes } = useAppSelector(state => state.templateTypes);
 
@@ -40,9 +43,9 @@ export function TemplatePage() {
     }, [currentPage, searchParams]);
     
     const loadTemplates = () => {        
-        dispatch(getTemplates({
+        dispatch(fetchTemplatesPage({
             page: currentPage,
-            itemsPerPage: 6,
+            pageSize: 6,
             searchParams
         }));
     };
@@ -50,7 +53,7 @@ export function TemplatePage() {
     useKeyboardNavigation({
         currentPage,
         totalPages,
-        onPrevPage: () => dispatch(setPage(currentPage - 1)),
+        onPrevPage: () => dispatch(setPage({ page: currentPage - 1, type: 'template' })),
         onNextPage: () => dispatch(setPage(currentPage + 1)),
         onFirstPage: () => dispatch(setPage(1)),
         onLastPage: () => dispatch(setPage(totalPages))
@@ -61,14 +64,14 @@ export function TemplatePage() {
     };
 
     const handleSearch = (newParams: typeof searchParams) => {
-        dispatch(setSearchParams(newParams));
+        dispatch(setSearchParams({ type: 'template', searchParams: newParams }));
     };
 
     const handleClearSearch = () => {
-        dispatch(clearSearchParams());
+        dispatch(clearSearchParams('template'));
     };
 
-    if (loading && templates.length === 0) {
+    if (loading || !templates) {
         return (
             <section className={cl.Section}>
                 <div className={cl.Loading}>Завантаження...</div>
@@ -118,18 +121,18 @@ export function TemplatePage() {
             )}
 
             <div className={cl.Templates}>
-                {templates.length === 0 ? (
+                {templates!.length === 0 ? (
                     <div className={cl.EmptyState}>
                         <i className="fa-solid fa-file-circle-question"></i>
                         <h3>Шаблонів не знайдено</h3>
                         <p>Створіть перший шаблон або змініть параметри пошуку</p>
                     </div>
                 ) : (
-                    <ItemList type='template' items={templates} />
+                    <ItemList type='template' items={templates!} />
                 )}
             </div>
 
-            {totalPages > 1 && templates.length > 0 && (
+            {totalPages > 1 && templates!.length > 0 && (
                 <div className={cl.PaginationContainer}>
                     <Pagination
                         currentPage={currentPage}

@@ -1,20 +1,16 @@
-import type { TemplateItemDTO } from "@/shared/api/templates/templateModels";
-import type { ReportItemDTO } from "@/shared/api/reports/reportModels";
-
 import { TemplateCard } from "../TemplateCard/TemplateCard";
 import { ReportCard } from '../ReportCard/ReportCard';
 
 import cl from './ItemList.module.css';
+import type { DocItemDTO } from "@/shared/api/doc/models";
+import type { EditorType } from "@/shared/api/doc/slice";
 
-type ItemListProps = {
-    type: 'template'
-    items: TemplateItemDTO[]
-} | {
-    type: 'report'
-    items: ReportItemDTO[]
+type Props = {
+    type: EditorType;
+    items: DocItemDTO[];
 }
 
-export function ItemList({ type, items }: ItemListProps) {
+export function ItemList({ type, items }: Props) {
     return (
         <div className={cl.Wrapper}>
             {

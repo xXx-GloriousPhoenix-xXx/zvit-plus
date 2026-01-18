@@ -2,17 +2,7 @@
 import JSZip from "jszip";
 import type { RepTemplate, MetaValue, RepElement } from "@/shared/types/repEditorTypes";
 import html2canvas from "html2canvas";
-
-export interface RepTemplateData {
-    meta: MetaValue;
-    elements: RepElement[];
-}
-
-export interface RepTemplateFiles {
-    previewUrl?: string;
-    dataFiles: Record<string, string>;
-    mediaFiles: Record<string, string>;
-}
+import type { RepDocData, RepDocFiles } from "@/shared/api/doc/models";
 
 export interface RepFileStructure {
     // meta.json - основні метадані
@@ -29,7 +19,7 @@ export interface RepFileStructure {
     // media/ - директорія зображень
 }
 
-export async function createRepFile(template: RepTemplate, previewElement?: HTMLElement | null): Promise<Blob> {
+export async function packRepFile(template: RepTemplate, previewElement?: HTMLElement | null): Promise<Blob> {
     const zip = new JSZip();
     
     zip.file("meta.json", JSON.stringify(template.meta, null, 2));
@@ -66,8 +56,8 @@ export async function createRepFile(template: RepTemplate, previewElement?: HTML
 }
 
 export async function unpackRepFile(blob: Blob): Promise<{
-    data: RepTemplateData;
-    files: RepTemplateFiles;
+    data: RepDocData;
+    files: RepDocFiles;
 }> {
     const zip = new JSZip();
     const zipData = await zip.loadAsync(blob);

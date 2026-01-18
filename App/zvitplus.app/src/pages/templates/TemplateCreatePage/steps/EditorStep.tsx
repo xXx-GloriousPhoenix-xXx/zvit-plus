@@ -1,47 +1,72 @@
 // EditorStep.tsx
+import { Button } from "@/shared/ui/Button/Button";
 import { useAppDispatch } from "@/app/store/hooks";
-import { Button } from "@/shared/ui/Button/Button.tsx";
+import { setEditorTemplate, setEditorStep } from "@/shared/api/doc/slice";
+import { RepEditor } from "../editor/RepEditor";
 import type { RepTemplate } from "@/shared/types/repEditorTypes";
-import { setTemplate } from "@/shared/api/templates/templateCreateSlice";
+import type { EditorMode, EditorType } from "@/shared/api/doc/slice";
 
 import cl from "../TemplateCreatePage.module.css";
-import { RepEditor } from "../editor/RepEditor";
 
 interface Props {
+    mode: EditorMode;
+    type: EditorType;
     template: RepTemplate;
-    onChange: (template: RepTemplate) => void;
-    onNext: () => void;
-    onBack: () => void;
 }
 
-export function EditorStep({ template, onNext, onBack }: Props) {
+export function EditorStep({ 
+    mode, 
+    type, 
+    template
+}: Props) {
     const dispatch = useAppDispatch();
 
     const handleTemplateChange = (newTemplate: RepTemplate) => {
-        dispatch(setTemplate(newTemplate));
+        dispatch(setEditorTemplate(newTemplate));
+    };
+
+    const handleNext = () => {
+        dispatch(setEditorStep(3));
+    };
+
+    const handleBack = () => {
+        dispatch(setEditorStep(1));
     };
 
     return (
-        <>
+        <div className={cl.Wrapper}>            
             <div className={cl.EditorContainer}>
                 <RepEditor
                     template={template}
                     onChange={handleTemplateChange}
+                    mode={type}
+                    readonly={mode === 'view'}
                 />
             </div>
 
             <div className={cl.ButtonGroup}>
                 <Button
-                    extraClassName={cl.Button}
                     text="Назад"
-                    onClick={onBack}
-                />
-                <Button
+                    onClick={handleBack}
                     extraClassName={cl.Button}
-                    text="Далее"
-                    onClick={onNext}
                 />
+                
+                {mode !== 'view' && (
+                    <Button
+                        text="Далі"
+                        onClick={handleNext}
+                        extraClassName={cl.Button}
+                    />
+                )}
+                
+                {mode === 'view' && (
+                    <Button
+                        text="Переглянути результат"
+                        onClick={() => dispatch(setEditorStep(3))}
+                        extraClassName={cl.Button}
+                    />
+                )}
             </div>
-        </>
+        </div>
     );
 }

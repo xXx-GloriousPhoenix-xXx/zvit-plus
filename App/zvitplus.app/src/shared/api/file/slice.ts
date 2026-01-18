@@ -1,8 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { FileItemDTO } from "./models";
 import { getFile, getMeta } from "./thunks";
+import type { RepDocData, RepDocFiles } from "../doc/models";
 // import type { RepTemplate } from "@/shared/types/repEditorTypes";
-import type { RepTemplateData, RepTemplateFiles } from "@/shared/lib/utils/repFileManager";
 
 type FileState = {
     meta: {
@@ -11,8 +11,8 @@ type FileState = {
         error: string | null;
     }
     file: {
-        data: RepTemplateData | null; 
-        files: RepTemplateFiles | null;
+        data: RepDocData | null; 
+        files: RepDocFiles | null;
         loading: boolean;
         error: string | null;
     }

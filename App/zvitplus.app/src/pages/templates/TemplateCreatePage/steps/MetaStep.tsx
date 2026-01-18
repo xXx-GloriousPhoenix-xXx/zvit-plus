@@ -1,25 +1,37 @@
 // MetaStep.tsx
 import { useEffect, useState } from "react";
-import { Input } from "@/shared/ui/Input/Input.tsx";
-import { Button } from "@/shared/ui/Button/Button.tsx";
-import { BoolCheckbox } from "@/shared/ui/BoolCheckbox/BoolCheckbox.tsx";
-import { Select } from "@/shared/ui/Select/Select.tsx";
-import { RadioGroup } from "@/shared/ui/RadioGroup/RadioGroup.tsx";
-import { StringToggle } from "@/shared/ui/StringToggle/StringToggle.tsx";
+import { useNavigate } from "react-router-dom";
+import { Input } from "@/shared/ui/Input/Input";
+import { Button } from "@/shared/ui/Button/Button";
+import { BoolCheckbox } from "@/shared/ui/BoolCheckbox/BoolCheckbox";
+import { Select } from "@/shared/ui/Select/Select";
+import { RadioGroup } from "@/shared/ui/RadioGroup/RadioGroup";
+import { StringToggle } from "@/shared/ui/StringToggle/StringToggle";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import { fetchTemplateTypes } from "@/shared/api/templateTypes/templateTypesSlice";
-import type { MetaValue, PageOrientation, PageSize } from "@/shared/types/repEditorTypes";
+import { setEditorMeta, setEditorStep } from "@/shared/api/doc/slice";
+import type { 
+    MetaValue, 
+    PageOrientation, 
+    PageSize 
+} from "@/shared/types/repEditorTypes";
 import { PAGE_SIZES } from "@/shared/types/repEditorTypes";
+import type { EditorMode, EditorType } from "@/shared/api/doc/slice";
 
 import cl from "../TemplateCreatePage.module.css";
+import mscl from './MetaStep.module.css';
 
 interface Props {
+    mode: EditorMode;
+    type: EditorType;
     value: MetaValue;
     onNext: (value: MetaValue) => void;
+    onBack: () => void;
 }
 
-export function MetaStep({ value, onNext }: Props) {
+export function MetaStep({ mode, type, value, onNext, onBack }: Props) {
     const dispatch = useAppDispatch();
+    const navigate = useNavigate();
     const { items, loading } = useAppSelector(s => s.templateTypes);
     const [formData, setFormData] = useState<MetaValue>(value);
 
@@ -37,21 +49,36 @@ export function MetaStep({ value, onNext }: Props) {
         setFormData(prev => ({ ...prev, ...updates }));
     };
 
+    const handleNext = () => {
+        dispatch(setEditorMeta(formData));
+        dispatch(setEditorStep(2));
+    };
+
+    const handleBack = () => {
+        if (mode === 'create') {
+            // Для создания - просто переходим назад
+            onBack();
+        } else {
+            // Для редактирования - возвращаемся на предыдущий шаг
+            onBack();
+        }
+    };
+
     return (
-        <>
+        <div className={mscl.Wrapper}>
             <Input
-                label="Назва шаблону"
-                placeholder="Invoice template"
+                label="Назва"
+                placeholder={type === 'template' ? "Invoice template" : "Monthly report"}
                 value={formData.templateName}
                 onChange={e =>
                     handleFieldChange({ templateName: e.target.value })
                 }
-            />
-
+                disabled={mode === 'view'}
+            />  
             <Select
-                label="Тип шаблону"
+                label="Тип"
                 value={formData.templateTypeId}
-                disabled={loading}
+                disabled={loading || mode === 'view' || (mode === 'edit' && type === 'report')}
                 options={items.map(t => ({
                     value: t.id,
                     label: t.name,
@@ -61,19 +88,22 @@ export function MetaStep({ value, onNext }: Props) {
                     const selectedOption = items.find(item => item.id === selectedValue);
                     
                     handleFieldChange({
-                        templateTypeId: selectedValue,
-                        templateTypeName: selectedOption?.name || ''
+                    templateTypeId: selectedValue,
+                    templateTypeName: selectedOption?.name || ''
                     });
                 }}
             />
 
-            <BoolCheckbox
-                label="Приватний шаблон"
-                checked={formData.isPrivate}
-                onChange={e =>
+            {type === 'template' && (
+                <BoolCheckbox
+                    label="Приватний"
+                    checked={formData.isPrivate}
+                    onChange={e =>
                     handleFieldChange({ isPrivate: e.target.checked })
-                }
-            />
+                    }
+                    disabled={mode === 'view'}
+                />
+            )}
 
             <RadioGroup
                 label="Розмір аркушу"
@@ -82,10 +112,11 @@ export function MetaStep({ value, onNext }: Props) {
                 onChange={v =>
                     handleFieldChange({ pageSize: v as PageSize })
                 }
+                disabled={mode === 'view'}
             />
 
             <StringToggle
-                label="Орієнтація аркушу"
+                label="Орієнтація"
                 options={[
                     { value: "portrait", label: "Портрет" },
                     { value: "landscape", label: "Альбом" },
@@ -94,14 +125,33 @@ export function MetaStep({ value, onNext }: Props) {
                 onChange={(val) =>
                     handleFieldChange({ orientation: val as PageOrientation })
                 }
+                disabled={mode === 'view'}
             />
 
-            <Button
-                text="Далі"
-                disabled={!isSelected}
-                onClick={() => onNext(formData)}
-                extraClassName={cl.MarginedButton}
-            />
-        </>
+            <div className={cl.ButtonGroup}>
+                <Button
+                    text="Назад"
+                    onClick={handleBack}
+                    extraClassName={cl.Button}
+                />
+
+                {mode !== 'view' && (
+                    <Button
+                        text="Далі"
+                        disabled={!isSelected}
+                        onClick={handleNext}
+                        extraClassName={cl.Button}
+                    />
+                )}
+
+                {mode === 'view' && (
+                    <Button
+                        text="Закрити"
+                        onClick={() => navigate(`/${type}s`)}
+                        extraClassName={cl.Button}
+                    />
+                )}
+            </div>    
+        </div>
     );
 }

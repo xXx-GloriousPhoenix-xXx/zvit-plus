@@ -1,31 +1,47 @@
+// editor/components/Canvas/Canvas.tsx
 import { useRepEditorContext } from '@/app/context/RepEditorContext';
 import cl from './Canvas.module.css';
 import { CanvasArea } from './CanvasArea/CanvasArea';
 import { CanvasHeader } from './CanvasHeader/CanvasHeader';
 import { ElementRenderer } from './ElementRenderer/ElementRenderer';
-import type { RepElement } from '@/shared/types/repEditorTypes';
 import { useAppSelector } from '@/app/store/hooks';
 
-export type CanvasProps = {
-  handleDragStart: (e: React.MouseEvent<Element, MouseEvent>, element: RepElement, resizeHandleClass: string) => void;
-  handleDragMove: (e: React.MouseEvent<Element, MouseEvent>) => void;
-  handleDragEnd: () => void;
-
-  handleResizeStart: (e: React.MouseEvent<Element, MouseEvent>, element: RepElement) => void;
-  handleResizeMove: (e: React.MouseEvent<Element, MouseEvent>) => void;
-  handleResizeEnd: () => void;
-
-  setSelectedElement: (value: React.SetStateAction<RepElement | null>) => void;
-
-  elements: RepElement[];
-  selectedElement: RepElement | null;
-  draggedElement: string | null;
-  canvasRef: React.RefObject<HTMLDivElement | null>;
+interface CanvasProps {
+  mode?: 'template' | 'report';
+  readonly?: boolean;
 }
 
-export function Canvas() {
-    const { rep, drag, resize, selectedElement, elements, draggedElement, canvasRef } = useRepEditorContext();
-    const { orientation } = useAppSelector(tc => tc.templateCreate.meta);
+export function Canvas({ mode = 'template', readonly = false }: CanvasProps) {
+  console.log('🎨 Canvas - рендеринг', { mode, readonly });
+  
+  const { rep, drag, resize, selectedElement, elements, draggedElement, canvasRef } = useRepEditorContext();
+  const { editor } = useAppSelector(state => state.docs);
+  const orientation = editor.meta.orientation;
+
+  console.log('📊 Canvas - состояние контекста', {
+    elementsCount: elements.length,
+    selectedElementId: selectedElement?.id || 'нет',
+    draggedElementId: draggedElement || 'нет',
+    orientation,
+    canvasRefExists: !!canvasRef.current
+  });
+
+  const handleElementSelect = (element: any) => {
+    console.log('🎯 Canvas - выбор элемента', { elementId: element.id });
+    rep.setSelectedElement(element);
+  };
+
+  const handleDragStart = (e: React.MouseEvent, element: any) => {
+    console.log('🚀 Canvas - начало перетаскивания', { 
+      elementId: element.id,
+    });
+    drag.handleMouseDown(e, element);
+  };
+
+  const handleResizeStart = (e: React.MouseEvent, element: any) => {
+    console.log('📏 Canvas - начало ресайза', { elementId: element.id });
+    resize.handleResizeStart(e, element);
+  };
 
   return (
     <div className={cl.CanvasContainer}>
@@ -36,8 +52,10 @@ export function Canvas() {
         handleResizeMove={resize.handleResizeMove}
         handleDragEnd={drag.handleMouseUp}
         handleResizeEnd={resize.handleResizeEnd}
+        readonly={readonly}
       >  
-        <div className={cl.CanvasWrapper}
+        <div 
+          className={cl.CanvasWrapper}
           style={{
             width: orientation === 'landscape' ? '1123px' : '794px',
             height: orientation === 'portrait' ? '1123px' : '794px',
@@ -45,19 +63,36 @@ export function Canvas() {
             minHeight: orientation === 'portrait' ? '1123px' : '794px'
           }}
           ref={canvasRef}
+          data-canvas-ready="true"
         >
-          {elements.map(el => (
-            <ElementRenderer
-              key={el.id}
-              element={el}
-              isSelected={selectedElement?.id === el.id}
-              isDragged={draggedElement === el.id}
-              onDragStart={(e) => drag.handleMouseDown(e, el, cl.ResizeHandle)}
-              onResizeStart={(e) => resize.handleResizeStart(e, el)}
-              onSelect={rep.setSelectedElement}
-              resizeHandleClass={cl.ResizeHandle}
-            />
-          ))}
+          {elements.length === 0 ? (
+            <div className={cl.NoElementsMessage}>
+              Немає елементів. Додайте елементи з бічної панелі.
+            </div>
+          ) : (
+            elements.map(el => {
+              console.log('🎨 Canvas - рендеринг элемента', {
+                id: el.id,
+                type: el.type,
+                position: el.position
+              });
+              
+              return (
+                <ElementRenderer
+                  key={el.id}
+                  element={el}
+                  isSelected={selectedElement?.id === el.id}
+                  isDragged={draggedElement === el.id}
+                  onDragStart={!readonly ? handleDragStart : undefined}
+                  onResizeStart={!readonly ? handleResizeStart : undefined}
+                  onSelect={!readonly ? handleElementSelect : undefined}
+                  resizeHandleClass={cl.ResizeHandle}
+                  readonly={readonly}
+                  mode={mode}
+                />
+              );
+            })
+          )}
         </div>
       </CanvasArea>
     </div>
