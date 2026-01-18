@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 import { getFile, getMeta } from "@/shared/api/file/thunks";
 import { useParams } from "react-router-dom";
 
-import { ReviewCanvas } from "@/pages/templates/TemplateCreatePage/Review/ReviewCanvas";
+import { ReviewCanvas } from "@/pages/docs/steps/Review/ReviewCanvas";
 import { revokeFileUrls } from "@/shared/api/file/slice";
 
 interface Props {

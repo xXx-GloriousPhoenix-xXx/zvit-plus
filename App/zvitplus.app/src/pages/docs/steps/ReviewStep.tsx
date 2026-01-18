@@ -2,7 +2,7 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/shared/ui/Button/Button";
-import { ReviewCanvas } from "../../templates/TemplateCreatePage/Review/ReviewCanvas";
+import { ReviewCanvas } from "./Review/ReviewCanvas";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import { 
   setEditorStep, 

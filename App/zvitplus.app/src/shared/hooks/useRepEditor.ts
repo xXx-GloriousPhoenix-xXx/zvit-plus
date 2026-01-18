@@ -130,20 +130,14 @@ export function useRepEditor({
   ) => {
     if (readonly) return;
     
-    console.log('useRepEditor - updatePayload called:', { id, payloadUpdates });
 
     setElements(prev => prev.map(el => {
-      if (el.id === id) {
-        console.log('useRepEditor - updating element:', el.id);
-        console.log('useRepEditor - current payload:', el.payload);
-        console.log('useRepEditor - updates:', payloadUpdates);
-        
+      if (el.id === id) {        
         const updatedElement = {
           ...el,
           payload: { ...el.payload, ...payloadUpdates }
         } as RepElement;
               
-        console.log('useRepEditor - updated payload:', updatedElement.payload);
         return updatedElement;
       }
       return el;
@@ -166,7 +160,6 @@ export function useRepEditor({
     setSelectedElement(null);
   }, []);
 
-  // Для режима report добавляем специальные методы
   const updateReportData = useCallback((elementId: string, data: any) => {
     if (mode !== 'report' || readonly) return;
     

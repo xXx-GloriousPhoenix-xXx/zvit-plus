@@ -15,8 +15,7 @@ export function TextProperties({
     readonly = false,
     isReportMode = false
 } : TextPropertiesProps) {
-    
-    // Для отчетов показываем упрощенную версию
+    const isDynamicElement = selectedElement.mode === 'dynamic';
     if (isReportMode) {
         return (
             <div className={cl.PropertyGroup}>
@@ -33,8 +32,9 @@ export function TextProperties({
                         })}
                         rows={3}
                         className={cl.PropertyTextarea}
-                        placeholder="{variable_name}"
-                        disabled={readonly}
+                        placeholder="Введіть текст..."
+                        disabled={readonly || !isDynamicElement}
+                        style={{resize: isDynamicElement ? "vertical" : "none"}}
                     />
                 )}
             </div>
@@ -52,11 +52,7 @@ export function TextProperties({
                     })}
                     rows={3}
                     className={cl.PropertyTextarea}
-                    placeholder={
-                        selectedElement.mode === 'dynamic' 
-                        ? '{variable_name}' 
-                        : 'Введіть текст...'
-                    }
+                    placeholder="Введіть текст..."
                     disabled={readonly}
                 />
             </div>
@@ -121,3 +117,9 @@ export function TextProperties({
         </>
     )
 }
+
+// Почти всё гуд
+// Отредактировать чтобы было сохранение ссылок для добавления данных
+// Запретить ресайз и мув объектов
+// Просмотреть работу пропсов
+// Добавить загрузку

@@ -93,28 +93,35 @@ export function DocEditorPage({ mode, type }: Props) {
                     />
                 );
             case 2:
-                if (type === 'report' && (mode === 'edit' || mode === 'create')) {
-                    // Для отчетов - шаг заполнения данных
-                    return (
-                        <DataStep
-                            mode={mode}
-                            type={type}
-                            template={editor.template}
-                            onNext={() => dispatch(setEditorStep(3))}
-                            onBack={() => dispatch(setEditorStep(1))}
-                        />
-                    );
-                }
-                else {
-                    // Для шаблонов - редактор структуры
-                    return (
-                        <EditorStep
-                            mode={mode}
-                            type={type}
-                            template={editor.template}
-                        />
-                    );
-                }
+                // if (type === 'report' && (mode === 'edit' || mode === 'create')) {
+                //     // Для отчетов - шаг заполнения данных
+                //     return (
+                //         <DataStep
+                //             mode={mode}
+                //             type={type}
+                //             template={editor.template}
+                //             onNext={() => dispatch(setEditorStep(3))}
+                //             onBack={() => dispatch(setEditorStep(1))}
+                //         />
+                //     );
+                // }
+                // else {
+                //     // Для шаблонов - редактор структуры
+                //     return (
+                //         <EditorStep
+                //             mode={mode}
+                //             type={type}
+                //             template={editor.template}
+                //         />
+                //     );
+                // }
+                return (
+                    <EditorStep
+                        mode={mode}
+                        type={type}
+                        template={editor.template}
+                    />
+                )
             case 3:
                 return (
                     <ReviewStep

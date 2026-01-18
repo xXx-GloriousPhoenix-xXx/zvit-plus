@@ -77,9 +77,9 @@ export function ElementRenderer({
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (readonly) return;
     
     if (onDragStart) {
+      if (readonly) return;
       onDragStart(e, element);
     }
     

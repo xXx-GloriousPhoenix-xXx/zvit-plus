@@ -41,7 +41,7 @@ export function RepEditor({ template, onChange, mode, readonly = false }: Props)
             >
             <div className={cl.Wrapper}>
                 {showSidebar && <Sidebar mode={mode} readonly={readonly} />}
-                <Canvas mode={mode} readonly={readonly} />
+                <Canvas mode={mode} readonly={readonly || mode === 'report'} />
                 {showPropertyPanel && <PropertyPanel/>}
             </div>
         </RepEditorProvider>

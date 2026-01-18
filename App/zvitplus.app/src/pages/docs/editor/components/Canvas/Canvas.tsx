@@ -11,35 +11,21 @@ interface CanvasProps {
   readonly?: boolean;
 }
 
-export function Canvas({ mode = 'template', readonly = false }: CanvasProps) {
-  console.log('🎨 Canvas - рендеринг', { mode, readonly });
-  
+export function Canvas({ mode = 'template', readonly = false }: CanvasProps) {  
   const { rep, drag, resize, selectedElement, elements, draggedElement, canvasRef } = useRepEditorContext();
   const { editor } = useAppSelector(state => state.docs);
   const orientation = editor.meta.orientation;
 
-  console.log('📊 Canvas - состояние контекста', {
-    elementsCount: elements.length,
-    selectedElementId: selectedElement?.id || 'нет',
-    draggedElementId: draggedElement || 'нет',
-    orientation,
-    canvasRefExists: !!canvasRef.current
-  });
-
   const handleElementSelect = (element: any) => {
-    console.log('🎯 Canvas - выбор элемента', { elementId: element.id });
     rep.setSelectedElement(element);
+    console.log('selected');
   };
 
   const handleDragStart = (e: React.MouseEvent, element: any) => {
-    console.log('🚀 Canvas - начало перетаскивания', { 
-      elementId: element.id,
-    });
     drag.handleMouseDown(e, element);
   };
 
   const handleResizeStart = (e: React.MouseEvent, element: any) => {
-    console.log('📏 Canvas - начало ресайза', { elementId: element.id });
     resize.handleResizeStart(e, element);
   };
 
@@ -66,17 +52,9 @@ export function Canvas({ mode = 'template', readonly = false }: CanvasProps) {
           data-canvas-ready="true"
         >
           {elements.length === 0 ? (
-            <div className={cl.NoElementsMessage}>
-              Немає елементів. Додайте елементи з бічної панелі.
-            </div>
+            null
           ) : (
             elements.map(el => {
-              console.log('🎨 Canvas - рендеринг элемента', {
-                id: el.id,
-                type: el.type,
-                position: el.position
-              });
-              
               return (
                 <ElementRenderer
                   key={el.id}
@@ -85,7 +63,7 @@ export function Canvas({ mode = 'template', readonly = false }: CanvasProps) {
                   isDragged={draggedElement === el.id}
                   onDragStart={!readonly ? handleDragStart : undefined}
                   onResizeStart={!readonly ? handleResizeStart : undefined}
-                  onSelect={!readonly ? handleElementSelect : undefined}
+                  onSelect={handleElementSelect}
                   resizeHandleClass={cl.ResizeHandle}
                   readonly={readonly}
                   mode={mode}

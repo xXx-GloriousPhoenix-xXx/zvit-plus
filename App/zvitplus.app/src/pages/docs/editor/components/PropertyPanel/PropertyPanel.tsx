@@ -54,95 +54,56 @@ export function PropertyPanel() {
                     </div>
                 </div>
 
-                {/* Основные свойства позиции/размера (только для шаблонов или если можно редактировать) */}
-                {(isTemplateMode || (isReportMode && isEditable)) && (
-                    <SizeProperties
+                <SizeProperties
+                    selectedElement={selectedElement}
+                    updateElement={rep.updateElement}
+                    readonly={!isTemplateMode}
+                />
+
+                {selectedElement.type === 'text' && (
+                    <TextProperties
                         selectedElement={selectedElement}
-                        updateElement={rep.updateElement}
+                        updatePayload={rep.updatePayload}
                         readonly={!isEditable}
+                        isReportMode={isReportMode}
                     />
                 )}
 
-                {/* Для отчетов показываем данные вместо свойств форматирования */}
-                {isReportMode && isDynamicElement ? (
-                    // Показываем компонент для заполнения данных отчета
-                    <ReportDataProperties
-                        element={selectedElement}
-                        onUpdate={(data) => {
-                            if (isEditable) {
-                                // Здесь будет логика обновления данных отчета
-                                rep.updatePayload(selectedElement.id, data);
-                            }
-                        }}
-                        readonly={!isEditable}
-                    />
-                ) : (
-                    // Показываем обычные свойства форматирования
+                {selectedElement.type === 'table' && (
                     <>
-                        {selectedElement.type === 'text' && (
-                            <TextProperties
+                        <TableProperties
+                            selectedElement={selectedElement}
+                            updatePayload={rep.updatePayload}
+                            readonly={!isEditable}
+                            isReportMode={isReportMode}
+                        />
+                        
+                        {selectedCell && isEditable && (
+                            <CellProperties
                                 selectedElement={selectedElement}
                                 updatePayload={rep.updatePayload}
-                                readonly={!isEditable}
-                                isReportMode={isReportMode}
-                            />
-                        )}
-
-                        {selectedElement.type === 'table' && (
-                            <>
-                                {/* Свойства таблицы */}
-                                <TableProperties
-                                    selectedElement={selectedElement}
-                                    updatePayload={rep.updatePayload}
-                                    readonly={!isEditable}
-                                    isReportMode={isReportMode}
-                                />
-                                
-                                {/* Свойства ячейки, если выбрана */}
-                                {selectedCell && isEditable && (
-                                    <CellProperties
-                                        selectedElement={selectedElement}
-                                        updatePayload={rep.updatePayload}
-                                    />
-                                )}
-                            </>
-                        )}
-
-                        {selectedElement.type === 'chart' && (
-                            <ChartProperties
-                                selectedElement={selectedElement}
-                                updatePayload={rep.updatePayload}
-                                readonly={!isEditable}
-                                isReportMode={isReportMode}
-                            />
-                        )}
-
-                        {selectedElement.type === 'image' && (
-                            <ImageProperties
-                                selectedElement={selectedElement}
-                                updatePayload={rep.updatePayload}
-                                readonly={!isEditable}
-                                isReportMode={isReportMode}
                             />
                         )}
                     </>
                 )}
 
-                {/* Информация о режиме */}
-                <div className={cl.ModeInfo}>
-                    <div className={cl.ModeInfoItem}>
-                        <span className={cl.ModeInfoLabel}>Режим:</span>
-                        <span className={cl.ModeInfoValue}>
-                            {isTemplateMode ? 'Шаблон' : 'Звіт'}
-                        </span>
-                    </div>
-                    <div className={cl.ModeInfoItem}>
-                        <span className={cl.ModeInfoLabel}>Доступ:</span>
-                        <span className={cl.ModeInfoValue}>
-                            {readonly ? 'Тільки перегляд' : 'Редагування'}
-                        </span>
-                    </div>
-                </div>
+                {selectedElement.type === 'chart' && (
+                    <ChartProperties
+                        selectedElement={selectedElement}
+                        updatePayload={rep.updatePayload}
+                        readonly={!isEditable}
+                        isReportMode={isReportMode}
+                    />
+                )}
+
+                {selectedElement.type === 'image' && (
+                    <ImageProperties
+                        selectedElement={selectedElement}
+                        updatePayload={rep.updatePayload}
+                        readonly={!isEditable}
+                        isReportMode={isReportMode}
+                    />
+                )}
             </div>
         </div>
     );
