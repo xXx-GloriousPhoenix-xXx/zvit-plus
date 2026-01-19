@@ -6,7 +6,6 @@ import { ImageProperties } from "./properties/ImageProperties";
 import { ChartProperties } from "./properties/ChartProperties";
 import { SizeProperties } from "./properties/SizeProperties";
 import { CellProperties } from "./properties/CellProperties";
-import { ReportDataProperties } from "./properties/ReportDataProperties"; // Новый компонент
 import { useRepEditorContext } from "@/app/context/RepEditorContext";
 
 export function PropertyPanel() {
@@ -14,7 +13,7 @@ export function PropertyPanel() {
         selectedElement, 
         rep, 
         selectedCell,
-        mode, // 'template' | 'report'
+        mode,
         readonly 
     } = useRepEditorContext();
 
@@ -78,10 +77,11 @@ export function PropertyPanel() {
                             isReportMode={isReportMode}
                         />
                         
-                        {selectedCell && isEditable && (
+                        {selectedCell && (
                             <CellProperties
                                 selectedElement={selectedElement}
                                 updatePayload={rep.updatePayload}
+                                isReportMode={mode === 'report'}
                             />
                         )}
                     </>

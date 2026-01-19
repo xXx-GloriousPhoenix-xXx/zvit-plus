@@ -1,10 +1,12 @@
 // editor/components/ElementRenderer/ElementRenderer.tsx
 import { ELEMENT_COLORS } from "@/shared/constants/editor";
 import type { RepElement } from "@/shared/types/repEditorTypes";
-import { BarChart3, Image } from "lucide-react";
+import { BarChart3, FileText, Image } from "lucide-react";
 import cl from '../Canvas.module.css';
 import { TableContent } from "./TableContent";
 import type { EditorType } from "@/shared/api/doc/slice";
+import { useAppSelector } from "@/app/store/hooks";
+import { ChartContent } from "./ChartContent";
 
 interface ElementRendererProps {
   element: RepElement;
@@ -29,15 +31,16 @@ export function ElementRenderer({
   readonly,
   mode
 }: ElementRendererProps) {
-  
+  const files = useAppSelector(state => state.docs.reports.current.files);
+  const mediaFiles = files?.mediaFiles || {};
+  const dataFiles = files?.dataFiles || {};
+
   const renderContent = () => {
     switch (element.type) {
       case 'text':
-        // Для отчетов показываем данные, для шаблонов - текст
         const text = element.mode === 'dynamic' && mode === 'report' 
-          ? `{${element.payload.text || 'data'}}`
-          : (element.payload.text || 'Текст');
-        
+          ? `${element.payload.text || 'data'}`
+          : (element.payload.text || 'Текст');        
         return (
           <div 
             style={{
@@ -52,22 +55,40 @@ export function ElementRenderer({
           </div>
         );
       case 'image':
-        return (
-          <div className={cl.PlaceholderIcon}>
-            <Image size={32} />
-            {mode === 'report' && element.mode === 'dynamic' && (
+        const imageUrl = mediaFiles[element.id];
+        if (mode === 'report' && imageUrl) {
+          return (
+            <div className={`${cl.ImageContainer} ${cl.FilledImage}`}>
+                <img 
+                  src={imageUrl} 
+                  alt={element.payload.alt || "Uploaded content"} 
+                  className={cl.ImageContent}
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+                <div className={cl.ImageFallback}>
+                  <Image size={24} />
+                  <div className={cl.ImageLabel}>Зображення</div>
+                </div>
+              </div>
+          )
+        }
+        else {
+          return (
+            <div className={cl.PlaceholderIcon}>
+              <Image size={32} />
               <div className={cl.ImageLabel}>[Зображення]</div>
-            )}
-          </div>
-        );
+            </div>
+          )
+        }
       case 'chart':
         return (
-          <div className={cl.PlaceholderIcon}>
-            <BarChart3 size={32} />
-            {mode === 'report' && element.mode === 'dynamic' && (
-              <div className={cl.ChartLabel}>[Дані графіка]</div>
-            )}
-          </div>
+          <ChartContent
+            isReport={mode === 'report'}
+            url={dataFiles[element.id]}
+            chartType={element.payload.chartType || 'bar'}
+          />
         );
       case 'table':
         return <TableContent element={element} mode={mode} />;

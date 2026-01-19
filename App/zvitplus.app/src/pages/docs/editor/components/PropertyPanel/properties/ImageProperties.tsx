@@ -2,6 +2,10 @@
 import type { ImageElement, RepElement } from "@/shared/types/repEditorTypes";
 import cl from '../PropertyPanel.module.css';
 
+import { FileDropZone } from "@/shared/ui/FileDropZone/FileDropZone";
+import { setImage } from "@/shared/api/doc/slice";
+import { useAppDispatch } from "@/app/store/hooks";
+
 type ImagePropertiesProps = {
     selectedElement: ImageElement;
     updatePayload: (id: string, payloadUpdates: Partial<RepElement['payload']>) => void;
@@ -16,61 +20,31 @@ export function ImageProperties({
     isReportMode = false
 } : ImagePropertiesProps) {
     
-    // Для отчетов показываем упрощенную версию
+    const dispatch = useAppDispatch();
+
     if (isReportMode) {
         return (
             <div className={cl.PropertyGroup}>
-                <label className={cl.PropertyLabel}>Шлях до зображення</label>
+                <label className={cl.PropertyLabel}>Зображення</label>
                 {readonly ? (
                     <div className={cl.PropertyValue}>
                         {selectedElement.payload.src || '(зображення не вказано)'}
                     </div>
                 ) : (
-                    <input
-                        type="text"
-                        value={selectedElement.payload.src || ''}
-                        onChange={(e) => updatePayload(selectedElement.id, { 
-                            src: e.target.value 
-                        })}
-                        placeholder="Назва змінної або шлях до файлу"
-                        className={cl.PropertyInput}
-                        disabled={readonly}
+                    <FileDropZone
+                        mode='image'
+                        onFileUpload={url => {
+                            const id = selectedElement.id;
+                            updatePayload(id, { src: url });
+                            dispatch(setImage({ id, url }));
+                            console.log(url);
+                        }}
                     />
                 )}
             </div>
         );
     }
-
-    return (
-        <>
-            <div className={cl.PropertyGroup}>
-                <label className={cl.PropertyLabel}>Шлях до зображення</label>
-                <input
-                    type="text"
-                    value={selectedElement.payload.src || ''}
-                    onChange={(e) => updatePayload(selectedElement.id, { 
-                        src: e.target.value 
-                    })}
-                    placeholder="media/logo.png"
-                    className={cl.PropertyInput}
-                    disabled={readonly}
-                />
-            </div>
-            
-            {!readonly && (
-                <div className={cl.PropertyGroup}>
-                    <label className={cl.PropertyLabel}>Alt текст</label>
-                    <input
-                        type="text"
-                        value={selectedElement.payload.alt || ''}
-                        onChange={(e) => updatePayload(selectedElement.id, { 
-                            alt: e.target.value 
-                        })}
-                        placeholder="Опис зображення"
-                        className={cl.PropertyInput}
-                    />
-                </div>
-            )}
-        </>
-    );
+    else {
+        return null;
+    }
 }

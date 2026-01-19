@@ -30,17 +30,12 @@ export function TableProperties({
                 <div className={cl.PropertyValue}>
                     {table.columns.length} колонок × {table.rows.length} рядків
                 </div>
-                <div className={cl.PropertyHint}>
-                    Структуру таблиці можна змінити тільки в шаблоні
-                </div>
             </div>
         );
     }
 
     return (
         <div className={cl.PropertyRow}>
-            
-            {/* Колонки */}
             <div className={cl.PropertyGroup}>
                 <label className={cl.PropertyLabel}>Колонки</label>
                 <div className={cl.CounterRow}>
@@ -68,7 +63,6 @@ export function TableProperties({
                 </div>
             </div>
 
-            {/* Рядки */}
             <div className={cl.PropertyGroup}>
                 <label className={cl.PropertyLabel}>Рядки</label>
                 <div className={cl.CounterRow}>

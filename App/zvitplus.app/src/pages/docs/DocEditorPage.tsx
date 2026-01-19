@@ -16,7 +16,6 @@ import cl from "./DocEditorPage.module.css";
 import { ReviewStep } from "./steps/ReviewStep";
 import { MetaStep } from "./steps/MetaStep";
 import { EditorStep } from "./steps/EditorStep";
-import { DataStep } from "./steps/DataStep";
 
 interface Props {
     mode: EditorMode;

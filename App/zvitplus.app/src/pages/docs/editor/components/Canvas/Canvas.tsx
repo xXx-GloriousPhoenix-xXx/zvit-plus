@@ -18,7 +18,6 @@ export function Canvas({ mode = 'template', readonly = false }: CanvasProps) {
 
   const handleElementSelect = (element: any) => {
     rep.setSelectedElement(element);
-    console.log('selected');
   };
 
   const handleDragStart = (e: React.MouseEvent, element: any) => {

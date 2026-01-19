@@ -8,6 +8,7 @@ import type {
   } from "@/shared/types/repEditorTypes";
   import cl from "../PropertyPanel.module.css";
   import { useRepEditorContext } from "@/app/context/RepEditorContext";
+import { useEffect } from "react";
   
   type CellPropertiesProps = {
       selectedElement: TableElement;
@@ -23,6 +24,10 @@ import type {
       isReportMode = false
   }: CellPropertiesProps) {
       const { selectedCell } = useRepEditorContext();
+
+      useEffect(() => {
+        console.log(selectedCell?.row, selectedCell?.col);
+      }, [selectedCell])
       
       // Проверяем, относится ли выбранная ячейка к текущему элементу
       const isCellFromThisElement = selectedCell && selectedCell.elementId === selectedElement.id;
@@ -39,7 +44,6 @@ import type {
           );
       }
   
-      // ВАЖНО: Получаем актуальные данные ячейки из selectedElement, а не из selectedCell.cell
       const getCurrentCell = (): TableCell => {
           const { columns = [], rows = [] } = selectedElement.payload;
           
@@ -100,30 +104,33 @@ import type {
       // Для отчетов показываем упрощенную версию
       if (isReportMode) {
           return (
-              <div className={cl.PropertySection}>
+              <>
+                {/* <div className={cl.PropertiesHeader}>
                   <h3 className={cl.PropertySubtitle}>
                       {selectedCell.row === null 
-                          ? `Заголовок колонки [${selectedCell.col + 1}]` 
-                          : `Ячейка [${selectedCell.row + 1},${selectedCell.col + 1}]`}
+                          ? `Властивості заголовка [${selectedCell.col + 1}]` 
+                          : `Властивості ячейки [${selectedCell.row + 1},${selectedCell.col + 1}]`}
                   </h3>
-                  
-                  <div className={cl.PropertyGroup}>
-                      <label className={cl.PropertyLabel}>Значення</label>
-                      {readonly ? (
-                          <div className={cl.PropertyValue}>
-                              {currentCell.text || '(порожньо)'}
-                          </div>
-                      ) : (
-                          <input
-                              type="text"
-                              value={currentCell.text || ''}
-                              onChange={(e) => updateCellProperty({ text: e.target.value })}
-                              className={cl.PropertyInput}
-                              placeholder="Введіть значення..."
-                          />
-                      )}
-                  </div>
+              </div> */}
+  
+              <div className={cl.PropertyGroup}>
+                  <label className={cl.PropertyLabel}>Текст</label>
+                  {readonly ? (
+                      <div className={cl.PropertyValue}>
+                          {currentCell.text || '(порожньо)'}
+                      </div>
+                  ) : (
+                      <input
+                          type="text"
+                          value={currentCell.text || ''}
+                          onChange={(e) => updateCellProperty({ text: e.target.value })}
+                          className={cl.PropertyInput}
+                          placeholder="Введіть текст..."
+                          disabled={readonly}
+                      />
+                  )}
               </div>
+              </>
           );
       }
   

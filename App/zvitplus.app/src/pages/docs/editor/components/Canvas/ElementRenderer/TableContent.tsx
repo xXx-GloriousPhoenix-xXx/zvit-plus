@@ -59,9 +59,7 @@ export function TableContent({ element, mode = 'template' }: TableContentProps) 
         setEditingCell(null);
     }
 
-    const handleCellClick = (clickedCell: Cell) => {
-        if (!isEditable) return;
-        
+    const handleCellClick = (clickedCell: Cell) => {        
         if (editingCell?.row === clickedCell.row && editingCell?.col === clickedCell.col) return;
         
         setEditingCell(clickedCell);
@@ -131,13 +129,13 @@ export function TableContent({ element, mode = 'template' }: TableContentProps) 
         if (rowIndex === null) {
             // Header
             if (mode === 'report' && element.mode === 'dynamic') {
-                return `{${cell.text || `header_${colIndex + 1}`}}`;
+                return `${cell.text || `header_${colIndex + 1}`}`;
             }
             return cell.text || `Заголовок ${colIndex + 1}`;
         } else {
             // Body
             if (mode === 'report' && element.mode === 'dynamic') {
-                return `{${cell.text || `cell_${rowIndex + 1}_${colIndex + 1}`}}`;
+                return `${cell.text || `cell_${rowIndex + 1}_${colIndex + 1}`}`;
             }
             return cell.text || `Клітинка ${rowIndex + 1}×${colIndex + 1}`;
         }
@@ -163,7 +161,7 @@ export function TableContent({ element, mode = 'template' }: TableContentProps) 
                         onClick={() => handleCellClick({ row: null, col: i })}
                         style={cellStyles}
                     >
-                        {isEditing && isEditable ? (
+                        {isEditing ? (
                             <input
                                 ref={inputRef}
                                 className={cl.TableCellInput}

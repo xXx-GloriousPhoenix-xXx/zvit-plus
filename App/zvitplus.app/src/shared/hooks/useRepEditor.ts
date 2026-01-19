@@ -150,9 +150,7 @@ export function useRepEditor({
         ...prev,
         payload: { ...prev.payload, ...payloadUpdates }
       } as RepElement;
-    
-      console.log('useRepEditor - updated selected element:', updated);
-      return updated;
+          return updated;
     });
   }, [readonly]);
 
@@ -163,8 +161,6 @@ export function useRepEditor({
   const updateReportData = useCallback((elementId: string, data: any) => {
     if (mode !== 'report' || readonly) return;
     
-    // Логика обновления данных отчета
-    console.log('Updating report data for element:', elementId, data);
   }, [mode, readonly]);
 
   return {

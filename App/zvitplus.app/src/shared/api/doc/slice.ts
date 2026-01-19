@@ -134,7 +134,11 @@ const initialState: DocsState = {
         },
         current: {
             data: null,
-            files: null,
+            files: {
+              previewUrl: undefined,
+              mediaFiles: {},
+              dataFiles: {}
+            },
             loading: false,
             error: null,
             isDirty: false
@@ -392,6 +396,16 @@ const docsSlice = createSlice({
           
             saveDraft(state.editor);
             console.log(state.reports.current);
+        },
+
+        setImage(state, action: PayloadAction<{id: string, url: string}>) {
+            const { id, url } = action.payload;
+            state.reports.current.files!.mediaFiles[id] = url;
+        },
+
+        setData(state, action: PayloadAction<{id: string, url: string}>) {
+            const { id, url } = action.payload;
+            state.reports.current.files!.dataFiles[id] = url;
         }
     },
     extraReducers: (builder) => {
@@ -546,7 +560,9 @@ export const {
     setPage,
     setSearchParams,
     clearSearchParams,
-    cloneTemplateToReport
+    cloneTemplateToReport,
+    setImage,
+    setData
 } = docsSlice.actions;
   
 export const docsReducer = docsSlice.reducer;

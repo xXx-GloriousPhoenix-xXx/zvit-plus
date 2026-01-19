@@ -1,6 +1,9 @@
 // properties/ChartProperties.tsx
 import type { ChartElement, ChartType, RepElement } from "@/shared/types/repEditorTypes";
 import cl from '../PropertyPanel.module.css';
+import { FileDropZone } from "@/shared/ui/FileDropZone/FileDropZone";
+import { setData } from "@/shared/api/doc/slice";
+import { useAppDispatch } from "@/app/store/hooks";
 
 type ChartPropertiesProps = {
     selectedElement: ChartElement;
@@ -15,29 +18,35 @@ export function ChartProperties({
     readonly = false,
     isReportMode = false
 } : ChartPropertiesProps) {
-    
-    // Для отчетов показываем только данные
+    const dispatch = useAppDispatch();
+
     if (isReportMode) {
         return (
-            <div className={cl.PropertyGroup}>
-                <label className={cl.PropertyLabel}>Дані для діаграми</label>
-                {readonly ? (
+            <>
+                <div className={cl.PropertyGroup}>
+                    <label className={cl.PropertyLabel}>Тип діаграми</label>
                     <div className={cl.PropertyValue}>
-                        {selectedElement.payload.dataSource || '(джерело не вказано)'}
+                        {selectedElement.payload.chartType}
                     </div>
-                ) : (
-                    <input
-                        type="text"
-                        value={selectedElement.payload.dataSource || ''}
-                        onChange={(e) => updatePayload(selectedElement.id, { 
-                            dataSource: e.target.value 
-                        })}
-                        placeholder="Назва змінної або шлях до даних"
-                        className={cl.PropertyInput}
-                        disabled={readonly}
-                    />
-                )}
-            </div>
+                </div>
+                <div className={cl.PropertyGroup}>
+                    <label className={cl.PropertyLabel}>Дані для діаграми</label>
+                    {readonly ? (
+                        <div className={cl.PropertyValue}>
+                            {selectedElement.payload.dataSource || '(джерело не вказано)'}
+                        </div>
+                    ) : (
+                        <FileDropZone
+                            mode='data'
+                            onFileUpload={url => {
+                                const id = selectedElement.id;
+                                updatePayload(id, { src: url });
+                                dispatch(setData({ id, url }));
+                            }}
+                        />
+                    )}
+                </div>
+            </>
         );
     }
 

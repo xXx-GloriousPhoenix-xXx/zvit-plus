@@ -1,5 +1,6 @@
-/* -------------------- Canvas -------------------- */
+/* Canvas.module.css - исправленная версия */
 
+/* -------------------- Canvas -------------------- */
 .CanvasContainer {
     display: flex;
     flex-direction: column;
@@ -41,66 +42,387 @@
 }
 
 /* -------------------- Elements -------------------- */
-
 .Element {
     transition: var(--transition);
 }
 
-.Element:hover {
-    border-color: var(--primary-color) !important;
-}
-
-.ElementLabel {
-    position: absolute;
-    top: 0.25rem;
-    left: 0.25rem;
-    background-color: white;
-    padding: 0.125rem 0.5rem;
-    border-radius: 0.25rem;
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: #4b5563;
-    box-shadow: var(--shadow);
-}
-
 .ElementContent {
-    padding: 0.75rem;
+    width: 100%;
     height: 100%;
+    box-sizing: border-box;
+    padding: 0.25rem;
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .TextContent {
     word-break: break-word;
+    line-height: 1.4;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 
-.PlaceholderIcon {
+/* -------------------- Image -------------------- */
+.ImageContainer {
+    width: 100%;
+    height: 100%;
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
+    background: #f3f4f6;
+    border-radius: 4px;
+}
+
+.FilledImage {
+    background: transparent;
+}
+
+.ImageContent {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.ImageFallback {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #6b7280;
+}
+
+.ImageContainer img:error + .ImageFallback {
+    display: flex;
+}
+
+.ImageLabel {
+    font-size: 14px;
+    color: #6b7280;
+    text-align: center;
+}
+
+/* -------------------- Chart -------------------- */
+.ChartContainer {
+    width: 100%;
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    background: white;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden; /* Убрали auto */
+    min-width: 0; /* Важно для flex-сжатия */
+    min-height: 0; /* Важно для flex-сжатия */
+}
+
+.ChartHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.25rem 0;
+    min-height: 2rem;
+    flex-shrink: 0; /* Не сжимать заголовок */
+}
+
+.ChartTitle {
+    font-size: 0.875rem; /* Используем относительные размеры */
+    font-weight: 600;
+    color: #1f2937;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 70%;
+    flex-shrink: 1;
+}
+
+.ChartType {
+    font-size: 1rem;
+    background: #f3f4f6;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    min-width: 2rem;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.ChartContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: #f9fafb;
+    border-radius: 6px;
+    border: 2px dashed #d1d5db;
+    margin: 0.25rem 0;
+    min-height: 3rem;
+    overflow: hidden; /* Добавили */
+    min-width: 0; /* Важно для сжатия */
+}
+
+.DataFileIcon {
+    color: #3b82f6;
+    width: 2rem;
+    height: 2rem;
+    flex-shrink: 0;
+}
+
+.DataFileInfo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    text-align: center;
+    min-width: 0; /* Важно для сжатия */
+    width: 100%;
+}
+
+.DataFileName {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1f2937;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.DataFileType {
+    font-size: 0.75rem;
+    color: #6b7280;
+    background: #e5e7eb;
+    padding: 0.125rem 0.5rem;
+    border-radius: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.ChartVisualization {
+    width: 100%;
+    flex: 1.5; /* Занимает больше места */
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    min-height: 4rem;
+    min-width: 0; /* Важно для сжатия */
+    overflow: hidden;
+}
+
+.VisualizationTitle {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 0;
+}
+
+.VisualizationContent {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    min-width: 0;
+    overflow: hidden;
+}
+
+/* Bar chart preview - адаптивный */
+.barChartPreview, .BarChart {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    gap: 0.5rem;
+    padding: 0 0.5rem;
+    min-width: 0;
+}
+
+.Bar {
+    flex: 1;
+    max-width: 2rem;
+    background: linear-gradient(to top, #3b82f6, #8b5cf6);
+    border-radius: 2px 2px 0 0;
+    min-height: 0.25rem;
+    transition: height 0.3s ease;
+}
+
+/* Line chart preview - адаптивный */
+.lineChartPreview, .LineChart {
+    width: 100%;
+    height: 100%;
+    padding: 0.5rem;
+    min-width: 0;
+}
+
+.LinePath {
+    stroke: #3b82f6;
+    stroke-width: 1.5;
+    fill: none;
+}
+
+.LinePoint {
+    fill: #3b82f6;
+    stroke: white;
+    stroke-width: 1;
+    r: 1.5; /* Уменьшили радиус точек */
+}
+
+/* Pie chart preview - адаптивный */
+.pieChartPreview, .PieChart {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+}
+
+.PieBackground {
+    fill: #f3f4f6;
+}
+
+.PieSlice1 { fill: #3b82f6; }
+.PieSlice2 { fill: #10b981; }
+.PieSlice3 { fill: #f59e0b; }
+.PieSlice4 { fill: #ef4444; }
+
+.ChartLegend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    padding: 0.5rem 0;
+    min-height: 2rem;
+    flex-shrink: 0;
+}
+
+.LegendItem {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.625rem;
+    color: #6b7280;
+    flex-shrink: 0;
+}
+
+.LegendColor {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 1px;
+    flex-shrink: 0;
+}
+
+@media (max-width: 300px) {
+    .ChartContainer {
+        padding: 0.25rem;
+    }
+    
+    .ChartTitle {
+        font-size: 0.75rem;
+    }
+    
+    .DataFileIcon {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+    
+    .Bar {
+        max-width: 1rem;
+    }
+}
+
+/* Placeholder styles */
+.PlaceholderIcon {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: #6b7280;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.ChartLabel {
+    font-size: 14px;
+    color: #6b7280;
+    text-align: center;
+}
+
+.ChartTypeHint {
+    font-size: 12px;
     color: #9ca3af;
+    background: #f3f4f6;
+    padding: 4px 12px;
+    border-radius: 12px;
+    margin-top: 4px;
 }
 
-/* -------------------- Resize -------------------- */
+/* Добавьте в Canvas.module.css */
 
-.ResizeHandle {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 1rem;
-    height: 1rem;
-    background-color: var(--secondary-color);
-    cursor: nwse-resize;
-    border-top-left-radius: var(--border-radius);
-    border-bottom-right-radius: var(--border-radius);
-    transition: var(--transition);
+.LoadingMessage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #6b7280;
+  font-size: 0.875rem;
 }
-.ResizeHandle:hover {
-    background-color: var(--primary-color);
+
+.ErrorMessage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #ef4444;
+  font-size: 0.75rem;
+  text-align: center;
+  gap: 0.5rem;
+}
+
+.FallbackChart {
+  width: 100%;
+  height: 80%;
+}
+
+.DataInfo {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+}
+
+.DataRowsCount, .DataColumnsCount {
+  background: #f3f4f6;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
 }
 
 /* -------------------- Table -------------------- */
-
 .TablePreview {
     width: 100%;
     height: 100%;
@@ -117,7 +439,6 @@
     padding: 0.25rem;
     background-color: #f9fafb;
     border: 0.05rem solid #ddd;
-
     word-break: break-word;
     overflow-wrap: break-word;
     white-space: normal;
@@ -136,16 +457,10 @@
     flex: 1;
     padding: 0.25rem;
     border: 0.05rem solid #ddd;
-
-    /* overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    text-wrap: wrap; */
-
-    word-break: break-word; /* Перенос длинных слов */
-    overflow-wrap: break-word; /* Перенос при необходимости */
-    white-space: normal; /* Разрешаем перенос */
-    min-width: 0; /* Важно для flex-элементов с текстом */
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    min-width: 0;
 }
 
 .EmptyTableCell {
@@ -163,17 +478,25 @@
     outline: none;
     padding: 0;
     background: transparent;
-
     white-space: normal;
     word-break: break-word;
     overflow-wrap: break-word;
 }
 
-/* -------------------- Hover -------------------- */
+/* -------------------- Resize -------------------- */
+.ResizeHandle {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 1rem;
+    height: 1rem;
+    background-color: var(--secondary-color);
+    cursor: nwse-resize;
+    border-top-left-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+    transition: var(--transition);
+}
 
-.EmptyTableCell:hover,
-.TableHeaderCell:hover,
-.TableCell:hover {
-    border-color: var(--primary-color);
-    z-index: 1;
+.ResizeHandle:hover {
+    background-color: var(--primary-color);
 }
