@@ -161,7 +161,7 @@ export function TableContent({ element, mode = 'template' }: TableContentProps) 
                         onClick={() => handleCellClick({ row: null, col: i })}
                         style={cellStyles}
                     >
-                        {isEditing ? (
+                        {isEditing && isEditable ? (
                             <input
                                 ref={inputRef}
                                 className={cl.TableCellInput}
