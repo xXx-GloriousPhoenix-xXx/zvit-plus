@@ -19,110 +19,134 @@ export interface RepFileStructure {
     // media/ - директорія зображень
 }
 
-export async function packRepFile(template: RepTemplate, previewElement?: HTMLElement | null): Promise<Blob> {
+export async function packRepFile(
+    template: RepTemplate,
+    files: RepDocFiles,
+    previewElement?: HTMLElement | null
+): Promise<Blob> {
     const zip = new JSZip();
-    
-    zip.file("meta.json", JSON.stringify(template.meta, null, 2));
-    
-    zip.file("struct.json", JSON.stringify({
-        elements: template.elements
-    }, null, 2));
 
+    // meta.json
+    zip.file("meta.json", JSON.stringify(template.meta, null, 2));
+
+    // struct.json
+    zip.file(
+        "struct.json",
+        JSON.stringify({ elements: template.elements }, null, 2)
+    );
+
+    // preview.jpg
     if (previewElement) {
         try {
-          const canvas = await html2canvas(previewElement, {
-            scale: 0.5,
-            backgroundColor: "#ffffff",
-            useCORS: true,
-            logging: false
-          });
-          
-          const previewBlob = await new Promise<Blob>((resolve) => {
-            canvas.toBlob((blob) => {
-              if (blob) resolve(blob);
-            }, 'image/jpeg', 0.7);
-          });
-          
-          zip.file("preview.jpg", previewBlob);
-        } catch (error) {
-          console.warn("Failed to generate preview:", error);
-        }
-      }
+            const canvas = await html2canvas(previewElement, {
+                scale: 0.5,
+                backgroundColor: "#ffffff",
+                useCORS: true,
+                logging: false
+            });
 
-    zip.folder("data");
-    zip.folder("media");
-    
-    return await zip.generateAsync({ type: "blob" });
+            const previewBlob = await new Promise<Blob>((resolve, reject) => {
+                canvas.toBlob(
+                    blob => (blob ? resolve(blob) : reject()),
+                    "image/jpeg",
+                    0.7
+                );
+            });
+
+            zip.file("preview.jpg", previewBlob);
+        } catch (err) {
+            console.warn("Failed to generate preview:", err);
+        }
+    }
+
+    // data/
+    const dataFolder = zip.folder("data")!;
+    for (const [id, file] of Object.entries(files.dataFiles)) {
+        dataFolder.file(id, file);
+    }
+
+    // media/
+    const mediaFolder = zip.folder("media")!;
+    for (const [id, file] of Object.entries(files.mediaFiles)) {
+        mediaFolder.file(id, file);
+    }
+
+    return zip.generateAsync({ type: "blob" });
 }
+
 
 export async function unpackRepFile(blob: Blob): Promise<{
     data: RepDocData;
     files: RepDocFiles;
+    preview: Blob | undefined;
 }> {
-    const zip = new JSZip();
-    const zipData = await zip.loadAsync(blob);
-    
-    // Читаем meta.json
-    const metaContent = await zipData.file("meta.json")?.async("text");
-    if (!metaContent) {
-        throw new Error("Файл meta.json не найден в архиве");
+    const zip = await JSZip.loadAsync(blob);
+
+    // meta.json
+    const metaText = await zip.file("meta.json")?.async("text");
+    if (!metaText) {
+        throw new Error("meta.json not found");
     }
-    const meta = JSON.parse(metaContent) as MetaValue;
-    
-    // Читаем struct.json
-    const structContent = await zipData.file("struct.json")?.async("text");
-    if (!structContent) {
-        throw new Error("Файл struct.json не найден в архиве");
+    const meta = JSON.parse(metaText) as MetaValue;
+
+    // struct.json
+    const structText = await zip.file("struct.json")?.async("text");
+    if (!structText) {
+        throw new Error("struct.json not found");
     }
-    const struct = JSON.parse(structContent) as { elements: RepElement[] };
-    
-    // Создаем URL для файлов
-    let previewUrl: string | undefined;
-    const previewFile = zipData.file("preview.jpg") || zipData.file("preview.jpeg");
+    const struct = JSON.parse(structText) as { elements: RepElement[] };
+
+    // preview
+    let preview: Blob | undefined;
+    const previewFile =
+        zip.file("preview.jpg") || zip.file("preview.jpeg");
     if (previewFile) {
-        const previewBlob = await previewFile.async("blob");
-        previewUrl = URL.createObjectURL(previewBlob);
+        preview = await previewFile.async("blob");
     }
-    
-    const dataFiles: Record<string, string> = {};
-    const mediaFiles: Record<string, string> = {};
-    
-    const dataFolder = zipData.folder("data");
+
+    // data/
+    const dataFiles: Record<string, File> = {};
+    const dataFolder = zip.folder("data");
     if (dataFolder) {
-        const dataFilePromises = Object.keys(dataFolder.files).map(async (filename) => {
-            const file = dataFolder.file(filename);
-            if (file && !file.dir) {
-                const blob = await file.async("blob");
-                dataFiles[filename] = URL.createObjectURL(blob);
+        for (const [path, entry] of Object.entries(dataFolder.files)) {
+            if (!entry.dir) {
+                const blob = await entry.async("blob");
+                const name = path.replace(/^data\//, "");
+                dataFiles[name] = new File([blob], name, {
+                    type: blob.type || "application/octet-stream"
+                });
             }
-        });
-        await Promise.all(dataFilePromises);
+        }
     }
-    
-    const mediaFolder = zipData.folder("media");
+
+    // media/
+    const mediaFiles: Record<string, File> = {};
+    const mediaFolder = zip.folder("media");
     if (mediaFolder) {
-        const mediaFilePromises = Object.keys(mediaFolder.files).map(async (filename) => {
-            const file = mediaFolder.file(filename);
-            if (file && !file.dir) {
-                const blob = await file.async("blob");
-                mediaFiles[filename] = URL.createObjectURL(blob);
+        for (const [path, entry] of Object.entries(mediaFolder.files)) {
+            if (!entry.dir) {
+                const blob = await entry.async("blob");
+                const name = path.replace(/^media\//, "");
+                mediaFiles[name] = new File([blob], name, {
+                    type: blob.type || "application/octet-stream"
+                });
             }
-        });
-        await Promise.all(mediaFilePromises);
+        }
     }
-    
+
     return {
         data: {
             meta,
             elements: struct.elements
         },
         files: {
-            previewUrl,
             dataFiles,
             mediaFiles
-        }
+        },
+        preview
     };
 }
+
 
 export function createRepFileName(meta: MetaValue): string {
     const name = meta.templateName

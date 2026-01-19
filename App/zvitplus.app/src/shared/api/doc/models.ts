@@ -22,9 +22,9 @@ export interface RepDocData {
 }
 
 export interface RepDocFiles {
-    previewUrl?: string;
-    dataFiles: Record<string, string>;
-    mediaFiles: Record<string, string>;
+    previewUrl?: Blob;
+    dataFiles: Record<string, File>;
+    mediaFiles: Record<string, File>;
 }
 
 export interface DocItemDTO {

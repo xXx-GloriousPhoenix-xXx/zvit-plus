@@ -8,11 +8,11 @@ export type FileType = 'image/jpeg' | 'image/png' | 'image/gif' | 'image/svg+xml
 
 interface FileDropZoneProps {
   mode: FileDropMode;
-  onFileUpload: (fileUrl: string) => void; // Упрощенный колбэк - только URL
+  onFileUpload: (file: File, fileUrl: string) => void;
   maxSize?: number;
   acceptedFormats?: FileType[];
   className?: string;
-  value?: string; // Для контролируемого компонента (опционально)
+  value?: string;
 }
 
 export function FileDropZone({
@@ -21,12 +21,12 @@ export function FileDropZone({
   maxSize = 10 * 1024 * 1024,
   acceptedFormats,
   className = '',
-  value
 }: FileDropZoneProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [fileUrl, setFileUrl] = useState<string | null>(null);
 
   const cleanupRef = useRef<string | null>(null);
 
@@ -51,8 +51,6 @@ export function FileDropZone({
       return false;
     }
 
-    console.log(file.type);
-
     const accepted = getAcceptedFormats();
     if (!accepted.includes(file.type as FileType)) {
       const extensions = accepted.map(f => {
@@ -73,19 +71,25 @@ export function FileDropZone({
     if (!validateFile(file)) return;
 
     try {
+      // Очищаем предыдущий URL если есть
       if (cleanupRef.current) {
         URL.revokeObjectURL(cleanupRef.current);
       }
 
-      const fileUrl = URL.createObjectURL(file);
-      cleanupRef.current = fileUrl;
+      // Создаем новый URL
+      const newFileUrl = URL.createObjectURL(file);
+      cleanupRef.current = newFileUrl;
+      setFileUrl(newFileUrl);
       
       setUploadedFile(file);
       setError(null);
-      onFileUpload(fileUrl);
+      
+      // Вызываем колбэк с файлом и URL
+      onFileUpload(file, newFileUrl);
 
     } catch (err) {
       setError('Помилка обробки файлу');
+      console.error('Error creating object URL:', err);
     }
   }, [validateFile, onFileUpload]);
 
@@ -96,8 +100,10 @@ export function FileDropZone({
     }
     
     setUploadedFile(null);
+    setFileUrl(null);
     setError(null);
-    onFileUpload('');
+    // Вызываем колбэк с null при удалении
+    onFileUpload(null as any, '');
   }, [onFileUpload]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -191,15 +197,15 @@ export function FileDropZone({
         ) : (
           <div className={cl.FileInfo}>
             <div className={mode === 'image' ? cl.ImagePreview : cl.DataFileInfo}>
-              {mode === 'image' ? (
+              {mode === 'image' && fileUrl ? (
                 <img 
-                  src={value || cleanupRef.current!} 
+                  src={fileUrl} 
                   alt="Превью" 
                   className={cl.PreviewImage} 
                 />
-              ) : (
+              ) : mode === 'data' ? (
                 <FileText size={32} className={cl.DataIcon} />
-              )}
+              ) : null}
               <div className={mode === 'image' ? cl.ImageOverlay : cl.DataDetails}>
                 <span className={cl.FileName}>{uploadedFile.name}</span>
                 <span className={cl.FileSize}>

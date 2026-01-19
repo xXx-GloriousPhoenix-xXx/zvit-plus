@@ -1,12 +1,13 @@
 // editor/components/ElementRenderer/ElementRenderer.tsx
 import { ELEMENT_COLORS } from "@/shared/constants/editor";
 import type { RepElement } from "@/shared/types/repEditorTypes";
-import { BarChart3, FileText, Image } from "lucide-react";
+import { Image } from "lucide-react";
 import cl from '../Canvas.module.css';
 import { TableContent } from "./TableContent";
-import type { EditorType } from "@/shared/api/doc/slice";
+import { type EditorType } from "@/shared/api/doc/slice";
 import { useAppSelector } from "@/app/store/hooks";
 import { ChartContent } from "./ChartContent";
+import { selectDataFileById } from "@/shared/hooks/useDocsData";
 
 interface ElementRendererProps {
   element: RepElement;
@@ -33,7 +34,7 @@ export function ElementRenderer({
 }: ElementRendererProps) {
   const files = useAppSelector(state => state.docs.reports.current.files);
   const mediaFiles = files?.mediaFiles || {};
-  const dataFiles = files?.dataFiles || {};
+  // const dataFiles = files?.dataFiles || {};
 
   const renderContent = () => {
     switch (element.type) {
@@ -55,8 +56,9 @@ export function ElementRenderer({
           </div>
         );
       case 'image':
-        const imageUrl = mediaFiles[element.id];
-        if (mode === 'report' && imageUrl) {
+        const imageFile = mediaFiles[element.id];
+        if (mode === 'report' && imageFile) {
+          const imageUrl = URL.createObjectURL(imageFile);
           return (
             <div className={`${cl.ImageContainer} ${cl.FilledImage}`}>
                 <img 
@@ -83,10 +85,11 @@ export function ElementRenderer({
           )
         }
       case 'chart':
+        const file = useAppSelector(state => selectDataFileById(state, element.id));
         return (
           <ChartContent
             isReport={mode === 'report'}
-            url={dataFiles[element.id]}
+            file={file}
             chartType={element.payload.chartType || 'bar'}
           />
         );

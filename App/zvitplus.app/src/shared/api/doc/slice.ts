@@ -88,24 +88,24 @@ const loadDraft = (workMode: EditorType): EditorState => {
             orientation: "portrait"
         },
         template: {
-        meta: {
-            id: null,
-            templateId: null,
-            templateName: "",
-            templateTypeId: "",
-            templateTypeName: "",
-            isPrivate: false,
-            pageSize: "A4",
-            orientation: "portrait"
+          meta: {
+              id: null,
+              templateId: null,
+              templateName: "",
+              templateTypeId: "",
+              templateTypeName: "",
+              isPrivate: false,
+              pageSize: "A4",
+              orientation: "portrait"
+          },
+          elements: []
         },
-        elements: []
-    },
-    step: 1,
-    loading: false,
-    error: null,
-    lastSaved: null
-  };
-};
+        step: 1,
+        loading: false,
+        error: null,
+        lastSaved: null
+      };
+    };
 
 const saveDraft = (state: EditorState) => {
     const key = getDraftKey(state.workMode);
@@ -137,7 +137,7 @@ const initialState: DocsState = {
             files: {
               previewUrl: undefined,
               mediaFiles: {},
-              dataFiles: {}
+              dataFiles: {},
             },
             loading: false,
             error: null,
@@ -160,7 +160,11 @@ const initialState: DocsState = {
         },
         current: {
             data: null,
-            files: null,
+            files: {
+              previewUrl: undefined,
+              mediaFiles: {},
+              dataFiles: {},
+            },
             loading: false,
             error: null,
             isDirty: false
@@ -193,11 +197,15 @@ const docsSlice = createSlice({
         clearCurrent(state, action: PayloadAction<EditorType>) {
           state[`${action.payload}s`].current = {
             data: null,
-            files: null,
+            files: {
+                previewUrl: undefined,
+                mediaFiles: {},
+                dataFiles: {}
+            },
             loading: false,
             error: null,
             isDirty: false
-          };
+        };
         },
     
         // Действия редактора
@@ -320,12 +328,12 @@ const docsSlice = createSlice({
           state.editor.error = null;
         },
     
-        // Для отчетов - можно добавить специфичные действия
-        setReportData(state, action: PayloadAction<{ elementId: string; data: any }>) {
-          if (state.editor.workMode === 'report') {
-            // Логика заполнения данных отчета
-          }
-        },
+        // // Для отчетов - можно добавить специфичные действия
+        // setReportData(state, action: PayloadAction<{ elementId: string; data: any }>) {
+        //   if (state.editor.workMode === 'report') {
+        //     // Логика заполнения данных отчета
+        //   }
+        // },
 
         resetSaveState(state, action: PayloadAction<EditorType>) {
           state[`${action.payload}s`].save = {
@@ -366,47 +374,84 @@ const docsSlice = createSlice({
         },
 
         cloneTemplateToReport(state) {
-            const currentTemplate = state.templates.current;
-            const newMeta = {
-              ...currentTemplate.data!.meta,
+          const currentTemplate = state.templates.current;
+    
+          // Проверяем, есть ли данные
+          if (!currentTemplate.data) {
+              return;
+          }
+          
+          const newMeta = {
+              ...currentTemplate.data.meta,
               id: null,
-              templateId: currentTemplate.data!.meta.id,
+              templateId: currentTemplate.data.meta.id,
               templateName: ""
-            
-            }
-            state.reports.current = {
-                ...currentTemplate,
-                data: {
-                    ...currentTemplate.data!,
-                    meta: newMeta
-                }
-            }
-
-            state.editor = {
-              ...state.editor,
-              mode: 'create' as EditorMode,
-              workMode: 'report' as EditorType,
+          };
+          
+          // Создаем новый объект, а не копируем Proxy
+          state.reports.current = {
+              data: {
+                  ...currentTemplate.data,
+                  meta: newMeta
+              },
+              files: currentTemplate.files ? {
+                  previewUrl: currentTemplate.files.previewUrl,
+                  mediaFiles: { ...currentTemplate.files.mediaFiles },
+                  dataFiles: { ...currentTemplate.files.dataFiles }
+              } : {
+                  previewUrl: undefined,
+                  mediaFiles: {},
+                  dataFiles: {}
+              },
+              loading: false,
+              error: null,
+              isDirty: false
+          };
+      
+          state.editor = {
+              mode: 'create',
+              workMode: 'report',
               meta: newMeta,
               template: {
                   meta: newMeta,
-                  elements: currentTemplate.data!.elements || []
+                  elements: [...currentTemplate.data.elements || []]
               },
               step: 1,
-            };
+              loading: false,
+              error: null,
+              lastSaved: null
+          };
           
-            saveDraft(state.editor);
-            console.log(state.reports.current);
+          saveDraft(state.editor);
         },
 
-        setImage(state, action: PayloadAction<{id: string, url: string}>) {
-            const { id, url } = action.payload;
-            state.reports.current.files!.mediaFiles[id] = url;
-        },
-
-        setData(state, action: PayloadAction<{id: string, url: string}>) {
-            const { id, url } = action.payload;
-            state.reports.current.files!.dataFiles[id] = url;
-        }
+        setImage(state, action: PayloadAction<{id: string, file: File}>) {
+          const { id, file } = action.payload;
+          // Проверяем, что files существует
+          if (!state.reports.current.files) {
+              state.reports.current.files = {
+                  previewUrl: undefined,
+                  mediaFiles: {},
+                  dataFiles: {}
+              };
+          }
+          state.reports.current.files.mediaFiles[id] = file;
+          console.log('media files: ', state.reports.current.files.mediaFiles);
+      },
+      
+      setData(state, action: PayloadAction<{id: string, file: File}>) {
+          const { id, file } = action.payload;
+          // Проверяем, что files существует
+          if (!state.reports.current.files) {
+              state.reports.current.files = {
+                  previewUrl: undefined,
+                  mediaFiles: {},
+                  dataFiles: {}
+              };
+          }
+          state.reports.current.files.dataFiles[id] = file;
+          console.log(`Data is set for element id: ${id}`);
+      },
     },
     extraReducers: (builder) => {
       builder
@@ -554,7 +599,7 @@ export const {
     removeEditorElement,
     clearEditorDraft,
     resetEditorError,
-    setReportData,
+    // setReportData,
     resetSaveState,
     markAsDirty,
     setPage,
@@ -562,7 +607,7 @@ export const {
     clearSearchParams,
     cloneTemplateToReport,
     setImage,
-    setData
+    setData,
 } = docsSlice.actions;
   
 export const docsReducer = docsSlice.reducer;

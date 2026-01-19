@@ -5,9 +5,8 @@ import { useEffect, useState } from 'react';
 
 type Props = {
     isReport: boolean;
-    url?: string;
+    file?: File;
     chartType?: 'bar' | 'line' | 'pie';
-    title?: string;
 }
 
 type ChartData = {
@@ -15,55 +14,52 @@ type ChartData = {
     data: Record<string, string>[];
 }
 
-export const ChartContent = ({ isReport, url, chartType = 'bar', title = 'Діаграма' }: Props) => {
+export const ChartContent = ({ isReport, file, chartType = 'bar' }: Props) => {
   const [chartData, setChartData] = useState<ChartData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!url) {
+    if (!file) {
       setChartData(null);
       return;
     }
-
+  
     const loadData = async () => {
       setLoading(true);
       setError(null);
-      
+  
       try {
-        const response = await fetch(url);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const fileContent = await response.text();
+        const text = await file.text();
         let parsedData: ChartData;
-        
-        if (url.endsWith('.json') || fileContent.trim().startsWith('{') || fileContent.trim().startsWith('[')) {
+  
+        if (
+          file.name.endsWith('.json') ||
+          text.trim().startsWith('{') ||
+          text.trim().startsWith('[')
+        ) {
           try {
-            const jsonData = JSON.parse(fileContent);
-            parsedData = convertJSONToChartData(jsonData);
-          } catch (e) {
+            const json = JSON.parse(text);
+            parsedData = convertJSONToChartData(json);
+          } catch {
             throw new Error('Невірний формат JSON файлу');
           }
         } else {
-          parsedData = parseCSV(fileContent);
+          parsedData = parseCSV(text);
         }
-        
-        console.log('Parsed chart data:', parsedData);
+  
         setChartData(parsedData);
       } catch (err) {
-        console.error('Помилка завантаження даних графіка:', err);
         setError(err instanceof Error ? err.message : 'Невідома помилка');
         setChartData(null);
       } finally {
         setLoading(false);
       }
     };
-
+  
     loadData();
-  }, [url]);
+
+  }, [file]);
 
   // 1. BAR CHART
   const renderBarChart = () => {
@@ -306,7 +302,6 @@ export const ChartContent = ({ isReport, url, chartType = 'bar', title = 'Діа
       );
     }
 
-    // Берем первую числовую колонку
     const valueHeader = numericHeaders[0];
     const displayData = data.slice(0, 5);
     
@@ -327,12 +322,11 @@ export const ChartContent = ({ isReport, url, chartType = 'bar', title = 'Діа
     }
 
     let currentAngle = 0;
-    const pieSegments = pieData.map((item, i) => {
+    const pieSegments = pieData.map(item => {
       const percentage = (item.value / totalValue) * 100;
       const angle = (percentage / 100) * 360;
       const endAngle = currentAngle + angle;
       
-      // Рассчитываем координаты для SVG path
       const startRad = (currentAngle - 90) * Math.PI / 180;
       const endRad = (endAngle - 90) * Math.PI / 180;
       
@@ -475,7 +469,7 @@ export const ChartContent = ({ isReport, url, chartType = 'bar', title = 'Діа
     return { headers: [], data: [] };
   };
 
-  if (!isReport || !url) {
+  if (!isReport || !file) {
     const Icon = chartType === 'bar' ? BarChart3 : 
                  chartType === 'line' ? TrendingUp : PieChart;
     

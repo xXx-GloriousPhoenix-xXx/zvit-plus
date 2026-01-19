@@ -38,10 +38,10 @@ export function ChartProperties({
                     ) : (
                         <FileDropZone
                             mode='data'
-                            onFileUpload={url => {
+                            onFileUpload={(file, fileUrl) => {
                                 const id = selectedElement.id;
-                                updatePayload(id, { src: url });
-                                dispatch(setData({ id, url }));
+                                updatePayload(id, { src: fileUrl });
+                                dispatch(setData({ id, file }));
                             }}
                         />
                     )}

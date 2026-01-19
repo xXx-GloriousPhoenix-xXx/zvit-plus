@@ -33,11 +33,10 @@ export function ImageProperties({
                 ) : (
                     <FileDropZone
                         mode='image'
-                        onFileUpload={url => {
+                        onFileUpload={(file: File, fileUrl: string) => {
                             const id = selectedElement.id;
-                            updatePayload(id, { src: url });
-                            dispatch(setImage({ id, url }));
-                            console.log(url);
+                            updatePayload(id, { src: fileUrl });
+                            dispatch(setImage({ id, file }));
                         }}
                     />
                 )}

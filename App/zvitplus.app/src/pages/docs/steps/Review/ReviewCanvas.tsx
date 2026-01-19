@@ -86,13 +86,11 @@ export function ReviewCanvas({ template, canvasRef }: ReviewCanvasProps) {
 
 interface ReviewElementProps {
     element: RepElement;
-    mediaFiles: Record<string, string>;
-    dataFiles: Record<string, string>;
+    mediaFiles: Record<string, File>;
+    dataFiles: Record<string, File>;
 }
 
 function ReviewElement({ element, mediaFiles, dataFiles }: ReviewElementProps) {
-
-
     const renderContent = () => {
         switch (element.type) {
             case 'text':
@@ -110,9 +108,9 @@ function ReviewElement({ element, mediaFiles, dataFiles }: ReviewElementProps) {
                     </div>
                 );
             case 'image':
-                const imageUrl = mediaFiles[element.id] || element.payload.src;
-                
-                if (imageUrl) {
+                const imageFile = mediaFiles[element.id];
+                if (imageFile) {
+                    const imageUrl = URL.createObjectURL(mediaFiles[element.id]);
                     return (
                         <div className={cl.ImageContainer}>
                             <img 
@@ -140,21 +138,16 @@ function ReviewElement({ element, mediaFiles, dataFiles }: ReviewElementProps) {
                     );
                 }
             case 'chart':
-                const chartUrl = dataFiles[element.id] || element.payload.dataSource;
+                const file = dataFiles[element.id]; //|| element.payload.dataSource;
                 const chartType = element.payload.chartType || 'bar';
                 const chartTitle = element.payload.title || 'Діаграма';
-                
-                if (chartUrl) {
-                    // Используем ваш компонент ChartContent
+                if (file) {
                     return (
-                        <div className={cl.ChartWrapper}>
-                            <ChartContent
+                        <ChartContent
                                 isReport={true}
-                                url={chartUrl}
+                                file={file}
                                 chartType={chartType}
-                                title={chartTitle}
                             />
-                        </div>
                     );
                 } else {
                     return (
