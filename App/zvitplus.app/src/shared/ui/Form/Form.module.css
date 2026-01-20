@@ -10,9 +10,6 @@
 }
 .Button {
     margin-top: 1.25em;
-    border: none;
-    background-color: var(--primary-color);
-    color: var(--white);
 }
 .Button:hover {
     background-color: var(--dark-color);

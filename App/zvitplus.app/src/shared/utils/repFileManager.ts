@@ -82,7 +82,7 @@ export async function packRepFile(
 export async function unpackRepFile(blob: Blob): Promise<{
     data: RepDocData;
     files: RepDocFiles;
-    preview: Blob | undefined;
+    // preview: Blob | undefined;
 }> {
     const zip = await JSZip.loadAsync(blob);
 
@@ -145,9 +145,9 @@ export async function unpackRepFile(blob: Blob): Promise<{
         },
         files: {
             dataFiles,
-            mediaFiles
-        },
-        preview
+            mediaFiles,
+            previewUrl: preview
+        }
     };
 }
 

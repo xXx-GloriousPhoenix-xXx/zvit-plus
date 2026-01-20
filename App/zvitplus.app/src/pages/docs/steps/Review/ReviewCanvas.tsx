@@ -170,11 +170,8 @@ function ReviewElement({ element, mediaFiles, dataFiles }: ReviewElementProps) {
         }
     };
 
-    const { mode, workMode } = useAppSelector(state => state.docs.editor);
+    const { workMode } = useAppSelector(state => state.docs.editor);
     const isReportViewing = workMode === 'report';
-    useEffect(() => {
-        console.log(mode, workMode, isReportViewing);
-    }, [isReportViewing])
 
     const elementStyle: React.CSSProperties = {
         position: 'absolute',

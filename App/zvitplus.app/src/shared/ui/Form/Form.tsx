@@ -80,6 +80,7 @@ export function Form(props: FormProps) {
 
             <div>
                 <Button 
+                    variant="secondary"
                     extraClassName={cl.Button}
                     text="Увійти"
                 />

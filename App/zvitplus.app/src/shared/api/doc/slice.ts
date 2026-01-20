@@ -182,7 +182,6 @@ const docsSlice = createSlice({
     name: "docs",
     initialState,
     reducers: {
-        // Общие действия для списков
         clearList(state, action: PayloadAction<EditorType>) {
           state[`${action.payload}s`].list = {
             items: null,
@@ -208,7 +207,6 @@ const docsSlice = createSlice({
         };
         },
     
-        // Действия редактора
         initEditor(state, action: PayloadAction<{ mode: EditorMode; workMode: EditorType; initialData?: RepDocData; id?: string; }>) {
           const { mode, workMode, initialData, id } = action.payload;
           
@@ -376,7 +374,6 @@ const docsSlice = createSlice({
         cloneTemplateToReport(state) {
           const currentTemplate = state.templates.current;
     
-          // Проверяем, есть ли данные
           if (!currentTemplate.data) {
               return;
           }
@@ -388,7 +385,6 @@ const docsSlice = createSlice({
               templateName: ""
           };
           
-          // Создаем новый объект, а не копируем Proxy
           state.reports.current = {
               data: {
                   ...currentTemplate.data,
@@ -475,8 +471,11 @@ const docsSlice = createSlice({
         })
         .addCase(fetchTemplateById.fulfilled, (state, action) => {
           state.templates.current.loading = false;
+          
           state.templates.current.data = action.payload.data;
           state.templates.current.files = action.payload.files;
+
+          state.templates.current.data.meta.id = action.payload.data.meta.id;
         })
         .addCase(fetchTemplateById.rejected, (state, action) => {
           state.templates.current.loading = false;

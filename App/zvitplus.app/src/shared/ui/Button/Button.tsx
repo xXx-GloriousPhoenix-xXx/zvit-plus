@@ -5,11 +5,12 @@ import cl from "./Button.module.css";
 type ButtonProps = {
     text: string;
     extraClassName?: string;
+    variant: 'primary' | 'secondary';
 } & ComponentPropsWithoutRef<"button">;
 
 export function Button(props : ButtonProps) {
-    const { text, extraClassName, ...rest } = props;
-    const classes = [cl.Button, extraClassName]
+    const { text, extraClassName, variant = 'primary', ...rest } = props;
+    const classes = [cl.Button, extraClassName, variant === 'primary' ? cl.Primary : cl.Secondary]
         .filter(Boolean)
         .join(" ");
         

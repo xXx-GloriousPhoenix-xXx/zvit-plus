@@ -10,12 +10,11 @@ import {
   resetSaveState, 
   cloneTemplateToReport
 } from "@/shared/api/doc/slice";
-import { createTemplate, updateTemplate } from "@/shared/api/doc/thunks";
+import { createReport, createTemplate, updateTemplate } from "@/shared/api/doc/thunks";
 import type { RepTemplate } from "@/shared/types/repEditorTypes";
 import type { EditorMode, EditorType } from "@/shared/api/doc/slice";
 
 import cl from "./Step.module.css";
-import { packRepFile } from "@/shared/utils/repFileManager";
 
 interface ReviewStepProps {
     mode: EditorMode;
@@ -78,8 +77,17 @@ export function ReviewStep({
           console.log(`${type} created successfully:`, result);
           navigate(`/${type}s`);
         } else {
-          const result = packRepFile(template, files!, canvasRef.current);
-          console.log('Packed report file:', result);
+          const result = await dispatch(createReport({
+            name: template.meta.templateName,
+            templateId: template.meta.templateId!,
+            isPrivate: template.meta.isPrivate || false,
+            files: files!,
+            template,
+            canvasRef
+          })).unwrap();
+
+          console.log(`${type} created successfully:`, result);
+          navigate(`/${type}s`);
         }
       } else if (mode === 'edit') {
         const { editor } = useAppSelector(state => state.docs);
@@ -140,17 +148,32 @@ export function ReviewStep({
         {mode === 'view' ? (
           <>
             <Button
+              variant="primary"
               text="Закрити"
               onClick={onClose}
               extraClassName={cl.Button}
             />
+            <Button
+              variant="primary"
+              text="Редагувати"
+              onClick={() => {}}
+              extraClassName={cl.Button}
+            />
+            <Button
+              variant="secondary"
+              text='Видалити'
+              onClick={() => {/* логика удаления */}}
+              extraClassName={cl.Button}
+            />
             {type === 'report'
                 ? <Button
+                    variant="primary"
                     text="Завантажити PDF"
                     onClick={() => {/* логика загрузки PDF */}}
                     extraClassName={cl.Button}
                 />
                 : <Button
+                    variant="primary"
                     text="Заповнити шаблон"
                     onClick={() => {
                         navigate(`/reports/create`);
@@ -163,6 +186,7 @@ export function ReviewStep({
         ) : (
           <>
             <Button
+              variant="primary"
               text="Назад"
               onClick={handleBack}
               disabled={isLoading}
@@ -171,6 +195,7 @@ export function ReviewStep({
             
             {mode === 'create' && onClearDraft && (
               <Button
+                variant="primary"
                 text="Очистити чернетку"
                 onClick={onClearDraft}
                 disabled={isLoading}
@@ -179,6 +204,7 @@ export function ReviewStep({
             )}
             
             <Button
+              variant="primary"
               text={isLoading 
                 ? (mode === 'create' ? 'Створення...' : 'Збереження...')
                 : (mode === 'create' ? 'Створити' : 'Зберегти зміни')

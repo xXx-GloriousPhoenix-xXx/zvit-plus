@@ -44,7 +44,7 @@ export function ReportCard({ report }: ReportCardProps) {
                 </div>
                 <div className={cl.IconPanel}>
                     <NavLink 
-                        to={`/templates/${report.id}`}
+                        to={`/reports/${report.id}`}
                         className={cl.ControlButton}
                     >
                         <i className="fa-solid fa-eye"></i> Переглянути

@@ -24,6 +24,22 @@ namespace ZvitPlus.API.Controllers
             [FromForm] CreateReportDTORequest request,
             CancellationToken ct = default)
         {
+            if (!ModelState.IsValid)
+            {
+                foreach (var kv in ModelState)
+                {
+                    Console.WriteLine($"{kv.Key}: {kv.Value.Errors.Count} errors");
+                    foreach (var err in kv.Value.Errors)
+                        Console.WriteLine($"  -> {err.ErrorMessage}");
+                }
+                return BadRequest(ModelState);
+            }
+
+            if (request.File == null)
+                return BadRequest("File is required");
+
+            Console.WriteLine($"In Controller: {request.TemplateId}");
+
             var dto = new CreateReportDTO(
                 Name: request.Name,
                 TemplateId: request.TemplateId,

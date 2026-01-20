@@ -91,7 +91,11 @@ const fetchDocById = createAsyncThunk<{ data: RepDocData, files: RepDocFiles }, 
                 responseType: 'blob' 
             });
 
-            return await unpackRepFile(response.data);
+            var result = await unpackRepFile(response.data);
+            result.data.meta.id = id;
+
+            console.log(result);
+            return result;
         }
         catch (error: any) {            
             let errorMessage = `Не вдалося завантажити ${type === 'template' ? 'шаблон' : 'звіт'}`;
@@ -139,8 +143,13 @@ interface UpdateTemplateData {
     canvasRef?: React.RefObject<HTMLDivElement | null>;
 }
 
+type CreateReportData = Omit<CreateTemplateData, 'templateTypeId'> & {
+    templateId: string;
+    files: RepDocFiles;
+}
+
 export const createTemplate = createAsyncThunk<
-  { id: string; name: string }, // Возвращаемый тип
+  { id: string; name: string }, 
   CreateTemplateData,
   { state: RootState; rejectValue: string }
 >(
@@ -154,26 +163,22 @@ export const createTemplate = createAsyncThunk<
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      console.log("📦 Подготовка данных для создания шаблона:", {
+      console.log("Data to create:", {
         name,
         templateTypeId,
         isPrivate,
         elementsCount: template.elements?.length || 0
       });
 
-      // Подготавливаем FormData
       const formData = new FormData();
       
-      // Добавляем метаданные
       formData.append("name", name);
       formData.append("templateTypeId", templateTypeId);
       formData.append("isPrivate", isPrivate.toString());
 
-      // Пакуем шаблон в файл .rep
       const repFile = await packRepFile(template);
       formData.append("file", repFile, `${name}.rep`);
 
-      // Если есть canvasRef, добавляем превью
       if (canvasRef?.current) {
         try {
           const canvasElement = canvasRef.current;
@@ -191,11 +196,9 @@ export const createTemplate = createAsyncThunk<
             }
           }, 'image/png');
         } catch (error) {
-          console.warn("⚠️ Не удалось создать превью:", error);
         }
       }
 
-      // Отправляем запрос
       const response = await baseApi.post<{ id: string; name: string }>(
         "templates",
         formData,
@@ -207,12 +210,11 @@ export const createTemplate = createAsyncThunk<
         }
       );
 
-      console.log("✅ Шаблон успешно создан:", response.data);
+      console.log(response.data);
+
       return response.data;
 
-    } catch (error: any) {
-      console.error("❌ Ошибка создания шаблона:", error);
-      
+    } catch (error: any) {      
       let errorMessage = "Не вдалося створити шаблон";
       if (error.response) {
         errorMessage = `Помилка ${error.response.status}: ${error.response.data?.message || error.response.statusText}`;
@@ -335,12 +337,9 @@ export const deleteTemplate = createAsyncThunk<
 
       await baseApi.delete(`templates/${id}`, { headers });
 
-      console.log("🗑️ Шаблон успешно удален:", id);
       return id;
 
-    } catch (error: any) {
-      console.error("❌ Ошибка удаления шаблона:", error);
-      
+    } catch (error: any) {      
       let errorMessage = "Не вдалося видалити шаблон";
       if (error.response) {
         errorMessage = `Помилка ${error.response.status}: ${error.response.data?.message || error.response.statusText}`;
@@ -354,5 +353,76 @@ export const deleteTemplate = createAsyncThunk<
     }
   }
 );
+
+export const createReport = createAsyncThunk<
+  { id: string; name: string },
+  CreateReportData,
+  { state: RootState; rejectValue: string }
+>(
+  'reports/create',
+  async({ name, templateId, isPrivate, template, files, canvasRef }, { rejectWithValue, getState }) => {
+      try {
+         const token = getState().auth.accessToken;
+
+          const headers: Record<string, string> = {};
+          if (token) {
+              headers['Authorization'] = `Bearer ${token}`;
+          }
+
+          console.log(name, templateId, isPrivate, template);
+
+          const formData = new FormData();
+          formData.append("name", name);
+          formData.append("templateId", templateId);
+          formData.append("isPrivate", isPrivate.toString());
+          const repFile = await packRepFile(template, files);
+          formData.append("file", repFile, `${name}.rep`);
+          if (canvasRef?.current) {
+              try {
+                  const canvasElement = canvasRef.current;
+                  const html2canvas = (await import('html2canvas')).default;
+                  const canvas = await html2canvas(canvasElement, {
+                      scale: 2,
+                      backgroundColor: '#ffffff',
+                      useCORS: true,
+                      logging: false
+                  });
+
+                  canvas.toBlob((blob) => {
+                      if (blob) {
+                          formData.append("preview", blob, "preview.png");
+                      }
+                  }, 'image/png');
+              } catch (error) {
+              }
+          }
+
+          const response = await baseApi.post<{ id: string; name: string }>(
+              "reports",
+              formData,
+              {
+                  headers: {
+                      ...headers,
+                      "Content-Type": "multipart/form-data"
+                  }
+              }
+          );
+
+          return response.data;
+      }
+      catch (error: any) {
+          let errorMessage = "Не вдалося створити звіт";
+          if (error.response) {
+              errorMessage = `Помилка ${error.response.status}: ${error.response.data?.message || error.response.statusText}`;
+          } else if (error.request) {
+              errorMessage = "Не вдалося отримати відповідь від сервера";
+          } else {
+              errorMessage = error.message || errorMessage;
+          }
+
+          return rejectWithValue(errorMessage);
+      }
+  }
+)
 
 
