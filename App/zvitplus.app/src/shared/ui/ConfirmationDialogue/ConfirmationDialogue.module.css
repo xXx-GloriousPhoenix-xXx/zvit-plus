@@ -1,0 +1,111 @@
+/* ConfirmationDialog.module.css */
+.Overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .Dialog {
+    background: white;
+    border-radius: 8px;
+    padding: 24px;
+    min-width: 400px;
+    max-width: 500px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  .Dialog.danger .Header h3 {
+    color: #dc2626;
+  }
+  
+  .Dialog.warning .Header h3 {
+    color: #f59e0b;
+  }
+  
+  .Header {
+    margin-bottom: 16px;
+  }
+  
+  .Header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  
+  .Body {
+    margin-bottom: 24px;
+  }
+  
+  .Body p {
+    margin: 0;
+    color: #4b5563;
+    line-height: 1.5;
+  }
+  
+  .Footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+  }
+  
+  .CancelButton {
+    padding: 8px 16px;
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    color: #374151;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  
+  .CancelButton:hover {
+    background: #e5e7eb;
+  }
+  
+  .ConfirmButton {
+    padding: 8px 16px;
+    background: #dc2626;
+    border: 1px solid #b91c1c;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  
+  .ConfirmButton:hover {
+    background: #b91c1c;
+  }
+  
+  .Dialog.danger .ConfirmButton {
+    background: #dc2626;
+    border-color: #b91c1c;
+  }
+  
+  .Dialog.danger .ConfirmButton:hover {
+    background: #b91c1c;
+  }
+  
+  .Dialog.warning .ConfirmButton {
+    background: #f59e0b;
+    border-color: #d97706;
+  }
+  
+  .Dialog.warning .ConfirmButton:hover {
+    background: #d97706;
+  }
+  
+  .Dialog.info .ConfirmButton {
+    background: #3b82f6;
+    border-color: #2563eb;
+  }
+  
+  .Dialog.info .ConfirmButton:hover {
+    background: #2563eb;
+  }

@@ -8,16 +8,17 @@ import type { EditorType } from "@/shared/api/doc/slice";
 type Props = {
     type: EditorType;
     items: DocItemDTO[];
+    interactive?: boolean;
 }
 
-export function ItemList({ type, items }: Props) {
+export function ItemList({ type, items, interactive = false }: Props) {
     return (
         <div className={cl.Wrapper}>
             {
                 items.map((item, index) => {
                     return type === 'template'
-                        ? <TemplateCard key={index} template={item}/>
-                        : <ReportCard key={index} report={item}/>
+                        ? <TemplateCard key={index} template={item} interactive={interactive}/>
+                        : <ReportCard key={index} report={item} interactive={interactive}/>
                 })
             }
         </div>

@@ -56,7 +56,7 @@ export function MyWorkPage() {
     return (
         <section className={cl.Wrapper}>
             <HeaderLine>Шаблони ({templates.totalCount})</HeaderLine>
-            <ItemList type="template" items={templates.items} />
+            <ItemList interactive={true} type="template" items={templates.items} />
             {templates.totalPages > 1 && templates.totalCount > 0 && (
                 <div className={cl.PaginationContainer}>
                     <Pagination
@@ -68,7 +68,7 @@ export function MyWorkPage() {
             )}
             
             <HeaderLine>Звіти ({reports.totalCount})</HeaderLine>
-            <ItemList type="report" items={reports.items} />
+            <ItemList interactive={true} type="report" items={reports.items} />
             {reports.totalPages > 1 && reports.totalCount > 0 && (
                 <div className={cl.PaginationContainer}>
                     <Pagination

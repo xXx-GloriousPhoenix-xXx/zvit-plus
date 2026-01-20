@@ -8,3 +8,9 @@
     border-radius: var(--border-radius);
     gap: 1em;
 }
+
+.ButtonGroup {
+    display: flex;
+    flex-flow: column wrap;
+    gap: 0.5rem;
+}

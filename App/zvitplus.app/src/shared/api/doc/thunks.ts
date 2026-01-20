@@ -244,23 +244,12 @@ export const updateTemplate = createAsyncThunk<
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      console.log("📦 Подготовка данных для обновления шаблона:", {
-        id,
-        name,
-        templateTypeId,
-        isPrivate,
-        elementsCount: template?.elements?.length || 0
-      });
-
-      // Подготавливаем FormData
       const formData = new FormData();
       
-      // Добавляем обновленные метаданные
       if (name) formData.append("name", name);
       if (templateTypeId) formData.append("templateTypeId", templateTypeId);
       if (isPrivate !== undefined) formData.append("isPrivate", isPrivate.toString());
 
-      // Если есть новый шаблон, пакуем его
       if (template) {
         const repFile = await packRepFile(template);
         formData.append("file", repFile, `${name || 'template'}.rep`);
@@ -321,8 +310,8 @@ export const updateTemplate = createAsyncThunk<
 );
 
 export const deleteTemplate = createAsyncThunk<
-  string, // ID удаленного шаблона
-  string, // ID шаблона
+  string,
+  string, 
   { state: RootState; rejectValue: string }
 >(
   "templates/delete",
@@ -425,4 +414,163 @@ export const createReport = createAsyncThunk<
   }
 )
 
+export const deleteReport = createAsyncThunk<
+  string,
+  string,
+  { state: RootState; rejectValue: string }
+>(
+  "reports/delete",
+  async (id, { rejectWithValue, getState }) => {
+    try {
+      const token = getState().auth.accessToken;
+      
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
 
+      await baseApi.delete(`reports/${id}`, { headers });
+
+      return id;
+
+    } catch (error: any) {      
+      let errorMessage = "Не вдалося видалити звіт";
+      if (error.response) {
+        errorMessage = `Помилка ${error.response.status}: ${error.response.data?.message || error.response.statusText}`;
+      } else if (error.request) {
+        errorMessage = "Не вдалося отримати відповідь від сервера";
+      } else {
+        errorMessage = error.message || errorMessage;
+      }
+      
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const updateReport = createAsyncThunk<
+  { id: string; name: string },
+  { 
+    id: string;
+    name?: string;
+    isPrivate?: boolean;
+    template?: RepTemplate;
+    files?: RepDocFiles;
+    canvasRef?: React.RefObject<HTMLDivElement | null>;
+  },
+  { state: RootState; rejectValue: string }
+>(
+  "reports/update",
+  async ({ id, name, isPrivate, template, files, canvasRef }, { rejectWithValue, getState }) => {
+    try {
+      const token = getState().auth.accessToken;
+      
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const formData = new FormData();
+      
+      if (name) formData.append("name", name);
+      if (isPrivate !== undefined) formData.append("isPrivate", isPrivate.toString());
+
+      if (template) {
+        const repFile = await packRepFile(template, files);
+        formData.append("file", repFile, `${name || 'report'}.rep`);
+      }
+
+      if (canvasRef?.current) {
+        try {
+          const canvasElement = canvasRef.current;
+          const html2canvas = (await import('html2canvas')).default;
+          const canvas = await html2canvas(canvasElement, {
+            scale: 2,
+            backgroundColor: '#ffffff',
+            useCORS: true,
+            logging: false
+          });
+          
+          canvas.toBlob((blob) => {
+            if (blob) {
+              formData.append("preview", blob, "preview.png");
+            }
+          }, 'image/png');
+        } catch (error) {
+          console.warn("⚠️ Не удалось создать превью:", error);
+        }
+      }
+
+      const response = await baseApi.patch<{ id: string; name: string }>(
+        `reports/${id}`,
+        formData,
+        {
+          headers: {
+            ...headers,
+            "Content-Type": "multipart/form-data"
+          }
+        }
+      );
+
+      return response.data;
+
+    } catch (error: any) {
+      console.error("❌ Ошибка обновления отчета:", error);
+      
+      let errorMessage = "Не вдалося оновити звіт";
+      if (error.response) {
+        errorMessage = `Помилка ${error.response.status}: ${error.response.data?.message || error.response.statusText}`;
+      } else if (error.request) {
+        errorMessage = "Не вдалося отримати відповідь від сервера";
+      } else {
+        errorMessage = error.message || errorMessage;
+      }
+      
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const downloadPdf = createAsyncThunk<
+  Blob,
+  { 
+    id: string;
+    type: DocType;
+    format?: 'pdf' | 'html';
+  },
+  { state: RootState; rejectValue: string }
+>(
+  "docs/downloadPdf",
+  async ({ id, type, format = 'pdf' }, { rejectWithValue, getState }) => {
+    try {
+      const token = getState().auth.accessToken;
+      
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await baseApi.get<Blob>(
+        `${type}s/${id}/export?format=${format}`,
+        { 
+          headers,
+          responseType: 'blob' 
+        }
+      );
+
+      return response.data;
+
+    } catch (error: any) {
+      let errorMessage = `Не вдалося завантажити ${format.toUpperCase()}`;
+      if (error.response) {
+        errorMessage = `Помилка ${error.response.status}: ${error.response.data?.message || error.response.statusText}`;
+      } else if (error.request) {
+        errorMessage = "Не вдалося отримати відповідь від сервера";
+      } else {
+        errorMessage = error.message || errorMessage;
+      }
+      
+      return rejectWithValue(errorMessage);
+    }
+  }
+);

@@ -55,7 +55,7 @@ namespace ZvitPlus.API.Controllers
         [Authorize(Policy = "UserLevel")]
         public async Task<ActionResult<GetFileEntityDTO>> UpdateAsync(
             [FromRoute] Guid id,
-            [FromBody] UpdateReportDTORequest request,
+            [FromForm] UpdateReportDTORequest request,
             CancellationToken ct = default)
         {
             var dto = new UpdateReportDTO(

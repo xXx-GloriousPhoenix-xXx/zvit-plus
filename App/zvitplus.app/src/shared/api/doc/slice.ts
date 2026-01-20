@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { DocItemDTO, RepDocData, RepDocFiles, SearchParams } from "./models";
-import { createTemplate, deleteTemplate, fetchReportById, fetchReportsPage, fetchTemplateById, fetchTemplatesPage, updateTemplate } from "./thunks";
+import { createTemplate, deleteReport, deleteTemplate, fetchReportById, fetchReportsPage, fetchTemplateById, fetchTemplatesPage, updateReport, updateTemplate } from "./thunks";
 import type { MetaValue, RepTemplate } from "@/shared/types/repEditorTypes";
 import { TEMPLATE_DRAFT_KEY, REPORT_DRAFT_KEY } from "@/shared/constants/localStorage";
 
@@ -528,7 +528,7 @@ const docsSlice = createSlice({
           state.templates.save.error = action.payload ?? "Помилка збереження шаблону";
         })
         
-        // ОБНОВЛЕНИЕ ШАБЛОНА
+        // Template Update
         .addCase(updateTemplate.pending, (state) => {
           state.templates.save.loading = true;
           state.templates.save.error = null;
@@ -551,7 +551,7 @@ const docsSlice = createSlice({
           state.templates.save.error = action.payload ?? "Помилка оновлення шаблону";
         })
         
-        // УДАЛЕНИЕ ШАБЛОНА
+        // Template Delete
         .addCase(deleteTemplate.pending, (state) => {
           state.templates.save.loading = true;
           state.templates.save.error = null;
@@ -582,7 +582,59 @@ const docsSlice = createSlice({
         .addCase(deleteTemplate.rejected, (state, action) => {
           state.templates.save.loading = false;
           state.templates.save.error = action.payload ?? "Помилка видалення шаблону";
-        });
+        })
+
+        // Report Delete
+        .addCase(deleteReport.pending, (state) => {
+          state.reports.save.loading = true;
+          state.reports.save.error = null;
+          state.reports.save.success = false;
+        })
+        .addCase(deleteReport.fulfilled, (state, action) => {
+          state.reports.save.loading = false;
+          state.reports.save.success = true;
+          
+          if (state.reports.current.data?.meta.id === action.payload) {
+            state.reports.current = {
+              data: null,
+              files: null,
+              loading: false,
+              error: null,
+              isDirty: false
+            };
+          }
+          
+          if (state.reports.list.items) {
+            state.reports.list.items = state.reports.list.items.filter(
+              item => item.id !== action.payload
+            );
+          }
+        })
+        .addCase(deleteReport.rejected, (state, action) => {
+          state.reports.save.loading = false;
+          state.reports.save.error = action.payload ?? "Помилка видалення звіту";
+        })
+
+        // Report Update
+        .addCase(updateReport.pending, (state) => {
+          state.reports.save.loading = true;
+          state.reports.save.error = null;
+          state.reports.save.success = false;
+        })
+        .addCase(updateReport.fulfilled, (state, action) => {
+          state.reports.save.loading = false;
+          state.reports.save.success = true;
+          
+          state.reports.current.isDirty = false;
+          
+          if (state.reports.current.data && state.editor.originalId === action.payload.id) {
+            state.reports.current.data.meta.templateName = action.payload.name;
+          }
+        })
+        .addCase(updateReport.rejected, (state, action) => {
+          state.reports.save.loading = false;
+          state.reports.save.error = action.payload ?? "Помилка оновлення звіту";
+        })
     }
 });
   

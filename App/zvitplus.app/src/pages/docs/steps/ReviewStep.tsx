@@ -1,5 +1,5 @@
-// ReviewStep.tsx (обновленная версия)
-import { useRef, useState } from "react";
+// ReviewStep.tsx (полная версия)
+import { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/shared/ui/Button/Button";
 import { ReviewCanvas } from "./Review/ReviewCanvas";
@@ -8,13 +8,23 @@ import {
   setEditorStep, 
   clearEditorDraft,
   resetSaveState, 
-  cloneTemplateToReport
+  cloneTemplateToReport,
+  initEditor
 } from "@/shared/api/doc/slice";
-import { createReport, createTemplate, updateTemplate } from "@/shared/api/doc/thunks";
+import { 
+  createReport, 
+  createTemplate, 
+  updateTemplate, 
+  updateReport,
+  deleteTemplate,
+  deleteReport,
+  downloadPdf 
+} from "@/shared/api/doc/thunks";
 import type { RepTemplate } from "@/shared/types/repEditorTypes";
 import type { EditorMode, EditorType } from "@/shared/api/doc/slice";
 
 import cl from "./Step.module.css";
+import { ConfirmationDialogue } from "@/shared/ui/ConfirmationDialogue/ConfirmationDialogue";
 
 interface ReviewStepProps {
     mode: EditorMode;
@@ -35,22 +45,74 @@ export function ReviewStep({
 }: ReviewStepProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   const canvasRef = useRef<HTMLDivElement>(null);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  
   const files = useAppSelector(state => state.docs.reports.current.files);
-
+  const editorState = useAppSelector(state => state.docs.editor);
   const saveState = useAppSelector(state => 
     type === 'template' 
       ? state.docs.templates.save 
       : state.docs.reports.save
   );
 
+  const { editor } = useAppSelector(state => state.docs);
+
   const handleBack = () => {
     if (mode === 'view') {
       onClose();
     } else {
       dispatch(setEditorStep(2));
+    }
+  };
+
+  const handleEdit = () => {
+    if (editorState.originalId) {
+      navigate(`/${type}s/${editorState.originalId}/edit`);
+    }
+  };
+
+  const handleDelete = async () => {
+    setShowDeleteDialog(false);
+    setLoading(true);
+    setError(null);
+    
+    try {
+      if (type === 'template') {
+        await dispatch(deleteTemplate(editorState.originalId!)).unwrap();
+        console.log(`${type} deleted successfully`);
+        navigate(`/${type}s`);
+      } else {
+        await dispatch(deleteReport(editorState.originalId!)).unwrap();
+        console.log(`${type} deleted successfully`);
+        navigate(`/${type}s`);
+      }
+    } catch (err: any) {
+      setError(err.message || `Помилка видалення ${type === 'template' ? 'шаблону' : 'звіту'}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDownloadPdf = async () => {
+    if (!editorState.originalId) return;
+    
+    setIsDownloadingPdf(true);
+    setError(null);
+    
+    try {
+      await dispatch(downloadPdf({ 
+        id: editorState.originalId, 
+        type,
+        format: 'pdf' 
+      })).unwrap();
+    } catch (err: any) {
+      setError(err.message || "Помилка завантаження PDF");
+    } finally {
+      setIsDownloadingPdf(false);
     }
   };
 
@@ -90,10 +152,9 @@ export function ReviewStep({
           navigate(`/${type}s`);
         }
       } else if (mode === 'edit') {
-        const { editor } = useAppSelector(state => state.docs);
         
         if (!editor.originalId) {
-          throw new Error("ID шаблона не найден");
+          throw new Error(`ID ${type === 'template' ? 'шаблона' : 'звіту'} не знайдено`);
         }
         
         if (type === 'template') {
@@ -109,8 +170,17 @@ export function ReviewStep({
           console.log(`${type} updated successfully:`, result);
           navigate(`/${type}s`);
         } else {
-          // TODO: Добавить обновление отчета
-          console.log('Обновление отчета пока не реализовано');
+          const result = await dispatch(updateReport({
+            id: editor.originalId,
+            name: template.meta.templateName,
+            isPrivate: template.meta.isPrivate,
+            template,
+            files: files!,
+            canvasRef
+          })).unwrap();
+          
+          console.log(`${type} updated successfully:`, result);
+          navigate(`/${type}s`);
         }
       }
     } catch (err: any) {
@@ -120,7 +190,12 @@ export function ReviewStep({
     }
   };
 
-  const isLoading = loading || saveState.loading;
+  const handleFillTemplate = () => {
+    navigate(`/reports/create`);
+    dispatch(cloneTemplateToReport());
+  };
+
+  const isLoading = loading || saveState.loading || isDownloadingPdf;
   const displayError = error || saveState.error;
 
   return (
@@ -156,29 +231,29 @@ export function ReviewStep({
             <Button
               variant="primary"
               text="Редагувати"
-              onClick={() => {}}
+              onClick={handleEdit}
+              disabled={!editorState.originalId}
               extraClassName={cl.Button}
             />
             <Button
-              variant="secondary"
+              variant="primary"
               text='Видалити'
-              onClick={() => {/* логика удаления */}}
+              onClick={() => setShowDeleteDialog(true)}
+              disabled={!editorState.originalId}
               extraClassName={cl.Button}
             />
             {type === 'report'
                 ? <Button
                     variant="primary"
-                    text="Завантажити PDF"
-                    onClick={() => {/* логика загрузки PDF */}}
+                    text={isDownloadingPdf ? "Завантаження..." : "Завантажити PDF"}
+                    onClick={handleDownloadPdf}
+                    disabled={!editorState.originalId || isDownloadingPdf}
                     extraClassName={cl.Button}
                 />
                 : <Button
                     variant="primary"
                     text="Заповнити шаблон"
-                    onClick={() => {
-                        navigate(`/reports/create`);
-                        dispatch(cloneTemplateToReport());
-                    }}
+                    onClick={handleFillTemplate}
                     extraClassName={cl.Button}
                 /> 
             }
@@ -195,7 +270,7 @@ export function ReviewStep({
             
             {mode === 'create' && onClearDraft && (
               <Button
-                variant="primary"
+                variant="secondary"
                 text="Очистити чернетку"
                 onClick={onClearDraft}
                 disabled={isLoading}
@@ -216,6 +291,17 @@ export function ReviewStep({
           </>
         )}
       </div>
+
+      <ConfirmationDialogue
+        isOpen={showDeleteDialog}
+        title={`Видалити ${type === 'template' ? 'шаблон' : 'звіт'}?`}
+        message={`Ви впевнені, що хочете видалити "${template.meta.templateName}"? Цю дію неможливо скасувати.`}
+        confirmText="Видалити"
+        cancelText="Скасувати"
+        onConfirm={handleDelete}
+        onCancel={() => setShowDeleteDialog(false)}
+        variant="danger"
+      />
     </div>
   );
 }

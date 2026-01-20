@@ -1,14 +1,20 @@
 // shared/ui/TemplateCard/TemplateCard.tsx
 import type { TemplateItemDTO } from '@/shared/api/templates/templateModels';
 import cl from './TemplateCard.module.css';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { formatFileSize, formatDate } from '@/shared/utils/formatters';
+import { A } from '../A/A';
+import { useAppDispatch } from '@/app/store/hooks';
+import { deleteTemplate } from '@/shared/api/doc/thunks';
 
 interface TemplateCardProps {
     template: TemplateItemDTO;
+    interactive?: boolean;
 }
 
-export function TemplateCard({ template }: TemplateCardProps) {
+export function TemplateCard({ template, interactive = false }: TemplateCardProps) {
+    const dispatch = useAppDispatch();
+    const navigate = useNavigate();
     return (
         <div className={cl.Wrapper}>
             <div className={cl.CardHeader}>
@@ -50,6 +56,18 @@ export function TemplateCard({ template }: TemplateCardProps) {
                     >
                         <i className="fa-solid fa-eye"></i> Переглянути
                     </NavLink>
+                    {
+                        interactive && (
+                            <>
+                                <A onClick={() => navigate(`/templates/${template.id}/edit`)}>
+                                    <i className="fa-solid fa-screwdriver-wrench"></i> Редагувати
+                                </A>
+                                <A onClick={() => dispatch(deleteTemplate(template.id))}>
+                                    <i className="fa-solid fa-trash-can"></i> Видалити
+                                </A>
+                            </>
+                        )
+                    }
                 </div>
             </div>
         </div>
