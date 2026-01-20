@@ -35,7 +35,6 @@ export function DocEditorPage({ mode, type }: Props) {
     
     const docState = type === 'template' ? templates : reports;
 
-    // Загрузка данных документа
     useEffect(() => {
         if (mode !== 'create' && id) {
         const fetchDoc = type === 'template' 
@@ -46,7 +45,6 @@ export function DocEditorPage({ mode, type }: Props) {
         }
     }, [mode, type, id, dispatch]);
 
-    // Инициализация редактора
     useEffect(() => {
         if (mode === 'create') {
         dispatch(initEditor({ mode, workMode: type }));
@@ -61,7 +59,6 @@ export function DocEditorPage({ mode, type }: Props) {
     }, [mode, type, id, docState.current.data, dispatch]);
 
     const renderStep = () => {
-        // Если режим просмотра и данные загружены
         if (mode === 'view' && docState.current.data) {
             return (
                 <ReviewStep

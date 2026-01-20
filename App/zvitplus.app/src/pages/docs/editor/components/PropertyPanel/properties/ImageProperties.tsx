@@ -38,6 +38,7 @@ export function ImageProperties({
                             updatePayload(id, { src: fileUrl });
                             dispatch(setImage({ id, file }));
                         }}
+                        // value={}
                     />
                 )}
             </div>

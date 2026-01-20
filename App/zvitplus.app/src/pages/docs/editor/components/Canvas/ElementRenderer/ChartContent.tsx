@@ -361,7 +361,7 @@ export const ChartContent = ({ isReport, file, chartType = 'bar' }: Props) => {
       <div className={cl.ChartWrapper}>
         <div className={cl.PieChartContainer}>
           <div className={cl.PieChartSvg}>
-            <svg width="100%" height="100%" viewBox="0 0 60 60" preserveAspectRatio="xMidYMid meet">
+            <svg className={cl.PieChartSvgItem} viewBox="0 0 60 60" preserveAspectRatio="xMidYMid meet">
               {pieSegments.map((segment, i) => (
                 <path
                   key={i}

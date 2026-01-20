@@ -18,9 +18,6 @@ export function ReviewCanvas({ template, canvasRef }: ReviewCanvasProps) {
     const { elements, meta } = template;
     
     const files = useAppSelector(state => state.docs.reports.current.files);
-    useEffect(() => {
-        console.log(files);
-    }, [files]);
     
     const mediaFiles = files?.mediaFiles || {};
     const dataFiles = files?.dataFiles || {};
@@ -173,23 +170,30 @@ function ReviewElement({ element, mediaFiles, dataFiles }: ReviewElementProps) {
         }
     };
 
+    const { mode, workMode } = useAppSelector(state => state.docs.editor);
+    const isReportViewing = workMode === 'report';
+    useEffect(() => {
+        console.log(mode, workMode, isReportViewing);
+    }, [isReportViewing])
+
     const elementStyle: React.CSSProperties = {
         position: 'absolute',
         left: `${element.position.x}px`,
         top: `${element.position.y}px`,
         width: `${element.size.width}px`,
         height: `${element.size.height}px`,
-        backgroundColor: ELEMENT_COLORS[element.type] || '#f3f4f6',
-        border: '0.05rem solid #ddd',
+        backgroundColor: isReportViewing ? 'transparent' : ELEMENT_COLORS[element.type],
+        border: isReportViewing ? 'none' : '0.05rem solid #ddd',
         borderRadius: 'var(--border-radius)',
+        boxShadow: isReportViewing ? 'none' : 'var(--shadow)',
         overflow: 'hidden'
     };
 
     return (
         <div style={elementStyle} className={cl.Element}>
-            <div className={cl.ElementLabel}>
+            {/* <div className={cl.ElementLabel}>
                 {element.type} ({element.mode})
-            </div>
+            </div> */}
             <div className={cl.ElementContent}>
                 {renderContent()}
             </div>

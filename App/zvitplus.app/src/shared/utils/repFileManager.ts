@@ -21,7 +21,7 @@ export interface RepFileStructure {
 
 export async function packRepFile(
     template: RepTemplate,
-    files: RepDocFiles,
+    files?: RepDocFiles,
     previewElement?: HTMLElement | null
 ): Promise<Blob> {
     const zip = new JSZip();
@@ -61,14 +61,18 @@ export async function packRepFile(
 
     // data/
     const dataFolder = zip.folder("data")!;
-    for (const [id, file] of Object.entries(files.dataFiles)) {
-        dataFolder.file(id, file);
+    if (files) {
+        for (const [id, file] of Object.entries(files.dataFiles)) {
+            dataFolder.file(id, file);
+        }
     }
 
     // media/
     const mediaFolder = zip.folder("media")!;
-    for (const [id, file] of Object.entries(files.mediaFiles)) {
-        mediaFolder.file(id, file);
+    if (files) {
+        for (const [id, file] of Object.entries(files.mediaFiles)) {
+            mediaFolder.file(id, file);
+        }
     }
 
     return zip.generateAsync({ type: "blob" });

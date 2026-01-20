@@ -227,7 +227,6 @@ export const createTemplate = createAsyncThunk<
   }
 );
 
-// Thunk для обновления шаблона
 export const updateTemplate = createAsyncThunk<
   { id: string; name: string },
   UpdateTemplateData,
@@ -319,7 +318,6 @@ export const updateTemplate = createAsyncThunk<
   }
 );
 
-// Thunk для удаления шаблона
 export const deleteTemplate = createAsyncThunk<
   string, // ID удаленного шаблона
   string, // ID шаблона
@@ -356,3 +354,5 @@ export const deleteTemplate = createAsyncThunk<
     }
   }
 );
+
+

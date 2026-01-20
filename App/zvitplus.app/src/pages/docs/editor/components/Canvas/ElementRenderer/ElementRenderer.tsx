@@ -41,7 +41,7 @@ export function ElementRenderer({
       case 'text':
         const text = element.mode === 'dynamic' && mode === 'report' 
           ? `${element.payload.text || 'data'}`
-          : (element.payload.text || 'Текст');        
+          : (element.payload.text || 'Текст');
         return (
           <div 
             style={{

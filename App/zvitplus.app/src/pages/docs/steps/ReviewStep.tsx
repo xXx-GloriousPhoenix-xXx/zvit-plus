@@ -15,6 +15,7 @@ import type { RepTemplate } from "@/shared/types/repEditorTypes";
 import type { EditorMode, EditorType } from "@/shared/api/doc/slice";
 
 import cl from "./Step.module.css";
+import { packRepFile } from "@/shared/utils/repFileManager";
 
 interface ReviewStepProps {
     mode: EditorMode;
@@ -38,7 +39,8 @@ export function ReviewStep({
   const canvasRef = useRef<HTMLDivElement>(null);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  
+  const files = useAppSelector(state => state.docs.reports.current.files);
+
   const saveState = useAppSelector(state => 
     type === 'template' 
       ? state.docs.templates.save 
@@ -76,11 +78,10 @@ export function ReviewStep({
           console.log(`${type} created successfully:`, result);
           navigate(`/${type}s`);
         } else {
-          // TODO: Добавить создание отчета
-          console.log('Создание отчета пока не реализовано');
+          const result = packRepFile(template, files!, canvasRef.current);
+          console.log('Packed report file:', result);
         }
       } else if (mode === 'edit') {
-        // Получаем originalId из редактора
         const { editor } = useAppSelector(state => state.docs);
         
         if (!editor.originalId) {
@@ -111,7 +112,6 @@ export function ReviewStep({
     }
   };
 
-  // Используем loading из saveState
   const isLoading = loading || saveState.loading;
   const displayError = error || saveState.error;
 
