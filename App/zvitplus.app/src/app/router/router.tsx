@@ -15,6 +15,7 @@ import { HomePage } from '@/pages/general/HomePage/HomePage';
 import { ProtectedOutlet } from '@/widgets/layouts/ProtectedOutlet/ProtectedOutlet';
 import { UploadPage } from '@/pages/general/UploadPage/UploadPage';
 import { DocEditorPage } from '@/pages/docs/DocEditorPage';
+import { ProfilePage } from '@/pages/general/ProfilePage/ProfilePage';
 
 export const router = createBrowserRouter([
     {
@@ -42,12 +43,12 @@ export const router = createBrowserRouter([
         element: <MainOutlet/>,
         children: [
             { index: true, element: <TemplatePage/> },
+            { path: ":id", element: <DocEditorPage mode="view" type="template" /> },
             {
                 element: <ProtectedOutlet />,
                 children: [
-                    { path: "upload", element: <UploadPage mode="template" /> },
+                    { path: "upload", element: <UploadPage mode='template' /> },
                     { path: "create", element: <DocEditorPage mode="create" type="template" /> },
-                    { path: ":id", element: <DocEditorPage mode="view" type="template" /> },
                     { path: ":id/edit", element: <DocEditorPage mode="edit" type="template" /> }
                 ]
             }
@@ -58,15 +59,23 @@ export const router = createBrowserRouter([
         element: <MainOutlet/>,
         children: [
             { index: true, element: <ReportPage/> },
+            { path: ":id", element: <DocEditorPage mode="view" type="report" /> },
             {
                 element: <ProtectedOutlet />,
                 children: [
                     { path: "upload", element: <UploadPage mode="report" /> },
                     { path: "create", element: <DocEditorPage mode="create" type="report" /> },
-                    { path: ":id", element: <DocEditorPage mode="view" type="report" /> },
                     { path: ":id/edit", element: <DocEditorPage mode="edit" type="report" /> }
                 ]
             }
+        ]
+    },
+    {
+        path: "/profiles",
+        element: <MainOutlet/>,
+        children: [
+            { index: true, element: <Navigate to="/my-works" replace /> },
+            { path: ":login", element: <ProfilePage /> }
         ]
     },
     // { 

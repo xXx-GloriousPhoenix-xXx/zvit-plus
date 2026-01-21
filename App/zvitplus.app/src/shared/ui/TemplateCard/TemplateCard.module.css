@@ -65,3 +65,12 @@
     flex-flow: column nowrap;
     gap: 0.25rem;
 }
+.Author i {
+    transition: var(--transition);
+}
+.Author:hover i {
+    color: var(--secondary-color)
+}
+.Author:hover {
+    cursor: pointer;
+}

@@ -92,7 +92,6 @@ namespace ZvitPlus.API.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Policy = "UserLevel")]
         public async Task<ActionResult<GetFileEntityDTO>> GetById(
             [FromRoute] Guid id,
             CancellationToken ct = default)
@@ -114,7 +113,6 @@ namespace ZvitPlus.API.Controllers
         }
 
         [HttpGet("{id}/download")]
-        [Authorize]
         public async Task<IActionResult> DownloadAsync([FromRoute] Guid id, CancellationToken ct = default)
         {
             var (entity, stream) = await _service.DownloadAsync(id, ct);

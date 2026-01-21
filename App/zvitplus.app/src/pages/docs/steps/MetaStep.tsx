@@ -129,6 +129,7 @@ export function MetaStep({ mode, type, value, onNext, onBack }: Props) {
 
             <div className={cl.ButtonGroup}>
                 <Button
+                    variant="primary"
                     text="Назад"
                     onClick={handleBack}
                     extraClassName={cl.Button}
@@ -136,6 +137,7 @@ export function MetaStep({ mode, type, value, onNext, onBack }: Props) {
 
                 {mode !== 'view' && (
                     <Button
+                        variant="primary"
                         text="Далі"
                         disabled={!isSelected}
                         onClick={handleNext}
@@ -145,6 +147,7 @@ export function MetaStep({ mode, type, value, onNext, onBack }: Props) {
 
                 {mode === 'view' && (
                     <Button
+                        variant="primary"
                         text="Закрити"
                         onClick={() => navigate(`/${type}s`)}
                         extraClassName={cl.Button}

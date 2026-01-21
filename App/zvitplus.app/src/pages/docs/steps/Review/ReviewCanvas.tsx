@@ -7,7 +7,6 @@ import { ReviewTableContent } from "./ReviewTableContent";
 import type React from "react";
 import { ChartContent } from "../../editor/components/Canvas/ElementRenderer/ChartContent";
 import { useAppSelector } from "@/app/store/hooks";
-import { useEffect } from "react";
 
 interface ReviewCanvasProps {
     template: RepTemplate;
@@ -118,10 +117,6 @@ function ReviewElement({ element, mediaFiles, dataFiles }: ReviewElementProps) {
                                     e.currentTarget.style.display = 'none';
                                 }}
                             />
-                            <div className={cl.ImageFallback}>
-                                <Image size={24} />
-                                <div className={cl.ImageLabel}>Зображення</div>
-                            </div>
                         </div>
                     );
                 } else {
@@ -188,9 +183,6 @@ function ReviewElement({ element, mediaFiles, dataFiles }: ReviewElementProps) {
 
     return (
         <div style={elementStyle} className={cl.Element}>
-            {/* <div className={cl.ElementLabel}>
-                {element.type} ({element.mode})
-            </div> */}
             <div className={cl.ElementContent}>
                 {renderContent()}
             </div>

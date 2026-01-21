@@ -3,12 +3,13 @@ import cl from './HeaderLine.module.css';
 
 type Props = {
     children: ReactNode;
+    extraClassName?: string;
 } & ComponentPropsWithoutRef<"h2">;
 
-export function HeaderLine({ children, ...otherProps } : Props) {
+export function HeaderLine({ children, extraClassName, ...otherProps } : Props) {
     return (
         <div className={cl.Wrapper}>
-            <h2 {...otherProps} className={cl.Header}>{children}</h2>
+            <h2 {...otherProps} className={`${cl.Header} ${extraClassName}`}>{children}</h2>
         </div>
     );
 }

@@ -114,6 +114,7 @@ export function TemplatePage() {
                 <div className={cl.Error}>
                     {error}
                     <Button
+                        variant='secondary'
                         onClick={loadTemplates}
                         text='Повторити'
                     />

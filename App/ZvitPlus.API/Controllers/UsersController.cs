@@ -31,5 +31,13 @@ namespace ZvitPlus.API.Controllers
             var result = await _service.BanAsync(userId, isBan, context, ct);
             return Ok(result);
         }
+
+        [HttpGet("get/{userName}")]
+        public async Task<ActionResult<GetUserDTO?>> GetByIdAsync(string userName, CancellationToken ct = default)
+        {
+            var result = await _service.GetByLoginAsync(userName, ct);
+            return Ok(result);
+        }
     }
 }
+    

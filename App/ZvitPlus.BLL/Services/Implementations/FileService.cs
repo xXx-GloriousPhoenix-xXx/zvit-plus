@@ -192,22 +192,21 @@ namespace ZvitPlus.BLL.Services.Implementations
             entity.IsDeleted = true;
             _unitOfWork.Files.Update(entity);
 
-
-            await _unitOfWork.BeginTransactionAsync(ct);
-            try
-            {
-                await _unitOfWork.CompleteAsync(ct);
-                await _unitOfWork.CommitTransactionAsync(ct);
+            //await _unitOfWork.BeginTransactionAsync(ct);
+            //try
+            //{
+            //    await _unitOfWork.CompleteAsync(ct);
+            //    await _unitOfWork.CommitTransactionAsync(ct);
 
                 AppLogger.LogActionCompleted(_logger, "Видалення файлу", entityId);
-            }
-            catch
-            {
-                await _unitOfWork.RollbackTransactionAsync(ct);
+            //}
+            //catch
+            //{
+            //    await _unitOfWork.RollbackTransactionAsync(ct);
 
-                AppLogger.LogActionFailed(_logger, "видалення файлу", entityId);
-                throw new BusinessException("Помилка видалення файлу");
-            }
+            //    AppLogger.LogActionFailed(_logger, "видалення файлу", entityId);
+            //    throw new BusinessException("Помилка видалення файлу");
+            //}
         }
 
         public async Task<PagedResponse<GetFileEntityDTO>> GetPageAsync(UserContext context, FileType ft, int page = 1, int pageSize = 10, SearchFileEntityDTO? search = null, CancellationToken ct = default)

@@ -177,12 +177,8 @@ namespace ZvitPlus.BLL.Services.Implementations
                 throw new BusinessException("Звіт не знайдено");
             }
 
-            Console.WriteLine("Entity Report Существует");// Debug
-
             var currentFileEntity = await _unitOfWork.Files.GetByIdAsync(entity.FileId, ct);
             string? fileBackupPath = null;
-
-            Console.WriteLine($"Current File Entity Существует: {currentFileEntity is not null}");// Debug
 
             await _unitOfWork.BeginTransactionAsync(ct);
             try
@@ -198,27 +194,17 @@ namespace ZvitPlus.BLL.Services.Implementations
                         File.Copy(currentFileEntity.FilePath, fileBackupPath, true);
                     }
 
-                    Console.WriteLine("Перед обновлением файла");// Debug
-
                     await _fileService.UpdateAsync(entity.FileId, innerDto, ct);
-
-                    Console.WriteLine("После обновления файла");// Debug
                 }
 
-                Console.WriteLine("Перед обновлением сущности отчета");// Debug
-
                 _unitOfWork.Reports.Update(entity);
-
-                Console.WriteLine("После обновления сущности отчета");// Debug
 
                 await _unitOfWork.CompleteAsync(ct);
                 await _unitOfWork.CommitTransactionAsync(ct);
                 AppLogger.LogActionCompleted(_logger, "Оновлення звіту", id);
             }
-            catch(Exception ex)
+            catch
             {
-                Console.WriteLine(ex.Message); // Debug
-
                 await _unitOfWork.RollbackTransactionAsync(ct);
 
                 if (fileBackupPath is not null && currentFileEntity != null)

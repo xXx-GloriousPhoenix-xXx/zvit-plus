@@ -68,20 +68,6 @@ export function ChartProperties({
                 </select>
             </div>
             
-            <div className={cl.PropertyGroup}>
-                <label className={cl.PropertyLabel}>Джерело даних</label>
-                <input
-                    type="text"
-                    value={selectedElement.payload.dataSource || ''}
-                    onChange={(e) => updatePayload(selectedElement.id, { 
-                        dataSource: e.target.value 
-                    })}
-                    placeholder="data/sales.json або {variable_name}"
-                    className={cl.PropertyInput}
-                    disabled={readonly}
-                />
-            </div>
-            
             {!readonly && (
                 <div className={cl.PropertyGroup}>
                     <label className={cl.PropertyLabel}>Заголовок діаграми</label>

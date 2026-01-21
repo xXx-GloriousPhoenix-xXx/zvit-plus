@@ -105,5 +105,11 @@ namespace ZvitPlus.BLL.Services.Implementations
 
             return _mapper.Map<GetUserDTO>(user);
         }
+    
+        public async Task<GetUserDTO?> GetByLoginAsync(string userName, CancellationToken ct = default)
+        {
+            var result = await _unitOfWork.Users.GetByLoginAsync(userName, ct);
+            return _mapper.Map<GetUserDTO>(result);
+        }
     }
 }

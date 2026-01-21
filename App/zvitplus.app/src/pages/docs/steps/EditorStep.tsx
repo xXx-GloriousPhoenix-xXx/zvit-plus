@@ -46,6 +46,7 @@ export function EditorStep({
 
             <div className={cl.ButtonGroup}>
                 <Button
+                    variant="primary"
                     text="Назад"
                     onClick={handleBack}
                     extraClassName={cl.Button}
@@ -53,6 +54,7 @@ export function EditorStep({
                 
                 {mode !== 'view' && (
                     <Button
+                        variant="primary"
                         text="Далі"
                         onClick={handleNext}
                         extraClassName={cl.Button}
@@ -61,6 +63,7 @@ export function EditorStep({
                 
                 {mode === 'view' && (
                     <Button
+                        variant="primary"
                         text="Переглянути результат"
                         onClick={() => dispatch(setEditorStep(3))}
                         extraClassName={cl.Button}

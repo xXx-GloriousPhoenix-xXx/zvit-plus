@@ -1,10 +1,9 @@
 import cl from './ReportCard.module.css';
-import { NavLink, useNavigate } from 'react-router-dom';
 import { formatFileSize, formatDate } from '@/shared/utils/formatters';
 import type { ReportItemDTO } from '@/shared/api/reports/reportModels';
 import { A } from '../A/A';
-import { deleteReport } from '@/shared/api/doc/thunks';
-import { useAppDispatch } from '@/app/store/hooks';
+import { useCardActions } from '@/shared/hooks/useCardActions';
+import { useNavigate } from 'react-router-dom';
 
 interface ReportCardProps {
     report: ReportItemDTO;
@@ -12,8 +11,14 @@ interface ReportCardProps {
 }
 
 export function ReportCard({ report, interactive = false }: ReportCardProps) {
-    const dispatch = useAppDispatch();
+    const {
+        handleView,
+        handleEdit,
+        handleDelete
+    } = useCardActions({ type: 'report', id: report.id });
+
     const navigate = useNavigate();
+    
     return (
         <div className={cl.Wrapper}>
             <div className={cl.CardHeader}>
@@ -27,7 +32,7 @@ export function ReportCard({ report, interactive = false }: ReportCardProps) {
             
             <div className={cl.CardBody}>
                 <div className={cl.Data}>
-                    <div className={cl.InfoRow}>
+                    <div className={`${cl.InfoRow} ${cl.Author}`} onClick={() => navigate(`/profiles/${report.author}`)}>
                         <i className="fa-solid fa-user"></i>
                         <span>{report.author}</span>
                     </div>
@@ -49,19 +54,16 @@ export function ReportCard({ report, interactive = false }: ReportCardProps) {
                     </div>
                 </div>
                 <div className={cl.IconPanel}>
-                    <NavLink 
-                        to={`/reports/${report.id}`}
-                        className={cl.ControlButton}
-                    >
+                    <A onClick={handleView}>
                         <i className="fa-solid fa-eye"></i> Переглянути
-                    </NavLink>
+                    </A>
                     {
                         interactive && (
                             <>
-                                <A onClick={() => navigate(`/reports/${report.id}/edit`)}>
+                                <A onClick={handleEdit}>
                                     <i className="fa-solid fa-screwdriver-wrench"></i> Редагувати
                                 </A>
-                                <A onClick={() => dispatch(deleteReport(report.id))}>
+                                <A onClick={handleDelete}>
                                     <i className="fa-solid fa-trash-can"></i> Видалити
                                 </A>
                             </>

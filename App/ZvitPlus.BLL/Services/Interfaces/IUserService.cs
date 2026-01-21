@@ -8,5 +8,6 @@ namespace ZvitPlus.BLL.Services.Interfaces
     {
         Task<GetUserDTO> GrantRoleAsync(Guid userId, UserRole role, UserContext context, CancellationToken ct = default);
         Task<GetUserDTO> BanAsync(Guid userId, bool isBan, UserContext context, CancellationToken ct = default);
+        Task<GetUserDTO?> GetByLoginAsync(string userName, CancellationToken ct = default);
     }
 }

@@ -78,7 +78,7 @@ export function Form(props: FormProps) {
 
             {children}
 
-            <div>
+            <div className={cl.SubmitWrapper}>
                 <Button 
                     variant="secondary"
                     extraClassName={cl.Button}

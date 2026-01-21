@@ -255,7 +255,6 @@ export const updateTemplate = createAsyncThunk<
         formData.append("file", repFile, `${name || 'template'}.rep`);
       }
 
-      // Если есть canvasRef, добавляем новое превью
       if (canvasRef?.current) {
         try {
           const canvasElement = canvasRef.current;
@@ -277,7 +276,6 @@ export const updateTemplate = createAsyncThunk<
         }
       }
 
-      // Отправляем PATCH запрос
       const response = await baseApi.patch<{ id: string; name: string }>(
         `templates/${id}`,
         formData,
@@ -289,11 +287,9 @@ export const updateTemplate = createAsyncThunk<
         }
       );
 
-      console.log("✅ Шаблон успешно обновлен:", response.data);
       return response.data;
 
     } catch (error: any) {
-      console.error("❌ Ошибка обновления шаблона:", error);
       
       let errorMessage = "Не вдалося оновити шаблон";
       if (error.response) {
@@ -514,54 +510,8 @@ export const updateReport = createAsyncThunk<
 
       return response.data;
 
-    } catch (error: any) {
-      console.error("❌ Ошибка обновления отчета:", error);
-      
+    } catch (error: any) {      
       let errorMessage = "Не вдалося оновити звіт";
-      if (error.response) {
-        errorMessage = `Помилка ${error.response.status}: ${error.response.data?.message || error.response.statusText}`;
-      } else if (error.request) {
-        errorMessage = "Не вдалося отримати відповідь від сервера";
-      } else {
-        errorMessage = error.message || errorMessage;
-      }
-      
-      return rejectWithValue(errorMessage);
-    }
-  }
-);
-
-export const downloadPdf = createAsyncThunk<
-  Blob,
-  { 
-    id: string;
-    type: DocType;
-    format?: 'pdf' | 'html';
-  },
-  { state: RootState; rejectValue: string }
->(
-  "docs/downloadPdf",
-  async ({ id, type, format = 'pdf' }, { rejectWithValue, getState }) => {
-    try {
-      const token = getState().auth.accessToken;
-      
-      const headers: Record<string, string> = {};
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-
-      const response = await baseApi.get<Blob>(
-        `${type}s/${id}/export?format=${format}`,
-        { 
-          headers,
-          responseType: 'blob' 
-        }
-      );
-
-      return response.data;
-
-    } catch (error: any) {
-      let errorMessage = `Не вдалося завантажити ${format.toUpperCase()}`;
       if (error.response) {
         errorMessage = `Помилка ${error.response.status}: ${error.response.data?.message || error.response.statusText}`;
       } else if (error.request) {

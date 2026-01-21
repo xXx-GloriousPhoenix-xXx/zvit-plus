@@ -26,16 +26,9 @@ export async function packRepFile(
 ): Promise<Blob> {
     const zip = new JSZip();
 
-    // meta.json
     zip.file("meta.json", JSON.stringify(template.meta, null, 2));
+    zip.file("struct.json", JSON.stringify({ elements: template.elements }, null, 2));
 
-    // struct.json
-    zip.file(
-        "struct.json",
-        JSON.stringify({ elements: template.elements }, null, 2)
-    );
-
-    // preview.jpg
     if (previewElement) {
         try {
             const canvas = await html2canvas(previewElement, {
@@ -59,19 +52,27 @@ export async function packRepFile(
         }
     }
 
-    // data/
-    const dataFolder = zip.folder("data")!;
-    if (files) {
+    const nameCheckArray = ['meta.json', 'struct.json'];
+
+    if (files?.dataFiles && Object.keys(files.dataFiles).length > 0) {
+        const dataFolder = zip.folder("data")!;
         for (const [id, file] of Object.entries(files.dataFiles)) {
-            dataFolder.file(id, file);
+            const fileName = id.split('/').pop() || id;
+            if (!nameCheckArray.includes(fileName))
+            {
+                dataFolder.file(fileName, file);
+            }
         }
     }
 
-    // media/
-    const mediaFolder = zip.folder("media")!;
-    if (files) {
+    if (files?.mediaFiles && Object.keys(files.mediaFiles).length > 0) {
+        const mediaFolder = zip.folder("media")!;
         for (const [id, file] of Object.entries(files.mediaFiles)) {
-            mediaFolder.file(id, file);
+            const fileName = id.split('/').pop() || id;
+            if (!nameCheckArray.includes(fileName))
+            {
+                mediaFolder.file(fileName, file);
+            }
         }
     }
 

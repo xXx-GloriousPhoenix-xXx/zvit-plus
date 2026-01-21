@@ -55,8 +55,15 @@ export function MyWorkPage() {
 
     return (
         <section className={cl.Wrapper}>
-            <HeaderLine>Шаблони ({templates.totalCount})</HeaderLine>
-            <ItemList interactive={true} type="template" items={templates.items} />
+            {
+                templates.totalCount > 0
+                ? <>
+                    <HeaderLine>Шаблони ({templates.totalCount})</HeaderLine>
+                    <ItemList interactive={true} type="template" items={templates.items} />
+                </>
+                : <HeaderLine >Нема створених шаблонів</HeaderLine>
+            }
+
             {templates.totalPages > 1 && templates.totalCount > 0 && (
                 <div className={cl.PaginationContainer}>
                     <Pagination
@@ -67,8 +74,15 @@ export function MyWorkPage() {
                 </div>
             )}
             
-            <HeaderLine>Звіти ({reports.totalCount})</HeaderLine>
-            <ItemList interactive={true} type="report" items={reports.items} />
+            {
+                reports.totalCount > 0
+                ? <>
+                    <HeaderLine >Звіти ({reports.totalCount})</HeaderLine>
+                    <ItemList interactive={true} type="report" items={reports.items} />
+                </>
+                : <HeaderLine >Нема створених Звітів</HeaderLine>
+            }
+
             {reports.totalPages > 1 && reports.totalCount > 0 && (
                 <div className={cl.PaginationContainer}>
                     <Pagination

@@ -1,15 +1,12 @@
 // ReviewStep.tsx (полная версия)
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/shared/ui/Button/Button";
 import { ReviewCanvas } from "./Review/ReviewCanvas";
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import { 
   setEditorStep, 
-  clearEditorDraft,
-  resetSaveState, 
-  cloneTemplateToReport,
-  initEditor
+  cloneTemplateToReport
 } from "@/shared/api/doc/slice";
 import { 
   createReport, 
@@ -17,14 +14,15 @@ import {
   updateTemplate, 
   updateReport,
   deleteTemplate,
-  deleteReport,
-  downloadPdf 
+  deleteReport 
 } from "@/shared/api/doc/thunks";
 import type { RepTemplate } from "@/shared/types/repEditorTypes";
 import type { EditorMode, EditorType } from "@/shared/api/doc/slice";
 
 import cl from "./Step.module.css";
 import { ConfirmationDialogue } from "@/shared/ui/ConfirmationDialogue/ConfirmationDialogue";
+import { generateDocumentPdf } from "@/shared/utils/pdfGenerator";
+import { createRepFileName, packRepFile } from "@/shared/utils/repFileManager";
 
 interface ReviewStepProps {
     mode: EditorMode;
@@ -47,6 +45,7 @@ export function ReviewStep({
   const [error, setError] = useState<string | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+  const [repLoading, setRepLoading] = useState(false);
   const canvasRef = useRef<HTMLDivElement>(null);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -98,19 +97,28 @@ export function ReviewStep({
   };
 
   const handleDownloadPdf = async () => {
-    if (!editorState.originalId) return;
+    if (!canvasRef.current) {
+      setError("Не вдалося знайти вміст для генерації PDF");
+      return;
+    }
     
     setIsDownloadingPdf(true);
     setError(null);
     
     try {
-      await dispatch(downloadPdf({ 
-        id: editorState.originalId, 
-        type,
-        format: 'pdf' 
-      })).unwrap();
+      await generateDocumentPdf(
+        canvasRef.current,
+        template.meta,
+        `${template.meta.templateName || 'document'}.pdf`,
+        {
+          scale: 2,
+          margin: 5,
+          quality: 0.95,
+          autoSplit: true
+        }
+      );
     } catch (err: any) {
-      setError(err.message || "Помилка завантаження PDF");
+      setError(err.message || "Помилка генерації PDF");
     } finally {
       setIsDownloadingPdf(false);
     }
@@ -190,13 +198,45 @@ export function ReviewStep({
     }
   };
 
+  const handleDownloadRep = async () => {
+    setRepLoading(true);
+    setError(null);
+    
+    try {
+      const repBlob = await packRepFile(
+        template,
+        type === 'report' ? files! : undefined,
+        canvasRef.current 
+      );
+
+      const filename = createRepFileName(template.meta);
+      
+      const url = URL.createObjectURL(repBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      
+      // Очищаем
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 100);
+    } catch (err: any) {
+      console.error('REP generation error:', err);
+      setError(err.message || "Помилка генерації .rep файлу");
+    } finally {
+      setRepLoading(false);
+    }
+  };
+
   const handleFillTemplate = () => {
     navigate(`/reports/create`);
     dispatch(cloneTemplateToReport());
   };
 
   const isLoading = loading || saveState.loading || isDownloadingPdf;
-  const displayError = error || saveState.error;
 
   return (
     <div className={cl.Wrapper}>
@@ -206,18 +246,6 @@ export function ReviewStep({
           canvasRef={canvasRef}
         />
       </div>
-
-      {displayError && (
-        <div className={cl.ErrorMessage}>
-          {displayError}
-        </div>
-      )}
-
-      {saveState.success && (
-        <div className={cl.SuccessMessage}>
-          {type === 'template' ? 'Шаблон успішно збережено!' : 'Звіт успішно збережено!'}
-        </div>
-      )}
 
       <div className={cl.ButtonGroup}>
         {mode === 'view' ? (
@@ -242,13 +270,20 @@ export function ReviewStep({
               disabled={!editorState.originalId}
               extraClassName={cl.Button}
             />
+            <Button
+              variant="primary"
+              text={repLoading ? "Генерація REP..." : "Завантажити REP"}
+              onClick={handleDownloadRep}
+              disabled={isDownloadingPdf || repLoading}
+              extraClassName={cl.Button}
+            />
             {type === 'report'
                 ? <Button
-                    variant="primary"
-                    text={isDownloadingPdf ? "Завантаження..." : "Завантажити PDF"}
-                    onClick={handleDownloadPdf}
-                    disabled={!editorState.originalId || isDownloadingPdf}
-                    extraClassName={cl.Button}
+                  variant="primary"
+                  text={isDownloadingPdf ? "Завантаження..." : "Завантажити PDF"}
+                  onClick={handleDownloadPdf}
+                  disabled={!editorState.originalId || isDownloadingPdf}
+                  extraClassName={cl.Button}
                 />
                 : <Button
                     variant="primary"
@@ -270,7 +305,7 @@ export function ReviewStep({
             
             {mode === 'create' && onClearDraft && (
               <Button
-                variant="secondary"
+                variant="primary"
                 text="Очистити чернетку"
                 onClick={onClearDraft}
                 disabled={isLoading}
@@ -279,7 +314,7 @@ export function ReviewStep({
             )}
             
             <Button
-              variant="primary"
+              variant="secondary"
               text={isLoading 
                 ? (mode === 'create' ? 'Створення...' : 'Збереження...')
                 : (mode === 'create' ? 'Створити' : 'Зберегти зміни')

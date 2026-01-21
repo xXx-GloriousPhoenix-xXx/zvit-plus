@@ -126,7 +126,8 @@ namespace ZvitPlus.BLL.Services.Implementations
             var tokenDto = new TokenDTO(
                 AccessToken: _tokenGenerator.GenerateAccessToken(user),
                 RefreshToken: refreshToken,
-                ExpiresIn: _tokenGenerator.AccessExpiresInMinutes
+                ExpiresIn: _tokenGenerator.AccessExpiresInMinutes,
+                Role: user.Role
             );
             var refreshTokenEntity = new RefreshToken
             {
@@ -234,7 +235,8 @@ namespace ZvitPlus.BLL.Services.Implementations
             var tokenDto = new TokenDTO(
                 AccessToken: newAccessToken,
                 RefreshToken: refreshToken,
-                ExpiresIn: _tokenGenerator.AccessExpiresInMinutes
+                ExpiresIn: _tokenGenerator.AccessExpiresInMinutes,
+                Role: user.Role
             );
 
             return tokenDto;

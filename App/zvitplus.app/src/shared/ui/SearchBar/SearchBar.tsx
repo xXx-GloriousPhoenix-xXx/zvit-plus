@@ -162,18 +162,23 @@ export function SearchBar({
 
             <div className={cl.ActionButtons}>
                 <Button
+                        variant='primary'
                         type="submit"
                         text={isLoading ? "Пошук..." : "Пошук"}
                         disabled={isLoading}
                     />
                     
                     <Button
+                        variant='primary'
+
                         type="button"
                         text="Очистити"
                         onClick={handleClear}
                     />
                     
                     <Button
+                        variant='primary'
+
                         type="button"
                         text={showAdvanced ? "Сховати" : "Розширений пошук"}
                         onClick={() => setShowAdvanced(!showAdvanced)}
