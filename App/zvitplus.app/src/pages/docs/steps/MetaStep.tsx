@@ -93,7 +93,6 @@ export function MetaStep({ mode, type, value, onNext, onBack }: Props) {
                 }}
             />
 
-            {type === 'template' && (
                 <BoolCheckbox
                     label="Приватний"
                     checked={formData.isPrivate}
@@ -102,7 +101,6 @@ export function MetaStep({ mode, type, value, onNext, onBack }: Props) {
                     }
                     disabled={mode === 'view'}
                 />
-            )}
 
             <RadioGroup
                 label="Розмір аркушу"

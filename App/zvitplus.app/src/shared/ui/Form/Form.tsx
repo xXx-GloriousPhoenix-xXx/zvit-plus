@@ -82,7 +82,7 @@ export function Form(props: FormProps) {
                 <Button 
                     variant="secondary"
                     extraClassName={cl.Button}
-                    text="Увійти"
+                    text={methodDictionary[method].header}
                 />
                 {methodDictionary[method].hint}
             </div>

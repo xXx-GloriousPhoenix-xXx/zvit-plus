@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ZvitPlus.API.Context.Interfaces;
 using ZvitPlus.API.DTOs.ReportDTOs;
-using ZvitPlus.API.DTOs.TemplateDTOs;
-using ZvitPlus.BLL.Context;
 using ZvitPlus.BLL.DTOs.AdditionalDTOs;
 using ZvitPlus.BLL.DTOs.FileEntityDTOs;
 using ZvitPlus.BLL.DTOs.ReportDTOs;

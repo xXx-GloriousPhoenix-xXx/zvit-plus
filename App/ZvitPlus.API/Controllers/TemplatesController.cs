@@ -1,11 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System;
 using ZvitPlus.API.Context.Interfaces;
 using ZvitPlus.API.DTOs.TemplateDTOs;
 using ZvitPlus.BLL.DTOs.AdditionalDTOs;
-using ZvitPlus.BLL.DTOs.FileDTOs;
 using ZvitPlus.BLL.DTOs.FileEntityDTOs;
 using ZvitPlus.BLL.DTOs.TemplateDTOs;
 using ZvitPlus.BLL.Services.Interfaces;

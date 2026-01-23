@@ -1,4 +1,3 @@
-// shared/utils/templatePackage.ts
 import JSZip from "jszip";
 import type { RepTemplate, MetaValue, RepElement } from "@/shared/types/repEditorTypes";
 import html2canvas from "html2canvas";
