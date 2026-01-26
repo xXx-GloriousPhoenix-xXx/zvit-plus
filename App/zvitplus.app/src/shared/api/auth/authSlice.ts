@@ -4,6 +4,15 @@ import type { TokenResponse, LoginRequest, RegisterRequest } from "@/shared/api/
 import { REFRESH_TOKEN_KEY, TEMPLATE_DRAFT_KEY } from "@/shared/constants/localStorage";
 import { clearDraft } from "../templates/templateCreateSlice";
 
+export type UserRole = 'guest' | 'user' | 'mod' | 'admin';
+export type GrantableRole = Extract<UserRole, 'user' | 'mod'>;
+export const RolePriority: Record<UserRole, number> = {
+    'guest': 0,
+    'user': 1,
+    'mod': 2,
+    'admin': 3
+} as const;
+
 type AuthState = {
     accessToken: string | null;
     refreshToken: string | null;
@@ -12,6 +21,7 @@ type AuthState = {
     loading: boolean;
     initialized: boolean;
     error: string | null;
+    role: UserRole;
 };
 
 const initialState: AuthState = {
@@ -22,6 +32,7 @@ const initialState: AuthState = {
     loading: false,
     initialized: false,
     error: null,
+    role: 'guest'
 };
 
 export const loginUser = createAsyncThunk<TokenResponse, LoginRequest, { rejectValue: string }>(
@@ -52,7 +63,6 @@ export const logoutUser = createAsyncThunk<void, LogoutArgs, { rejectValue: stri
     async ({ refreshToken, accessToken }, { rejectWithValue, dispatch }) => {
         try {
             await authApi.logout(refreshToken, accessToken);
-            // Очищаем черновик при выходе
             dispatch(clearDraft());
         } catch {
             return rejectWithValue("Logout failed");
@@ -118,6 +128,7 @@ const authSlice = createSlice({
                 state.expiresIn = action.payload.expiresIn;
                 state.isAuth = true;
                 state.loading = false;
+                state.role = action.payload.role;
 
                 localStorage.setItem(REFRESH_TOKEN_KEY, action.payload.refreshToken);
             })
@@ -145,6 +156,7 @@ const authSlice = createSlice({
                 state.refreshToken = null;
                 state.expiresIn = null;
                 state.isAuth = false;
+                state.role = 'guest';
 
                 localStorage.removeItem(REFRESH_TOKEN_KEY);
                 localStorage.removeItem(TEMPLATE_DRAFT_KEY);
@@ -160,12 +172,14 @@ const authSlice = createSlice({
                 state.refreshToken = action.payload.refreshToken;
                 state.expiresIn = action.payload.expiresIn;
                 state.isAuth = true;
+                state.role = action.payload.role;
             })
             .addCase(refreshToken.rejected, (state, action) => {
                 state.accessToken = null;
                 state.refreshToken = null;
                 state.expiresIn = null;
                 state.isAuth = false;
+                state.role = 'guest';
                 state.error = action.payload ?? "Unknown refresh error";
             })
 

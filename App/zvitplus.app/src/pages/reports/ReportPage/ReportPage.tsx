@@ -1,4 +1,4 @@
-import { useReportPage } from "@/shared/lib/hooks/useReportPage.ts";
+import { useReportPage } from "@/shared/hooks/useReportPage";
 
 import cl from './ReportPage.module.css';
 import { NavLink } from "react-router-dom";

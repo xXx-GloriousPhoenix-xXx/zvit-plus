@@ -1,13 +1,24 @@
 import cl from './ReportCard.module.css';
-import { NavLink } from 'react-router-dom';
-import { formatFileSize, formatDate } from '@/shared/lib/utils/formatters';
+import { formatFileSize, formatDate } from '@/shared/utils/formatters';
 import type { ReportItemDTO } from '@/shared/api/reports/reportModels';
+import { A } from '../A/A';
+import { useCardActions } from '@/shared/hooks/useCardActions';
+import { useNavigate } from 'react-router-dom';
 
 interface ReportCardProps {
     report: ReportItemDTO;
+    interactive?: boolean;
 }
 
-export function ReportCard({ report }: ReportCardProps) {
+export function ReportCard({ report, interactive = false }: ReportCardProps) {
+    const {
+        handleView,
+        handleEdit,
+        handleDelete
+    } = useCardActions({ type: 'report', id: report.id });
+
+    const navigate = useNavigate();
+    
     return (
         <div className={cl.Wrapper}>
             <div className={cl.CardHeader}>
@@ -21,7 +32,7 @@ export function ReportCard({ report }: ReportCardProps) {
             
             <div className={cl.CardBody}>
                 <div className={cl.Data}>
-                    <div className={cl.InfoRow}>
+                    <div className={`${cl.InfoRow} ${cl.Author}`} onClick={() => navigate(`/profiles/${report.author}`)}>
                         <i className="fa-solid fa-user"></i>
                         <span>{report.author}</span>
                     </div>
@@ -43,12 +54,21 @@ export function ReportCard({ report }: ReportCardProps) {
                     </div>
                 </div>
                 <div className={cl.IconPanel}>
-                    <NavLink 
-                        to={`/templates/${report.id}`}
-                        className={cl.ControlButton}
-                    >
+                    <A onClick={handleView}>
                         <i className="fa-solid fa-eye"></i> Переглянути
-                    </NavLink>
+                    </A>
+                    {
+                        interactive && (
+                            <>
+                                <A onClick={handleEdit}>
+                                    <i className="fa-solid fa-screwdriver-wrench"></i> Редагувати
+                                </A>
+                                <A onClick={handleDelete}>
+                                    <i className="fa-solid fa-trash-can"></i> Видалити
+                                </A>
+                            </>
+                        )
+                    }
                 </div>
             </div>
         </div>

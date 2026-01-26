@@ -47,6 +47,9 @@ namespace ZvitPlus.BLL.Mappings
                 .ForCtorParam("FileSize", opt => opt.MapFrom(src => src.FileSize))
                 .ForCtorParam("CreatedAt", opt => opt.MapFrom(src => src.CreatedAt))
                 .ForCtorParam("UpdatedAt", opt => opt.MapFrom(src => src.UpdatedAt));
+
+            CreateMap<UpdateReportDTO, UpdateFileDTO>();
+            CreateMap<UpdateTemplateDTO, UpdateFileDTO>();
         }
     }
 }

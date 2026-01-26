@@ -198,6 +198,7 @@ namespace ZvitPlus.BLL.Services.Implementations
                 }
 
                 _unitOfWork.Reports.Update(entity);
+
                 await _unitOfWork.CompleteAsync(ct);
                 await _unitOfWork.CommitTransactionAsync(ct);
                 AppLogger.LogActionCompleted(_logger, "Оновлення звіту", id);

@@ -1,3 +1,5 @@
+import type { UserRole } from "./authSlice";
+
 export type LoginRequest = {
     loginOrEmail: string;
     password: string;
@@ -13,4 +15,5 @@ export type TokenResponse = {
     accessToken: string;
     refreshToken: string;
     expiresIn: number;
+    role: UserRole;
 };

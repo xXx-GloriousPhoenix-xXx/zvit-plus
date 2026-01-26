@@ -1,0 +1,301 @@
+.Wrapper {
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+.Wrapper i {
+    color: var(--primary-color);
+}
+.Header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.Header h1 {
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.Subtitle {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+.DropZone {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    text-align: center;
+    background-color: transparent;
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
+}
+
+.DropZone:hover {
+    border-color: var(--primary-color);
+    background-color: rgba(var(--primary-rgb), 0.05);
+}
+
+.DropZone.HasFile {
+    border-color: var(--success-color);
+    background-color: rgba(var(--success-rgb), 0.05);
+}
+
+.DropZoneContent {
+    border: 0.05em dashed var(--primary-color);
+    border-radius: var(--border-radius);
+    padding: 2rem 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: fit-content;
+    gap: 1.5rem;
+}
+
+.UploadIcon {
+    font-size: 3rem;
+    color: var(--primary-color);
+}
+
+.Instructions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.DragText {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.FileInputLabel {
+    display: inline-block;
+}
+
+.FileInput {
+    display: none;
+}
+
+.BrowseButton {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.BrowseButton:hover {
+    background-color: var(--dark-color);
+}
+
+.FileTypes {
+    color: var(--text-tertiary);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.FileInfo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.1rem;
+}
+
+.FileInfo i {
+    color: var(--success-color);
+    font-size: 1.5rem;
+}
+
+.FileName {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.FileSize {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.ChangeFile {
+    margin: 0.5rem 0 0;
+}
+
+.ChangeFile button {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    font-size: inherit;
+    font-family: inherit;
+    padding: 0.5rem 1rem;
+    text-decoration: underline;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.2s;
+}
+
+.ChangeFile button:hover {
+    color: var(--primary-dark);
+    text-decoration: none;
+}
+
+.ChangeFile button:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.ChangeFile button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Убедитесь, что кнопка не перекрыта другими элементами */
+.ChangeFile {
+    position: relative;
+    z-index: 100;
+}
+
+.Preview {
+    background-color: var(--background-secondary);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.Preview h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.PreviewInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.PreviewRow {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.PreviewLabel {
+    font-weight: 500;
+    min-width: 100px;
+    color: var(--text-secondary);
+}
+
+.PreviewValue {
+    color: var(--text-primary);
+}
+
+.ValidationError,
+.Error {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+}
+
+.ValidationError {
+    background-color: rgba(var(--warning-rgb), 0.1);
+    color: var(--warning-color);
+    border: 1px solid var(--warning-color);
+}
+
+.Error {
+    background-color: rgba(var(--danger-rgb), 0.1);
+    color: var(--danger-color);
+    border: 1px solid var(--danger-color);
+}
+
+.ValidationError i,
+.Error i {
+    font-size: 1.2rem;
+}
+
+.Actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 3rem;
+}
+
+.Button {
+    min-width: 180px;
+}
+
+.HelpSection {
+    background-color: var(--background-secondary);
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.HelpSection h4 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.HelpList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.HelpList li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.HelpList i {
+    color: var(--primary-color);
+    margin-top: 0.2rem;
+}
+
+.DragOver {
+    border-color: var(--primary-color) !important;
+    background-color: rgba(var(--primary-rgb), 0.05) !important;
+    transform: scale(1.01);
+    transition: all 0.2s ease;
+}
+
+.FileInputLabel {
+    pointer-events: auto;
+}
+
+.FileDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.OrText {
+    margin: 0;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.BrowseButton i {
+    color: var(--white);
+    margin-right: 0.5rem;
+}

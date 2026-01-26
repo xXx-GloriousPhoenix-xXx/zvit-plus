@@ -13,10 +13,11 @@ type RadioGroupProps = {
     error?: string;
     value: string;
     onChange: (value: string) => void;
+    disabled?: boolean;
 } & ComponentPropsWithoutRef<"div">;
 
 export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
-    ({ label, options, error, value, onChange, ...rest }, ref) => {
+    ({ label, options, error, value, onChange, disabled, ...rest }, ref) => {
         return (
             <div className={cl.Wrapper} ref={ref} {...rest}>
                 <span className={cl.Label}>{label}</span>
@@ -30,8 +31,9 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
                                 value={o.value}
                                 checked={value === o.value}
                                 onChange={() => onChange(o.value)}
+                                disabled={disabled}
                             />
-                            <span>{o.label}</span> {/* эта span — визуальная кнопка */}
+                            <span>{o.label}</span>
                         </label>
                     ))}
                 </div>

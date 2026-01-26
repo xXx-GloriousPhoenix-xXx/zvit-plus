@@ -2,7 +2,7 @@ import { useAppDispatch, useAppSelector } from '@/app/store/hooks';
 import cl from './HomePage.module.css';
 import { getStats } from '@/shared/api/stats/thunks';
 import { useEffect } from 'react';
-import { formatQuantity } from '@/shared/lib/utils/formatters';
+import { formatQuantity } from '@/shared/utils/formatters';
 import { HeaderLine } from '@/shared/ui/HeaderLine/HeaderLine';
 import { NavLink } from 'react-router-dom';
 

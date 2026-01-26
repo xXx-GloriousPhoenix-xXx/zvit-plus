@@ -63,13 +63,11 @@ export function LoginPage() {
                     type="password"
                     disabled={loading}
                 />
-
-                {error && <p className={cl.Error}>{error}</p>}
             </Form>
             <div className={cl.Test}>
-                <Button text="admin" onClick={() => fillTestData(0)} />
-                <Button text="mod" onClick={() => fillTestData(1)} />
-                <Button text="user" onClick={() => fillTestData(2)} />
+                <Button variant="primary" text="admin" onClick={() => fillTestData(0)} />
+                <Button variant="primary" text="mod" onClick={() => fillTestData(1)} />
+                <Button variant="primary" text="user" onClick={() => fillTestData(2)} />
             </div>
         </section>
     );

@@ -3,13 +3,13 @@ import { useState, useEffect } from 'react';
 import { Input } from '@/shared/ui/Input/Input';
 import { Select } from '@/shared/ui/Select/Select';
 import { Button } from '@/shared/ui/Button/Button';
-import type { SearchTemplateParams } from '@/shared/api/templates/templateModels';
 import cl from './SearchBar.module.css';
+import type { SearchParams } from '@/shared/api/doc/models';
 
 interface SearchBarProps {
-    onSearch: (params: SearchTemplateParams) => void;
+    onSearch: (params: SearchParams) => void;
     onClear?: () => void;
-    initialParams?: SearchTemplateParams;
+    initialParams?: SearchParams;
     templateTypes?: Array<{ id: string; name: string }>;
     isLoading?: boolean;
 }
@@ -21,14 +21,14 @@ export function SearchBar({
     templateTypes = [],
     isLoading = false 
 }: SearchBarProps) {
-    const [params, setParams] = useState<SearchTemplateParams>(initialParams);
+    const [params, setParams] = useState<SearchParams>(initialParams);
     const [showAdvanced, setShowAdvanced] = useState(false);
 
     useEffect(() => {
         setParams(initialParams);
     }, [initialParams]);
 
-    const handleInputChange = (key: keyof SearchTemplateParams, value: string) => {
+    const handleInputChange = (key: keyof SearchParams, value: string) => {
         setParams(prev => ({
             ...prev,
             [key]: value || undefined
@@ -38,7 +38,7 @@ export function SearchBar({
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         
-        const cleanedParams: SearchTemplateParams = {};
+        const cleanedParams: SearchParams = {};
         
         if (params.name && params.name.trim() !== '') {
             cleanedParams.name = params.name.trim();
@@ -66,7 +66,7 @@ export function SearchBar({
     };
 
     const handleClear = () => {
-        const clearedParams: SearchTemplateParams = {};
+        const clearedParams: SearchParams = {};
         setParams(clearedParams);
         
         if (onClear) {
@@ -162,18 +162,23 @@ export function SearchBar({
 
             <div className={cl.ActionButtons}>
                 <Button
+                        variant='primary'
                         type="submit"
                         text={isLoading ? "Пошук..." : "Пошук"}
                         disabled={isLoading}
                     />
                     
                     <Button
+                        variant='primary'
+
                         type="button"
                         text="Очистити"
                         onClick={handleClear}
                     />
                     
                     <Button
+                        variant='primary'
+
                         type="button"
                         text={showAdvanced ? "Сховати" : "Розширений пошук"}
                         onClick={() => setShowAdvanced(!showAdvanced)}

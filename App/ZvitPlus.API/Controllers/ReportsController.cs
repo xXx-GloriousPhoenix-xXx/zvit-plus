@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ZvitPlus.API.Context.Interfaces;
 using ZvitPlus.API.DTOs.ReportDTOs;
-using ZvitPlus.API.DTOs.TemplateDTOs;
-using ZvitPlus.BLL.Context;
 using ZvitPlus.BLL.DTOs.AdditionalDTOs;
 using ZvitPlus.BLL.DTOs.FileEntityDTOs;
 using ZvitPlus.BLL.DTOs.ReportDTOs;
@@ -24,6 +22,22 @@ namespace ZvitPlus.API.Controllers
             [FromForm] CreateReportDTORequest request,
             CancellationToken ct = default)
         {
+            if (!ModelState.IsValid)
+            {
+                foreach (var kv in ModelState)
+                {
+                    Console.WriteLine($"{kv.Key}: {kv.Value.Errors.Count} errors");
+                    foreach (var err in kv.Value.Errors)
+                        Console.WriteLine($"  -> {err.ErrorMessage}");
+                }
+                return BadRequest(ModelState);
+            }
+
+            if (request.File == null)
+                return BadRequest("File is required");
+
+            Console.WriteLine($"In Controller: {request.TemplateId}");
+
             var dto = new CreateReportDTO(
                 Name: request.Name,
                 TemplateId: request.TemplateId,
@@ -39,7 +53,7 @@ namespace ZvitPlus.API.Controllers
         [Authorize(Policy = "UserLevel")]
         public async Task<ActionResult<GetFileEntityDTO>> UpdateAsync(
             [FromRoute] Guid id,
-            [FromBody] UpdateReportDTORequest request,
+            [FromForm] UpdateReportDTORequest request,
             CancellationToken ct = default)
         {
             var dto = new UpdateReportDTO(
@@ -76,7 +90,6 @@ namespace ZvitPlus.API.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Policy = "UserLevel")]
         public async Task<ActionResult<GetFileEntityDTO>> GetById(
             [FromRoute] Guid id,
             CancellationToken ct = default)
@@ -98,7 +111,6 @@ namespace ZvitPlus.API.Controllers
         }
 
         [HttpGet("{id}/download")]
-        [Authorize]
         public async Task<IActionResult> DownloadAsync([FromRoute] Guid id, CancellationToken ct = default)
         {
             var (entity, stream) = await _service.DownloadAsync(id, ct);

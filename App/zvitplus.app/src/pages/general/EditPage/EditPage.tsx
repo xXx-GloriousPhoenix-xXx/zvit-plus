@@ -1,12 +1,12 @@
-import type { EditorMode } from "@/shared/types/repEditorTypes";
 import cl from './EditPage.module.css';
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks";
 import { useEffect, useRef } from "react";
 import { getFile, getMeta } from "@/shared/api/file/thunks";
 import { useParams } from "react-router-dom";
 
-import { ReviewCanvas } from "@/pages/templates/TemplateCreatePage/Review/ReviewCanvas";
+import { ReviewCanvas } from "@/pages/docs/steps/Review/ReviewCanvas";
 import { revokeFileUrls } from "@/shared/api/file/slice";
+import type { EditorMode } from '@/shared/api/doc/slice';
 
 interface Props {
     mode: EditorMode;

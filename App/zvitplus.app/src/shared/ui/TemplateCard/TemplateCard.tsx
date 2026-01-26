@@ -1,14 +1,27 @@
 // shared/ui/TemplateCard/TemplateCard.tsx
 import type { TemplateItemDTO } from '@/shared/api/templates/templateModels';
 import cl from './TemplateCard.module.css';
-import { NavLink } from 'react-router-dom';
-import { formatFileSize, formatDate } from '@/shared/lib/utils/formatters';
+import { formatFileSize, formatDate } from '@/shared/utils/formatters';
+import { A } from '../A/A';
+import { useCardActions } from '@/shared/hooks/useCardActions';
+import { useProfileActions } from '@/shared/hooks/useProfileActions';
+import { useNavigate } from 'react-router-dom';
 
 interface TemplateCardProps {
     template: TemplateItemDTO;
+    interactive?: boolean;
 }
 
-export function TemplateCard({ template }: TemplateCardProps) {
+export function TemplateCard({ template, interactive = false }: TemplateCardProps) {
+    const {
+        handleCreate,
+        handleView,
+        handleEdit,
+        handleDelete
+    } = useCardActions({ type: 'template', id: template.id });
+
+    const navigate = useNavigate();
+
     return (
         <div className={cl.Wrapper}>
             <div className={cl.CardHeader}>
@@ -22,7 +35,7 @@ export function TemplateCard({ template }: TemplateCardProps) {
             
             <div className={cl.CardBody}>
                 <div className={cl.Data}>
-                    <div className={cl.InfoRow}>
+                    <div className={`${cl.InfoRow} ${cl.Author}`} onClick={() => navigate(`/profiles/${template.author}`)}>
                         <i className="fa-solid fa-user"></i>
                         <span>{template.author}</span>
                     </div>
@@ -44,12 +57,24 @@ export function TemplateCard({ template }: TemplateCardProps) {
                     </div>
                 </div>
                 <div className={cl.IconPanel}>
-                    <NavLink 
-                        to={`/templates/${template.id}`}
-                        className={cl.ControlButton}
-                    >
+                    <A onClick={handleView}>
                         <i className="fa-solid fa-eye"></i> Переглянути
-                    </NavLink>
+                    </A>
+                    <A onClick={handleCreate!}>
+                        <i className="fas fa-edit"></i> Заповнити
+                    </A>
+                    {
+                        interactive && (
+                            <>
+                                <A onClick={handleEdit}>
+                                    <i className="fa-solid fa-screwdriver-wrench"></i> Редагувати
+                                </A>
+                                <A onClick={handleDelete}>
+                                    <i className="fa-solid fa-trash-can"></i> Видалити
+                                </A>
+                            </>
+                        )
+                    }
                 </div>
             </div>
         </div>

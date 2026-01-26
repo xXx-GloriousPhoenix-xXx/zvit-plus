@@ -1,0 +1,150 @@
+/* ReviewCanvas.module.css */
+.ReviewCanvasWrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+    padding: 1rem;
+}
+
+.TemplateInfo {
+    background: var(--white);
+    border: 0.05em solid #ddd;
+    box-shadow: var(--shadow);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    height: fit-content;
+    position: sticky;
+    top: 1rem;
+    z-index: 10;
+}
+
+.TemplateInfo h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: #1f2937;
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+.InfoGrid {
+    display: flex;
+    flex-flow: column nowrap;
+    gap: 1rem;
+}
+
+.InfoItem {
+    display: flex;
+    flex-direction: row;
+    gap: 0.25rem;
+}
+
+.InfoLabel {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.InfoValue {
+    font-size: 0.95rem;
+    color: #1f2937;
+    font-weight: 500;
+}
+
+.Element {
+    position: absolute;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: none !important;
+}
+
+/* .ElementLabel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 2px 0 4px 0;
+    z-index: 10;
+} */
+
+.ElementContent {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.TextContent {
+    width: 100%;
+    height: 100%;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.PlaceholderIcon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #9ca3af;
+    gap: 0.5rem;
+}
+
+.ImageLabel,
+.ChartLabel {
+    font-size: 0.75rem;
+    color: #6b7280;
+    text-align: center;
+}
+
+.TablePreview {
+    width: 100%;
+    height: 100%;
+    font-size: 0.75rem;
+}
+
+.TableHeaderCell {
+    padding: 4px 8px;
+    border-bottom: 2px solid #d1d5db;
+    border-right: 1px solid #e5e7eb;
+    background-color: #f9fafb;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    min-height: 32px;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+}
+
+.TableCell {
+    padding: 4px 8px;
+    border-bottom: 1px solid #e5e7eb;
+    border-right: 1px solid #e5e7eb;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    min-height: 32px;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+}
+
+.ReviewCanvas {
+    background-color: var(--white);
+    border: 0.05rem solid #ddd;
+    box-shadow: var(--shadow);
+    border-radius: 0;
+}
+
+.ImageContent {
+    display: flex;
+    width: 100%;
+    height: 100%;
+
+}

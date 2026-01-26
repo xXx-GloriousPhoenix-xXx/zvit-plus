@@ -1,0 +1,25 @@
+.MarginedButton {
+    margin-top: 1em;
+}
+.Button,
+.MarginedButton {
+    display: flex;
+    border: 0.05em solid var(--primary-color);
+    color: var(--primary-color);
+    flex: 1 1 45%;
+}
+.Button:hover,
+.MarginedButton:hover {
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+.Control {
+    display: flex;
+    width: 100%;
+    gap: 1em;
+}
+.ButtonGroup {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 1em;
+}

@@ -11,12 +11,11 @@ import { TemplatePage } from '@/pages/templates/TemplatePage/TemplatePage';
 import { ReportPage } from '@/pages/reports/ReportPage/ReportPage';
 
 import { NotFoundPage } from '@/pages/extra/NotFoundPage/NotFoundPage';
-import { TemplateCreatePage } from '@/pages/templates/TemplateCreatePage/TemplateCreatePage';
 import { HomePage } from '@/pages/general/HomePage/HomePage';
 import { ProtectedOutlet } from '@/widgets/layouts/ProtectedOutlet/ProtectedOutlet';
-import { ReportCreatePage } from '@/pages/reports/ReportCreatePage/ReportCreatePage';
-import { EditPage } from '@/pages/general/EditPage/EditPage';
 import { UploadPage } from '@/pages/general/UploadPage/UploadPage';
+import { DocEditorPage } from '@/pages/docs/DocEditorPage';
+import { ProfilePage } from '@/pages/general/ProfilePage/ProfilePage';
 
 export const router = createBrowserRouter([
     {
@@ -44,13 +43,13 @@ export const router = createBrowserRouter([
         element: <MainOutlet/>,
         children: [
             { index: true, element: <TemplatePage/> },
+            { path: ":id", element: <DocEditorPage mode="view" type="template" /> },
             {
                 element: <ProtectedOutlet />,
                 children: [
-                    { path: "upload", element: <UploadPage mode="template" /> },
-                    { path: "create", element: <TemplateCreatePage /> },
-                    { path: ":id", element: <EditPage mode="template" readonly={true} />},
-                    { path: ":id/edit", element: <EditPage mode="template" readonly={false} /> }
+                    { path: "upload", element: <UploadPage mode='template' /> },
+                    { path: "create", element: <DocEditorPage mode="create" type="template" /> },
+                    { path: ":id/edit", element: <DocEditorPage mode="edit" type="template" /> }
                 ]
             }
         ]
@@ -60,15 +59,23 @@ export const router = createBrowserRouter([
         element: <MainOutlet/>,
         children: [
             { index: true, element: <ReportPage/> },
+            { path: ":id", element: <DocEditorPage mode="view" type="report" /> },
             {
                 element: <ProtectedOutlet />,
                 children: [
                     { path: "upload", element: <UploadPage mode="report" /> },
-                    { path: "create", element: <ReportCreatePage /> },
-                    { path: ":id", element: <EditPage mode="report" readonly={true} />},
-                    { path: ":id/edit", element: <EditPage mode="report" readonly={false} /> }
+                    { path: "create", element: <DocEditorPage mode="create" type="report" /> },
+                    { path: ":id/edit", element: <DocEditorPage mode="edit" type="report" /> }
                 ]
             }
+        ]
+    },
+    {
+        path: "/profiles",
+        element: <MainOutlet/>,
+        children: [
+            { index: true, element: <Navigate to="/my-works" replace /> },
+            { path: ":login", element: <ProfilePage /> }
         ]
     },
     // { 

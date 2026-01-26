@@ -2,7 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import type { FileGetArgs, FileItemDTO } from "./models";
 import type { RootState } from "@/app/store/store";
 import { baseApi } from "../baseApi";
-import { unpackRepFile, type RepTemplateData, type RepTemplateFiles } from "@/shared/lib/utils/repFileManager";
+import { unpackRepFile, type RepTemplateData, type RepTemplateFiles } from "@/shared/utils/repFileManager";
 
 export const getMeta = createAsyncThunk<
     FileItemDTO,

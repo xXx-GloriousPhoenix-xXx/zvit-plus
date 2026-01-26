@@ -1,11 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System;
 using ZvitPlus.API.Context.Interfaces;
 using ZvitPlus.API.DTOs.TemplateDTOs;
 using ZvitPlus.BLL.DTOs.AdditionalDTOs;
-using ZvitPlus.BLL.DTOs.FileDTOs;
 using ZvitPlus.BLL.DTOs.FileEntityDTOs;
 using ZvitPlus.BLL.DTOs.TemplateDTOs;
 using ZvitPlus.BLL.Services.Interfaces;
@@ -57,7 +54,7 @@ namespace ZvitPlus.API.Controllers
         [Authorize(Policy = "UserLevel")]
         public async Task<ActionResult<GetFileEntityDTO>> UpdateAsync(
             [FromRoute] Guid id,
-            [FromBody] UpdateTemplateDTORequest request,
+            [FromForm] UpdateTemplateDTORequest request,
             CancellationToken ct = default)
         {
             var dto = new UpdateTemplateDTO(
@@ -95,7 +92,6 @@ namespace ZvitPlus.API.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Policy = "UserLevel")]
         public async Task<ActionResult<GetFileEntityDTO>> GetById(
             [FromRoute] Guid id,
             CancellationToken ct = default)
@@ -117,7 +113,6 @@ namespace ZvitPlus.API.Controllers
         }
 
         [HttpGet("{id}/download")]
-        [Authorize]
         public async Task<IActionResult> DownloadAsync([FromRoute] Guid id, CancellationToken ct = default)
         {
             var (entity, stream) = await _service.DownloadAsync(id, ct);

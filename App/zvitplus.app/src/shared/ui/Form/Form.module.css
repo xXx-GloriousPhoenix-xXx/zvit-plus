@@ -10,9 +10,6 @@
 }
 .Button {
     margin-top: 1.25em;
-    border: none;
-    background-color: var(--primary-color);
-    color: var(--white);
 }
 .Button:hover {
     background-color: var(--dark-color);
@@ -49,4 +46,9 @@
 }
 .Hint a:hover {
     text-decoration: underline;
+}
+.SubmitWrapper {
+    display: flex;
+    width: 100%;
+    flex-flow: column nowrap;
 }

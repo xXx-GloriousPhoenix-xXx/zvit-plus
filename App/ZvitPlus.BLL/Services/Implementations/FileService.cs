@@ -81,6 +81,7 @@ namespace ZvitPlus.BLL.Services.Implementations
 
             try
             {
+                // НЕ начинаем новую транзакцию - используем существующую из ReportService
                 if (dto.File is not null)
                 {
                     if (File.Exists(entity.FilePath))
@@ -94,6 +95,7 @@ namespace ZvitPlus.BLL.Services.Implementations
                     var fileInfo = new FileInfo(entity.FilePath);
                     entity.FileSize = fileInfo.Length;
                 }
+
                 if (dto.Name is not null)
                 {
                     entity.Name = dto.Name;
@@ -106,13 +108,19 @@ namespace ZvitPlus.BLL.Services.Implementations
 
                 _unitOfWork.Files.Update(entity);
 
+                // ВАЖНО: Сохраняем изменения
+                await _unitOfWork.CompleteAsync(ct);  // ← Добавить эту строку
+
                 AppLogger.LogActionCompleted(_logger, "Оновлення файлу", entityId);
 
                 return entity;
             }
-            catch
+            catch (Exception ex)  // ← Добавить логгирование конкретной ошибки
             {
-                await _unitOfWork.RollbackTransactionAsync(ct);
+                AppLogger.LogActionFailed(_logger, "оновлення файлу", entityId);
+
+                // Удалить ненужный rollback - пусть ReportService управляет транзакцией
+                // await _unitOfWork.RollbackTransactionAsync(ct);
 
                 if (backupFilePath is not null && File.Exists(backupFilePath))
                 {
@@ -127,17 +135,22 @@ namespace ZvitPlus.BLL.Services.Implementations
                         var fileInfo = new FileInfo(entity.FilePath);
                         entity.FileSize = fileInfo.Length;
                     }
-
                 }
 
-                AppLogger.LogActionFailed(_logger, "оновлення файлу", entityId);
-                throw;
+                throw new BusinessException($"Помилка оновлення файлу: {ex.Message}");
             }
             finally
             {
                 if (backupFilePath is not null && File.Exists(backupFilePath))
                 {
-                    File.Delete(backupFilePath);
+                    try
+                    {
+                        File.Delete(backupFilePath);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning($"Не вдалося видалити backup файл: {ex.Message}");
+                    }
                 }
             }
         }
@@ -179,22 +192,21 @@ namespace ZvitPlus.BLL.Services.Implementations
             entity.IsDeleted = true;
             _unitOfWork.Files.Update(entity);
 
-
-            await _unitOfWork.BeginTransactionAsync(ct);
-            try
-            {
-                await _unitOfWork.CompleteAsync(ct);
-                await _unitOfWork.CommitTransactionAsync(ct);
+            //await _unitOfWork.BeginTransactionAsync(ct);
+            //try
+            //{
+            //    await _unitOfWork.CompleteAsync(ct);
+            //    await _unitOfWork.CommitTransactionAsync(ct);
 
                 AppLogger.LogActionCompleted(_logger, "Видалення файлу", entityId);
-            }
-            catch
-            {
-                await _unitOfWork.RollbackTransactionAsync(ct);
+            //}
+            //catch
+            //{
+            //    await _unitOfWork.RollbackTransactionAsync(ct);
 
-                AppLogger.LogActionFailed(_logger, "видалення файлу", entityId);
-                throw new BusinessException("Помилка видалення файлу");
-            }
+            //    AppLogger.LogActionFailed(_logger, "видалення файлу", entityId);
+            //    throw new BusinessException("Помилка видалення файлу");
+            //}
         }
 
         public async Task<PagedResponse<GetFileEntityDTO>> GetPageAsync(UserContext context, FileType ft, int page = 1, int pageSize = 10, SearchFileEntityDTO? search = null, CancellationToken ct = default)
