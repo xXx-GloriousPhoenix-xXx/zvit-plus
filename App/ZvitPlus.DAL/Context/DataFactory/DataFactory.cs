@@ -15,9 +15,9 @@ namespace ZvitPlus.DAL.Context.DataFactory
         private readonly string _basePath = configuration["DataStorage:BasePath"]!;
         public async Task InitializeAsync(CancellationToken ct = default)
         {
-            //await ClearEntitiesAsync(ct);
-            //await InitializeUsersAsync(ct);
-            //await InitializeTemplateTypesAsync(ct);
+            await ClearEntitiesAsync(ct);
+            await InitializeUsersAsync(ct);
+            await InitializeTemplateTypesAsync(ct);
         }
         private async Task InitializeUsersAsync(CancellationToken ct = default)
         {
